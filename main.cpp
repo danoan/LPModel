@@ -1,6 +1,62 @@
 #include <iostream>
-#include <opencv2/imgcodecs.hpp>
-#include <set>
+
+#include "DGtal/shapes/ShapeFactory.h"
+#include "DGtal/shapes/GaussDigitizer.h"
+#include "DGtal/shapes/Shapes.h"
+
+#include "DIPaCUS/base/Representation.h"
+#include "DIPaCUS/components/Transform.h"
+#include "DIPaCUS/components/Morphology.h"
+#include "DIPaCUS/derivates/Misc.h"
+
+#include "SCaBOliC/Core/ODRUtils.h"
+#include "SCaBOliC/Core/ODRPixels.h"
+
+typedef DGtal::Z2i::DigitalSet DigitalSet;
+typedef DGtal::Z2i::Domain Domain;
+
+typedef DGtal::Z2i::Space Space;
+typedef DGtal::NGon2D<Space> NGon2D;
+
+typedef DIPaCUS::Misc::DigitalBoundary<DIPaCUS::Neighborhood::FourNeighborhoodPredicate> FourDigitalBoundary;
+typedef SCaBOliC::Core::ODRPixels ODRPixels;
+
+DigitalSet square()
+{
+    NGon2D square(0,0,10,4,3.1416/4.0);
+    DGtal::GaussDigitizer<Space,NGon2D> gd;
+
+    gd.init(square.getLowerBound(),square.getUpperBound(),1.0);
+    gd.attach(square);
+
+    Domain domain(square.getLowerBound(),square.getUpperBound());
+    DigitalSet ds(domain);
+    DGtal::Shapes<Domain>::digitalShaper(ds,gd);
+
+    return DIPaCUS::Transform::bottomLeftBoundingBoxAtOrigin(ds);
+}
+
+ODRModel odrModel(const DigitalSet& originalDS)
+{
+    const Domain& domain = originalDS.domain();
+    DigitalSet boundary(domain);
+    DigitalSet optRegion(domain);
+
+    ODRPixels odrPixels(ODRModel::AC_PIXEL,ODRModel::CM_PIXEL,3,ODRModel::FourNeighborhood);
+    ODRModel odrModel = odrPixels.createODR(ODRModel::OM_OriginalBoundary,ODRModel::AM_AroundBoundary,3,originalDS);
+
+    DigitalSet optRegionDS = odrModel.optRegion;
+    optRegionDS.insert(odrModel.applicationRegion.begin(),odrModel.applicationRegion.end());
+
+    return ODRModel(odrModel.domain,
+                    odrModel.original,
+                    optRegionDS,odrModel.trustFRG,
+                    odrModel.trustBKG,
+                    odrModel.applicationRegion,
+                    odrModel.toImageCoordinates);
+
+}
+
 
 enum LinelOrientation{Left,Down,Right,Up};
 typedef LinelOrientation EdgeOrientation;
@@ -25,19 +81,23 @@ struct Pixel
 
 struct Linel
 {
-    Linel(const Pixel& p1, const Pixel& p2, const LinelOrientation& orientation):p1(p1),
-                                                                                 p2(p2),
-                                                                                 orientation(orientation)
+    Linel(const Pixel& p1,
+          const Pixel& p2,
+          const LinelOrientation& orientation,
+          const int linelIndex):p1(p1),
+                                p2(p2),
+                                orientation(orientation),
+                                linelIndex(linelIndex)
     {}
 
     bool operator<(const Linel& other) const
     {
-        if(p1.varIndex!=other.p2.varIndex) return p1.varIndex < other.p1.varIndex;
-        else return p1.orientation==LinelOrientation::Up;
+        return this->linelIndex < other.linelIndex;
     }
 
     const Pixel &p1,&p2;
     const LinelOrientation orientation;
+    const int linelIndex;
 };
 
 struct Edge
@@ -52,50 +112,74 @@ struct Edge
     const int varIndex;
 };
 
-struct ExtendedImage
+struct ExtendedRegion
 {
-    ExtendedImage(const cv::Mat& image, int border):image(image),
-                                                    border(border),
-                                                    extW(image.cols+2*border),
-                                                    extH(image.rows+2*border)
+private:
+    static int _width(const DigitalSet& ds)
+    {
+        DGtal::Z2i::Point lb,ub;
+        ds.computeBoundingBox(lb,ub);
+        DGtal::Z2i::Point dimSize = ub-lb+DGtal::Z2i::Point(1,1);
+
+        return dimSize(0);
+    }
+
+    static int _height(const DigitalSet& ds)
+    {
+        DGtal::Z2i::Point lb,ub;
+        ds.computeBoundingBox(lb,ub);
+        DGtal::Z2i::Point dimSize = ub-lb+DGtal::Z2i::Point(1,1);
+
+        return dimSize(1);
+    }
+public:
+    ExtendedRegion(const DigitalSet& ds,
+                   int border):digitalSet(ds),
+                               border(border),
+                               width(_width(ds)),
+                               height(_height(ds)),
+                               extW(width+2*border),
+                               extH(height+2*border)
     {}
 
-    const cv::Mat& image;
+    const DigitalSet& digitalSet;
     const int border;
+    const int width;
+    const int height;
     const int extW;
     const int extH;
 };
 
-CellType resolveCellType(const ExtendedImage& extImage,int row,int col)
+CellType resolveCellType(const ExtendedRegion& extRegion,int row,int col)
 {
-    int border = extImage.border;
+    int border = extRegion.border;
     row -= border;
     col -= border;
 
     if(row<=-(border+1) || col<=-(border+1)) return CellType::Not_Defined;
-    if(row>=(extImage.extH-border) || col>=(extImage.extW-border)) return CellType::Not_Defined;
+    if(row>=(extRegion.extH-border) || col>=(extRegion.extW-border)) return CellType::Not_Defined;
 
     if(row<=-border || col<=-border) return CellType::Border;
-    if(row>=(extImage.extH-border-1) || col>=(extImage.extW-border-1)) return CellType::Border;
+    if(row>=(extRegion.extH-border-1) || col>=(extRegion.extW-border-1)) return CellType::Border;
 
     if(row<=-1 || col<=-1) return CellType::Aux;
-    if(row>=extImage.image.rows || col>=extImage.image.cols) return CellType::Aux;
+    if(row>=extRegion.height || col>=extRegion.width) return CellType::Aux;
 
     return CellType::Normal;
 }
 
 void createPixelSet(std::vector<Pixel>& pxlVector,
-                    const ExtendedImage& extImage)
+                    const ExtendedRegion& extRegion)
 {
-    int h = extImage.extH;
-    int w = extImage.extW;
+    int h = extRegion.extH;
+    int w = extRegion.extW;
 
     int varIndex=0;
     for(int i=0;i<h;++i)
     {
         for(int j=0;j<w;++j)
         {
-            CellType ct = resolveCellType(extImage,i,j);
+            CellType ct = resolveCellType(extRegion,i,j);
             if(ct==CellType::Not_Defined) continue;
 
             pxlVector.push_back(Pixel(i,j,ct,varIndex++));
@@ -103,81 +187,12 @@ void createPixelSet(std::vector<Pixel>& pxlVector,
     }
 }
 
-void createLinelSet(std::set<Linel>& lnlSet, const ExtendedImage& extImage, const std::vector<Pixel>& pxlVector)
+int main(int argc, char* argv[])
 {
-    int h = extImage.image.rows;
-    int w = extImage.image.cols;
-
-    int extW = extImage.extW;
-    int extH = extImage.extH;
-
-    std::vector<Pixel>::const_iterator it = pxlVector.begin();
-
-    while(it->ct==CellType::Border) ++it;
-    --it;
-    do
-    {
-        const Pixel &a1 = *(it+1);
-        const Pixel &a2 = *it;
-
-        lnlSet.insert( Linel(a1,a2,LinelOrientation::Up) );
-
-        const Pixel &b1 = a1;
-        const Pixel &b2 = *(it-extW);
-        lnlSet.insert( Linel(b1,b2,LinelOrientation::Right) );
-
-        ++it;
-        while(it->ct!=CellType::Border && it!=pxlVector.end()) ++it;
-
-    }while(it!=pxlVector.end());
-
-}
-
-void createEdgeVector(std::vector<Edge>& edgVector, const std::set<Linel>& lnlSet)
-{
-    std::set<Linel>::const_iterator it = lnlSet.begin();
-    do
-    {
-        const Linel& linel = *it;
-        const Pixel& pixel = linel.p1;
-        int baseVarIndex = pixel.varIndex*4;
-
-        if(linel.orientation==LinelOrientation::Up || linel.orientation==LinelOrientation::Down)
-        {
-            edgVector.push_back( Edge(linel,EdgeOrientation::Up,baseVarIndex) );
-            edgVector.push_back( Edge(linel,EdgeOrientation::Down,baseVarIndex+1) );
-        }
-        else
-        {
-            edgVector.push_back( Edge(linel,EdgeOrientation::Right,baseVarIndex+2) );
-            edgVector.push_back( Edge(linel,EdgeOrientation::Left,baseVarIndex+3) );
-        }
-
-        ++it;
-
-    }while(it!=lnlSet.end());
-}
-
-int main()
-{
-    typedef cv::Vec3b ImagePixelType;
-
-    cv::Mat image=cv::imread("images/cow2.jpg");
-    ExtendedImage extImage(image,2);
-
-    std::vector<Pixel> pxlVector;
-    createPixelSet(pxlVector,extImage);
-    assert(pxlVector.size()==extImage.extW*extImage.extH);
-
-    std::set<Linel> lnlSet;
-    createLinelSet(lnlSet,extImage,pxlVector);
-    std::for_each(lnlSet.begin(),lnlSet.end(),[](const Linel& linel){ assert(linel.p1.ct==CellType::Normal); });
-
-    std::vector<Edge> edgVector;
-    createEdgeVector(edgVector,lnlSet);
+    DigitalSet ds = square();
+    ODRModel odrModel = odrModel(ds);
 
 
 
-    std::cout << "Hello, World!" << std::endl;
     return 0;
 }
