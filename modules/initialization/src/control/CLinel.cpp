@@ -2,58 +2,79 @@
 
 using namespace LPModel::Initialization;
 
-void CLinel::createLinelSet(LinelSet &lnlSet,
-                            const Domain &domain,
-                            const PixelMap &pixelMap)
+CLinel::Internal::IncidentLinels CLinel::Internal::incidentLinels(const KPoint &pixel)
+{
+    return
+    IncidentLinels ( { SignedKPoint( pixel+KPoint(1,0),true ),
+                       SignedKPoint( pixel+KPoint(0,1),false ),
+                       SignedKPoint( pixel+KPoint(-1,0),false ),
+                       SignedKPoint( pixel+KPoint(0,-1), true) } );
+}
+
+CLinel::KPoint CLinel::Internal::findOutRangePixelCoord(const PixelMap& pixelMap)
+{
+    KPoint outRangePixelCoord;
+    for(auto it=pixelMap.begin();it!=pixelMap.end();++it)
+    {
+        if(it->second.varIndex==-1) return it->first;
+    }
+}
+
+void CLinel::Internal::auxiliaryMap(AuxLinelMap& auxLinelMap,
+                                    const Domain& domain,
+                                    const PixelMap& pixelMap)
 {
     KSpace kspace;
     kspace.init(domain.lowerBound(),domain.upperBound(),true);
 
-    struct _Linel
-    {
-        _Linel(Linel::LinelOrientation orientation): orientation(orientation),
-                                              p1(-1),
-                                              p2(-1){}
-
-        int p1,p2;
-        DGtal::Z2i::SCell linel;
-        Linel::LinelOrientation orientation;
-    };
-
-    std::map<DGtal::Z2i::Point,_Linel> linelMap;
-    typedef std::pair<DGtal::Z2i::Point,_Linel> Element;
-
+    KPoint outRangePixelCoord = findOutRangePixelCoord(pixelMap);
     DGtal::Z2i::SCell pixelModel = kspace.sCell( DGtal::Z2i::Point(1,1),true);
+
+    std::set<KPoint> testSet;
+    int j=0;
     for(auto it1=pixelMap.begin();it1!=pixelMap.end();++it1)
     {
         if(it1->second.varIndex==-1) continue;
-        DGtal::Z2i::Point p( it1->second.col, it1->second.row );
-        DGtal::Z2i::SCells scells = kspace.sLowerIncident(kspace.sCell(p,pixelModel));
+        DGtal::Z2i::Point pCoord = it1->first;
+        Internal::IncidentLinels incLinels = Internal::incidentLinels(pCoord);
 
-        for(auto it2=scells.begin();it2!=scells.end();++it2)
+        for(auto it2=incLinels.begin();it2!=incLinels.end();++it2)
         {
-            DGtal::Z2i::SCell linel = *it2;
-            DGtal::Z2i::Point coord = linel.preCell().coordinates;
+            KPoint coord= it2->coord;
 
-            if( linelMap.find(coord)==linelMap.end() )
+            if( auxLinelMap.find(coord)==auxLinelMap.end() )
             {
                 if(coord(0)%2==0) //Vertical
-                    linelMap.insert( Element(coord,_Linel(Linel::LinelOrientation::Up)) );
+                    auxLinelMap.insert( AuxMapElement(coord,_Linel(coord,outRangePixelCoord,Linel::LinelOrientation::Up)) );
                 else
-                    linelMap.insert( Element(coord,_Linel(Linel::LinelOrientation::Right) ) );
+                    auxLinelMap.insert( AuxMapElement(coord,_Linel(coord,outRangePixelCoord,Linel::LinelOrientation::Right) ) );
             }
-            _Linel& l = linelMap.at(coord);
+            _Linel& l = auxLinelMap.at(coord);
 
-            if(kspace.sSign(l.linel)) l.p1 = it1->second.varIndex;
-            else l.p2 = it1->second.varIndex;
+            if(it2->pos) l.pCoord1 = pCoord;
+            else l.pCoord2 = pCoord;
         }
-    }
 
-    int linelIndex=0;
-    for(auto it=linelMap.begin();it!=linelMap.end();++it)
+    }
+}
+
+void CLinel::createLinelSet(LinelMap &linelMap,
+                            const Domain &domain,
+                            const PixelMap &pixelMap)
+{
+
+    Internal::AuxLinelMap auxLinelMap;
+    Internal::auxiliaryMap(auxLinelMap,domain,pixelMap);
+
+
+    unsigned int linelIndex=pixelMap.size();
+    for(auto it=auxLinelMap.begin();it!=auxLinelMap.end();++it)
     {
-        _Linel& l = it->second;
-        lnlSet.insert( Linel( pixelMap.at(l.p1),pixelMap.at(l.p2),l.orientation,linelIndex++) );
+        Internal::_Linel& l = it->second;
+        linelMap.insert( Linel::MapElement(l.linelCoord, Linel( pixelMap.at(l.pCoord1),
+                                                                pixelMap.at(l.pCoord2),
+                                                                l.orientation,
+                                                                linelIndex++) ) );
     }
 
 }

@@ -14,15 +14,14 @@ namespace LPModel
     {
         namespace CEdge
         {
-            typedef std::map<int,Edge> EdgeMap;
-            typedef std::pair<int,Edge> Element;
+            typedef Edge::EdgeMap EdgeMap;
 
-            typedef std::map<int,Pixel> PixelMap;
-            typedef std::set<Linel> LinelSet;
+            typedef Pixel::PixelMap PixelMap;
+            typedef Linel::LinelMap LinelMap;
 
             void createEdgeMap(EdgeMap& edgeMap,
                                const PixelMap& pixelMap,
-                               const LinelSet& lnlSet);
+                               const LinelMap& linelMap);
         }
     }
 }

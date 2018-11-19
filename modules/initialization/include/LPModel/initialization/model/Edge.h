@@ -10,6 +10,8 @@ namespace LPModel
         struct Edge
         {
             enum EdgeOrientation{Left,Down,Right,Up};
+            typedef std::map<int,Edge> EdgeMap;
+            typedef std::pair<int,Edge> MapElement;
 
             Edge(const Linel& l1,
                  const EdgeOrientation& orientation,

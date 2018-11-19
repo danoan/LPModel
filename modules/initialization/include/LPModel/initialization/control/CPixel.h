@@ -12,8 +12,8 @@ namespace LPModel
         namespace CPixel
         {
             typedef DGtal::Z2i::DigitalSet DigitalSet;
-            typedef std::map<int, Pixel> PixelMap;
-            typedef std::pair<int, Pixel> Element;
+            typedef Pixel::PixelMap PixelMap;
+            typedef Pixel::MapElement MapElement;
 
             void createPixelMap(PixelMap &pxlMap,
                                 const DigitalSet &ds);

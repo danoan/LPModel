@@ -4,28 +4,28 @@ using namespace LPModel::Initialization;
 
 void CEdge::createEdgeMap(EdgeMap &edgeMap,
                           const PixelMap &pixelMap,
-                          const LinelSet &lnlSet)
+                          const LinelMap &linelMap)
 {
-    LinelSet::const_iterator it = lnlSet.begin();
+    LinelMap::const_iterator it = linelMap.begin();
     int varIndex = pixelMap.size();
     do
     {
-    const Linel& linel = *it;
+    const Linel& linel = it->second;
 
     if(linel.orientation==Linel::LinelOrientation::Up
        || linel.orientation==Linel::LinelOrientation::Down)
     {
-    edgeMap.insert( Element(varIndex,Edge(linel,Edge::EdgeOrientation::Up,varIndex) ));
-    edgeMap.insert( Element(varIndex+1,Edge(linel,Edge::EdgeOrientation::Down,varIndex+1)));
+    edgeMap.insert( Edge::MapElement(varIndex,Edge(linel,Edge::EdgeOrientation::Up,varIndex) ));
+    edgeMap.insert( Edge::MapElement(varIndex+1,Edge(linel,Edge::EdgeOrientation::Down,varIndex+1)));
     }
     else
     {
-    edgeMap.insert(Element(varIndex,Edge(linel,Edge::EdgeOrientation::Right,varIndex)));
-    edgeMap.insert(Element(varIndex+1,Edge(linel,Edge::EdgeOrientation::Left,varIndex+1)));
+    edgeMap.insert( Edge::MapElement(varIndex,Edge(linel,Edge::EdgeOrientation::Right,varIndex)));
+    edgeMap.insert( Edge::MapElement(varIndex+1,Edge(linel,Edge::EdgeOrientation::Left,varIndex+1)));
     }
 
     varIndex+=2;
     ++it;
 
-    }while(it!=lnlSet.end());
+    }while(it!=linelMap.end());
 }

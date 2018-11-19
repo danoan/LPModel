@@ -15,27 +15,28 @@ namespace LPModel
         struct Grid
         {
             typedef DGtal::Z2i::DigitalSet DigitalSet;
-            typedef std::map<int, Pixel> PixelMap;
-            typedef std::map<int,Edge> EdgeMap;
-            typedef std::set<Linel> LinelSet;
+
+            typedef Pixel::PixelMap PixelMap;
+            typedef Edge::EdgeMap EdgeMap;
+            typedef Linel::LinelMap LinelMap;
 
             Grid(const DigitalSet& ds):pixelMap(_pixelMap),
                                        edgeMap(_edgeMap),
-                                       linelSet(_linelSet)
+                                       linelMap(_linelMap)
             {
                 CPixel::createPixelMap(_pixelMap,ds);
-                CLinel::createLinelSet(_linelSet,ds.domain(),_pixelMap);
-                CEdge::createEdgeMap(_edgeMap,_pixelMap,_linelSet);
+                CLinel::createLinelSet(_linelMap,ds.domain(),_pixelMap);
+                CEdge::createEdgeMap(_edgeMap,_pixelMap,_linelMap);
             }
 
             const PixelMap& pixelMap;
             const EdgeMap& edgeMap;
-            const LinelSet& linelSet;
+            const LinelMap& linelMap;
 
         private:
             PixelMap _pixelMap;
             EdgeMap _edgeMap;
-            LinelSet _linelSet;
+            LinelMap _linelMap;
         };
     }
 }

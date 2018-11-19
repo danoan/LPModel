@@ -7,11 +7,14 @@ void CPixel::createPixelMap(PixelMap& pxlMap,
 {
 
     int varIndex=0;
+    Pixel::KPoint lb,ub;
+    ds.computeBoundingBox(lb,ub);
 
-    pxlMap.insert( Element(-1,Pixel(0,0,-1)));
+    Pixel::KPoint outRange(ub+Pixel::KPoint(1,1));
+    pxlMap.insert( MapElement( outRange ,Pixel(outRange(1),outRange(0),-1) ) );
     for(auto it=ds.begin();it!=ds.end();++it)
     {
-        pxlMap.insert( Element(varIndex,Pixel( (*it)(1),(*it)(0), varIndex ) ) );
+        pxlMap.insert( MapElement(*it,Pixel( (*it)(1),(*it)(0), varIndex ) ) );
         ++varIndex;
     }
 }
