@@ -11,10 +11,11 @@ void CPixel::createPixelMap(PixelMap& pxlMap,
     ds.computeBoundingBox(lb,ub);
 
     Pixel::KPoint outRange(ub+Pixel::KPoint(1,1));
-    pxlMap.insert( MapElement( outRange ,Pixel(outRange(1),outRange(0),-1) ) );
+    pxlMap.insert( MapElement( outRange ,
+                               Pixel(outRange(1),outRange(0),-1,Pixel::CellType::Auxiliar) ) );
     for(auto it=ds.begin();it!=ds.end();++it)
     {
-        pxlMap.insert( MapElement(*it,Pixel( (*it)(1),(*it)(0), varIndex ) ) );
+        pxlMap.insert( MapElement(*it,Pixel( (*it)(1),(*it)(0), varIndex, Pixel::CellType::Variable) ) );
         ++varIndex;
     }
 }

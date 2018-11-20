@@ -10,21 +10,27 @@ namespace LPModel
         struct Pixel
         {
             enum CellOrientation{Clockwise,Counterclockwise};
+            enum CellType{Variable,Auxiliar};
 
             typedef DGtal::Z2i::Point KPoint;
 
             typedef std::map<KPoint, Pixel> PixelMap;
             typedef std::pair<KPoint, Pixel> MapElement;
 
-            Pixel(int row, int col,unsigned int varIndex):row(row),
-                                                 col(col),
-                                                 varIndex(varIndex),
-                                                 orientation(CellOrientation::Counterclockwise)
+            Pixel(int row,
+                  int col,
+                  unsigned int varIndex,
+                  CellType ct):row(row),
+                               col(col),
+                               varIndex(varIndex),
+                               orientation(CellOrientation::Counterclockwise),
+                               ct(ct)
             {}
 
             const int row,col;
             const CellOrientation orientation;
             const unsigned int varIndex;
+            const CellType ct;
         };
     }
 }
