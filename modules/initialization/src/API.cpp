@@ -2,23 +2,100 @@
 
 using namespace LPModel::Initialization;
 
-API::DigitalSet API::Internal::pixelOptRegion(const DigitalSet &ds)
+API::DigitalSet API::Internal::extendedOptRegion(const ODRModel &odrModel)
 {
-    ODRInterpixels odrInterpixels(ODRModel::AC_PIXEL,
-                                  ODRModel::CM_PIXEL,
-                                  3,
-                                  ODRModel::FourNeighborhood);
+    typedef DGtal::Z2i::Point Point;
 
-    ODRModel odrModel = odrInterpixels.createODR(ODRModel::OM_OriginalBoundary,
-                                                 ODRModel::AM_AroundBoundary,
-                                                 3,
-                                                 ds);
+    Point neighPixel[4] = {Point(1,1),Point(-1,-1),Point(1,-1),Point(-1,1)};
+    std::map<Point,int> incidence;
 
-    DigitalSet optRegion = odrModel.optRegion;
-    optRegion.insert(odrModel.applicationRegion.begin(),odrModel.applicationRegion.end());
+    DigitalSet extOptRegion = odrModel.optRegion;
+    for(auto it=odrModel.applicationRegion.begin();it!=odrModel.applicationRegion.end();++it)
+    {
+        Point p = *it;
+        for(int i=0;i<4;++i)
+        {
+            Point np = *it+neighPixel[i];
+            if(incidence.find(np)==incidence.end()) incidence[np]=0;
+            incidence[np]+=1;
+        }
+    }
 
-    return optRegion;
+    for(auto it=incidence.begin();it!=incidence.end();++it)
+    {
+        if(it->second==4) extOptRegion.insert(it->first);
+    }
+
+    return extOptRegion;
 }
+
+API::DigitalSet API::Internal::extendedAppRegion(const ODRModel &odrModel)
+{
+    typedef DGtal::Z2i::Point Point;
+    Point neighPointel[4] = {Point(1,1),Point(-1,-1),Point(1,-1),Point(-1,1) };
+
+    DigitalSet extAppRegion = odrModel.applicationRegion;
+    for(auto it=odrModel.optRegion.begin();it!=odrModel.optRegion.end();++it)
+    {
+        for(int i=0;i<4;++i)
+        {
+            Point np = *it + neighPointel[i];
+            extAppRegion.insert(np);
+        }
+    }
+
+    return extAppRegion;
+}
+
+bool API::Internal::isConnected(const DigitalSet& ds)
+{
+    DigitalSet component(ds.domain());
+    Point neigh[4] = {Point(1,0),Point(0,1),Point(-1,0),Point(0,-1)};
+
+    std::stack<Point> s;
+    s.push(*ds.begin());
+    while(!s.empty())
+    {
+        Point p = s.top();
+        s.pop();
+
+        if(component(p)) continue;
+        if(!ds(p)) continue;
+
+        component.insert(p);
+
+        for(int i=0;i<4;++i)
+        {
+            Point np = p + neigh[i];
+            s.push(np);
+        }
+    }
+
+    return component.size()==ds.size();
+}
+
+bool API::Internal::consistentGrid(const Parameters& prm,
+                                   const Grid& grid)
+{
+    DGtal::Z2i::KSpace kspace;
+    kspace.init(prm.odrModel.domain.lowerBound(),prm.odrModel.domain.upperBound(),true);
+
+    DigitalSet gridSet(prm.odrModel.domain);
+    for(auto it=grid.linelMap.begin();it!=grid.linelMap.end();++it)
+    {
+        gridSet.insert(it->first);
+    }
+
+    for(auto it=grid.pixelMap.begin();it!=grid.pixelMap.end();++it)
+    {
+        if(it->second.varIndex==-1) continue;
+        gridSet.insert(it->first);
+    }
+
+    gridSet.insert(prm.odrModel.applicationRegion.begin(),prm.odrModel.applicationRegion.end());
+
+    return isConnected(gridSet);
+};
 
 Parameters API::initParameters(const DigitalSet &originalDS)
 {
@@ -28,7 +105,7 @@ Parameters API::initParameters(const DigitalSet &originalDS)
 
     ODRInterpixels odrInterpixels(ODRModel::AC_POINTEL,
                                   ODRModel::CM_PIXEL,
-                                  3,
+                                  1,
                                   ODRModel::FourNeighborhood);
 
     ODRModel odrModel = odrInterpixels.createODR(ODRModel::OM_OriginalBoundary,
@@ -37,27 +114,24 @@ Parameters API::initParameters(const DigitalSet &originalDS)
                                                  originalDS);
 
 
-    DigitalSet pixelOptRegion = Internal::pixelOptRegion(originalDS);
 
-
-    DigitalSet optRegionDS = odrModel.optRegion;
-    optRegionDS.insert(odrModel.applicationRegion.begin(), odrModel.applicationRegion.end());
-
+    DigitalSet extendedOptRegion = Internal::extendedOptRegion(odrModel);
+    DigitalSet extendedAppRegion = Internal::extendedAppRegion(odrModel);
 
     InterpixelSpaceHandle* ish = (InterpixelSpaceHandle*) odrInterpixels.handle();
 
     return Parameters( ODRModel(odrModel.domain,
                                 odrModel.original,
-                                optRegionDS,
+                                extendedOptRegion,
                                 odrModel.trustFRG,
                                 odrModel.trustBKG,
-                                odrModel.applicationRegion,
+                                extendedAppRegion,
                                 odrModel.toImageCoordinates),
-                       *ish,
-                       pixelOptRegion );
+                       *ish );
 }
 
-Grid API::createGrid(const DigitalSet &ds)
+Grid API::createGrid(const DigitalSet &ds,
+                     const Parameters& prm)
 {
     Grid grid(ds);
     assert(grid.pixelMap.size()==ds.size()+1);
@@ -66,6 +140,8 @@ Grid API::createGrid(const DigitalSet &ds)
 
     assert(grid.linelMap.size()==(ds.size()*2+boundaryLinels/2));
     assert(grid.edgeMap.size()==grid.linelMap.size()*2);
+
+    assert(Internal::consistentGrid(prm,grid));
 
     return grid;
 }

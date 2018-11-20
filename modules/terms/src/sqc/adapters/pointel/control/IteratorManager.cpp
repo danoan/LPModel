@@ -1,12 +1,12 @@
-#include "LPModel/terms/sqc/control/IteratorManager.h"
+#include "LPModel/terms/sqc/adapters/pointel/control/IteratorManager.h"
 
-using namespace LPModel::Terms::SquaredCurvature;
+using namespace LPModel::Terms::SquaredCurvature::Internal::Pointel;
 
 void IteratorManager::run(const Parameters &prm, const BinaryCallback &bcbk, const TernaryCallback &tcbk)
 {
     DGtal::Z2i::DigitalSet temp(prm.odrModel.domain);
     DIPaCUS::Misc::DigitalBallIntersection DBIOptimization = prm.handle.intersectionComputer(prm.radius,
-                                                                                             prm.pixelOptRegion);
+                                                                                             prm.odrModel.optRegion);
 
 
     for(auto pointelPtr=prm.odrModel.applicationRegion.begin();pointelPtr!=prm.odrModel.applicationRegion.end();++pointelPtr)

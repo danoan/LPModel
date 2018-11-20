@@ -28,12 +28,20 @@ namespace LPModel
             typedef SCaBOliC::Core::ODRModel ODRModel;
 
             Parameters initParameters(const DigitalSet &originalDS);
-            Grid createGrid(const DigitalSet& ds);
+            Grid createGrid(const DigitalSet& ds,
+                            const Parameters& prm);
 
             namespace Internal
             {
                 int boundaryLinels(const DigitalSet& ds);
-                DigitalSet pixelOptRegion(const DigitalSet& ds);
+
+                DigitalSet extendedOptRegion(const ODRModel& odrModel);
+                DigitalSet extendedAppRegion(const ODRModel& odrModel);
+
+                bool consistentGrid(const Parameters& prm,
+                                    const Grid& grid);
+
+                bool isConnected(const DigitalSet& ds);
             }
         }
     }

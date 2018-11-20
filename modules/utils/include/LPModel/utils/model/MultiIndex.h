@@ -33,10 +33,16 @@ namespace LPModel
                 ConstIterator it1 = this->elements.begin();
                 ConstIterator it2 = other.elements.begin();
 
-                while(*it1==*it2)
+                while(*it1==*it2 && it1!=this->elements.end())
                 {
                     ++it1;
                     ++it2;
+                }
+
+                if(it1==this->elements.end())
+                {
+                    --it1;
+                    --it2;
                 }
 
                 return *it1 < *it2;

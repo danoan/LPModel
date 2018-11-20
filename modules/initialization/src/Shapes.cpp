@@ -5,14 +5,15 @@ using namespace LPModel::Initialization;
 Shapes::DigitalSet Shapes::square()
 {
     NGon2D square(0,0,10,4,3.1416/4.0);
-    GaussDigitizer gd;
+    DigitalSet ds = Internal::shapeDigitizer(square);
 
-    gd.init(square.getLowerBound(),square.getUpperBound(),1.0);
-    gd.attach(square);
+    return DIPaCUS::Transform::bottomLeftBoundingBoxAtOrigin(ds);
+}
 
-    Domain domain(square.getLowerBound(),square.getUpperBound());
-    DigitalSet ds(domain);
-    DGtal::Shapes<Domain>::digitalShaper(ds,gd);
+Shapes::DigitalSet Shapes::flower()
+{
+    Flower flower(0,0,10,5,3,0);
+    DigitalSet ds = Internal::shapeDigitizer(flower);
 
     return DIPaCUS::Transform::bottomLeftBoundingBoxAtOrigin(ds);
 }

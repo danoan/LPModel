@@ -14,7 +14,8 @@ int main(int argc, char* argv[])
     Initialization::Shapes::DigitalSet ds = Initialization::Shapes::square();
     Initialization::Parameters prm = Initialization::API::initParameters(ds);
 
-    Initialization::Grid grid = Initialization::API::createGrid(prm.pixelOptRegion);
+    Initialization::Grid grid = Initialization::API::createGrid(prm.odrModel.optRegion,
+                                                                prm);
 
     SquaredCurvature::API::prepare(prm,grid);
 
