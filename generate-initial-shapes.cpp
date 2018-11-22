@@ -10,16 +10,17 @@ int main(int argc, char* argv[])
     typedef DGtal::Z2i::DigitalSet DigitalSet;
     typedef DIPaCUS::Representation::Image2D Image2D;
 
-    if(argc<2)
+    if(argc<3)
     {
-        std::cerr << "Expected output-path\n";
+        std::cerr << "Expected output-path grid-step\n";
         exit(1);
     }
 
     std::string outputPath = argv[1];
+    double h = atof(argv[2]);
 
-    DigitalSet square = Initialization::Shapes::square();
-    DigitalSet flower = Initialization::Shapes::flower();
+    DigitalSet square = Initialization::Shapes::square(h);
+    DigitalSet flower = Initialization::Shapes::flower(h);
 
     std::cerr << "Generating Square\n";
     Image2D squareImg(square.domain());

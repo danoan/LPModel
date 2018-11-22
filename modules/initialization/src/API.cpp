@@ -140,7 +140,7 @@ Grid API::createGrid(const DigitalSet &ds,
 
     int boundaryLinels = Internal::boundaryLinels(ds);
 
-    assert(grid.linelMap.size()==(ds.size()*2+boundaryLinels/2));
+    //assert(grid.linelMap.size()==(ds.size()*2+boundaryLinels/2));//TODO:: It is not the good assertion.
     assert(grid.edgeMap.size()==grid.linelMap.size()*2);
 
     assert(Internal::consistentGrid(prm,grid));

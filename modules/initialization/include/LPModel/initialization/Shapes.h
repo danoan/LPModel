@@ -22,8 +22,8 @@ namespace LPModel
             typedef DGtal::NGon2D<Space> NGon2D;
             typedef DGtal::AccFlower2D<Space> Flower;
 
-            DigitalSet square();
-            DigitalSet flower();
+            DigitalSet square(double h);
+            DigitalSet flower(double h);
 
             namespace Internal
             {

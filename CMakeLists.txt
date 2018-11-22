@@ -11,6 +11,7 @@ link_directories(cmake-build-debug/modules/constraints
         cmake-build-debug/modules/objective
         cmake-build-debug/modules/solassign
         cmake-build-debug/modules/terms
+        ${CMAKE_PREFIX_PATH}
         ${DIPACUS_LIBS_DIR})
 
 add_subdirectory(modules/constraints)
@@ -36,6 +37,8 @@ target_link_libraries(export-lp
         -ldipacus-derivates
         -ldipacus-components
         -ldipacus-base
+        -lboost_system
+        -lboost_filesystem
         ${DGTAL_LIBRARIES}
         ${OpenCV_LIBS})
 
@@ -80,5 +83,23 @@ target_link_libraries(generate-initial-shapes
 target_include_directories(generate-initial-shapes PRIVATE
         ext/include
         modules/initialization/include
+        ${DIPACUS_INCLUDE_DIRS}
+        ${DGTAL_INCLUDE_DIRS})
+
+
+link_directories(/home-local/dantu1/GIT/RC/Clp-1.16.11/lib)
+
+add_executable(clp-solver clp-solver.cpp )
+
+target_link_libraries(clp-solver
+        -lOsi
+        -lClpSolver
+        -lClp
+        -lOsiClp
+        ${DGTAL_LIBRARIES})
+
+target_include_directories(clp-solver PRIVATE
+        ext/include
+        /home-local/dantu1/GIT/RC/Clp-1.16.11/include
         ${DIPACUS_INCLUDE_DIRS}
         ${DGTAL_INCLUDE_DIRS})

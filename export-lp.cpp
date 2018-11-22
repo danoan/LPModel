@@ -11,6 +11,8 @@
 #include "LPModel/lpwriter/LPWriter.h"
 #include "LPModel/objective/model/Objective.h"
 
+#include "boost/filesystem.hpp"
+
 using namespace LPModel;
 using namespace LPModel::Terms;
 
@@ -45,6 +47,9 @@ void writeLP(const std::string& outputPath,
 {
     std::cerr << "Writing LP-Program\n";
 
+    boost::filesystem::path p(outputPath);
+    boost::filesystem::create_directories(outputPath);
+
     std::ofstream ofs(outputPath+"/lp-program.txt");
     Objective::writeObjective(ofs,linearization.begin(),linearization.end());
     ofs << "\nSubject To\n";
@@ -67,7 +72,7 @@ void writeLP(const std::string& outputPath,
 
 int main(int argc, char* argv[])
 {
-    if(argc<2)
+    if(argc<3)
     {
         std::cerr <<"Expected pgm-input-image output-path\n";
         exit(1);
