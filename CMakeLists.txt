@@ -4,25 +4,30 @@ project(LPModel)
 find_package(DGtal REQUIRED)
 find_package(OpenCV REQUIRED)
 
-link_directories(cmake-build-debug/modules/initialization
-        cmake-build-debug/modules/terms
-        cmake-build-debug/modules/constraints
+link_directories(cmake-build-debug/modules/constraints
+        cmake-build-debug/modules/initialization
+        cmake-build-debug/modules/linearization
         cmake-build-debug/modules/lpwriter
+        cmake-build-debug/modules/objective
+        cmake-build-debug/modules/solassign
+        cmake-build-debug/modules/terms
         ${DIPACUS_LIBS_DIR})
 
-
-add_executable(LPModel main.cpp)
-
-
-add_subdirectory(modules/utils)
-add_subdirectory(modules/initialization)
-add_subdirectory(modules/terms)
 add_subdirectory(modules/constraints)
+add_subdirectory(modules/initialization)
+add_subdirectory(modules/linearization)
 add_subdirectory(modules/lpwriter)
+add_subdirectory(modules/objective)
+add_subdirectory(modules/solassign)
+add_subdirectory(modules/terms)
+add_subdirectory(modules/utils)
 
-add_dependencies(LPModel utils initialization terms constraints lpwriter)
 
-target_link_libraries(LPModel
+add_executable(export-lp export-lp.cpp)
+add_dependencies(export-lp constraints initialization linearization lpwriter objective solassign terms utils)
+
+target_link_libraries(export-lp
+        -lobjective
         -llpwriter
         -lconstraints
         -lterms
@@ -34,12 +39,46 @@ target_link_libraries(LPModel
         ${DGTAL_LIBRARIES}
         ${OpenCV_LIBS})
 
-target_include_directories(LPModel PRIVATE
+target_include_directories(export-lp PRIVATE
         ext/include
+        modules/constraints/include
         modules/initialization/include
+        modules/linearization/include
+        modules/lpwriter/include
+        modules/objective/include
         modules/terms/include
         modules/utils/include
-        modules/constraints/include
-        modules/lpwriter/include
         ${DGTAL_INCLUDE_DIRS})
 
+
+
+add_executable(generate-solution generate-solution.cpp)
+add_dependencies(generate-solution initialization solassign utils)
+
+target_link_libraries(generate-solution
+        -lsolassign
+        -linitialization
+        -ldipacus-base
+        ${DGTAL_LIBRARIES})
+
+target_include_directories(generate-solution PRIVATE
+        ext/include
+        modules/solassign/include
+        modules/initialization/include
+        modules/utils/include
+        ${DGTAL_INCLUDE_DIRS})
+
+
+add_executable(generate-initial-shapes generate-initial-shapes.cpp )
+add_dependencies(generate-initial-shapes initialization)
+
+target_link_libraries(generate-initial-shapes
+        -linitialization
+        -ldipacus-base
+        ${DGTAL_LIBRARIES})
+
+target_include_directories(generate-initial-shapes PRIVATE
+        ext/include
+        modules/initialization/include
+        ${DIPACUS_INCLUDE_DIRS}
+        ${DGTAL_INCLUDE_DIRS})

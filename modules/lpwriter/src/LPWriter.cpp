@@ -13,12 +13,12 @@ void LPWriter::writePixel(std::ofstream &ofs,
 void LPWriter::writeEdge(std::ofstream &ofs,
                          const EdgeIncidence &ei)
 {
-    char s = ei.posIncidence?' ':'-';
+    char s = ei.posIncidence?'+':'-';
     ofs << " " <<  s << " " << "x" << ei.edge.varIndex;
 }
 
 void LPWriter::writeConstraint(std::ofstream &ofs,
-                               int cIndexStart,
+                               int& cIndexStart,
                                const LinelConstraints &lc)
 {
     for(auto it=lc.begin();it!=lc.end();++it)
@@ -31,6 +31,6 @@ void LPWriter::writeConstraint(std::ofstream &ofs,
         writePixel(ofs,li.pixel2);
         writeEdge(ofs,li.edge1);
         writeEdge(ofs,li.edge2);
-        ofs << "\n";
+        ofs << " = 0\n";
     }
 }

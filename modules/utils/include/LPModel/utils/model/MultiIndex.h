@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <assert.h>
+#include <algorithm>
 
 namespace LPModel
 {
@@ -28,7 +29,7 @@ namespace LPModel
 
             bool operator<(const Self& other) const
             {
-                assert(this->elements.size()==other.elements.size());
+                if(this->size()!=other.size()) return this->size()<other.size();
 
                 ConstIterator it1 = this->elements.begin();
                 ConstIterator it2 = other.elements.begin();
@@ -48,6 +49,8 @@ namespace LPModel
                 return *it1 < *it2;
             }
 
+
+            size_t size() const{return elements.size();}
             ConstIterator begin() const{return elements.begin();}
             ConstIterator end() const{return elements.end();}
 

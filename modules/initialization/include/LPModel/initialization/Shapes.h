@@ -28,14 +28,14 @@ namespace LPModel
             namespace Internal
             {
                 template<typename TShape>
-                DigitalSet shapeDigitizer(TShape shape)
+                DigitalSet shapeDigitizer(TShape shape, double h=1.0)
                 {
                     DGtal::GaussDigitizer<Space,TShape> gd;
 
-                    gd.init(shape.getLowerBound(),shape.getUpperBound(),1.0);
+                    gd.init(shape.getLowerBound(),shape.getUpperBound(),h);
                     gd.attach(shape);
 
-                    Domain domain(shape.getLowerBound(),shape.getUpperBound());
+                    Domain domain(gd.getLowerBound(),gd.getUpperBound());
                     DigitalSet ds(domain);
                     DGtal::Shapes<Domain>::digitalShaper(ds,gd);
 

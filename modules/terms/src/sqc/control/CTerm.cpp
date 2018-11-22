@@ -55,21 +55,51 @@ void CTerm::Internal::separate(DGtal::Z2i::Point& linel,
     pixel2 = pixels[1];
 }
 
+void CTerm::Internal::addBinaryElement(Term::BinaryMap& bm,
+                                       const unsigned long n1,
+                                       const unsigned long n2,
+                                       const double value)
+{
+    Term::UIntMultiIndex  uiBI;
+    uiBI <<  n1 << n2;
+
+    if(bm.find(uiBI)==bm.end()) bm[uiBI]=0;
+    bm[uiBI] += value;
+}
+
+void CTerm::Internal::addTernaryElement(Term::TernaryMap& tm,
+                                        const unsigned long n1,
+                                        const unsigned long n2,
+                                        const unsigned long n3,
+                                        const double value)
+{
+    Term::UIntMultiIndex  uiBI;
+    uiBI <<  n1 << n2 << n3;
+
+    if(tm.find(uiBI)==tm.end()) tm[uiBI]=0;
+    tm[uiBI] += value;
+}
+
 void CTerm::Internal::setBinaryMap(Term::BinaryMap& bm,
                                    const LinelContribution& lctbr,
                                    const Grid& grid)
 {
+    unsigned long firstLinelVar = grid.pixelMap.size();
+    unsigned long firstEdgeVar = firstLinelVar + grid.linelMap.size();
+
+    int edgeBaseIndex;
+
     DGtal::Z2i::Point linel,pixel;
     for(auto it=lctbr.binaryMap.begin();it!=lctbr.binaryMap.end();++it)
     {
         separate(linel,pixel,it->first);
 
-        Term::UIntMultiIndex  uiBI;
-        uiBI << grid.linelMap.at(linel).linelIndex
-             << grid.pixelMap.at(pixel).varIndex;
+        edgeBaseIndex = Initialization::CLinel::edgeBaseIndex(firstLinelVar,
+                                                              firstEdgeVar,
+                                                              grid.linelMap.at(linel).linelIndex);
 
-        if(bm.find(uiBI)==bm.end()) bm[uiBI]=0;
-        bm[uiBI] += it->second;
+        addBinaryElement(bm,edgeBaseIndex,grid.pixelMap.at(pixel).varIndex,it->second);
+        addBinaryElement(bm,edgeBaseIndex+1,grid.pixelMap.at(pixel).varIndex,it->second);
     }
 
 }
@@ -79,18 +109,22 @@ void CTerm::Internal::setTernaryMap(Term::TernaryMap& tm,
                                     const LinelContribution& lctbr,
                                     const Grid& grid)
 {
+    unsigned long firstLinelVar = grid.pixelMap.size();
+    unsigned long firstEdgeVar = firstLinelVar + grid.linelMap.size();
+
+    int edgeBaseIndex;
+
     DGtal::Z2i::Point linel,pixel1,pixel2;
     for(auto it=lctbr.ternaryMap.begin();it!=lctbr.ternaryMap.end();++it)
     {
         separate(linel,pixel1,pixel2,it->first);
 
-        Term::UIntMultiIndex  uiBI;
-        uiBI << grid.linelMap.at(linel).linelIndex
-             << grid.pixelMap.at(pixel1).varIndex
-             << grid.pixelMap.at(pixel2).varIndex;
+        edgeBaseIndex = Initialization::CLinel::edgeBaseIndex(firstLinelVar,
+                                                              firstEdgeVar,
+                                                              grid.linelMap.at(linel).linelIndex);
 
-        if(tm.find(uiBI)==tm.end()) tm[uiBI]=0;
-        tm[uiBI] += it->second;
+        addTernaryElement(tm,edgeBaseIndex,grid.pixelMap.at(pixel1).varIndex,grid.pixelMap.at(pixel2).varIndex,it->second);
+        addTernaryElement(tm,edgeBaseIndex+1,grid.pixelMap.at(pixel1).varIndex,grid.pixelMap.at(pixel2).varIndex,it->second);
     }
 
 }

@@ -23,6 +23,11 @@ namespace LPModel
                                 const Domain& domain,
                                 const PixelMap& pixelMap);
 
+            int edgeBaseIndex(const int firstLinelVar,
+                              const int firstEdgeVar,
+                              const int linelIndex);
+
+
             namespace Internal
             {
                 struct _Linel

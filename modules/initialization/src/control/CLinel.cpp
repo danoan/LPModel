@@ -58,6 +58,15 @@ void CLinel::Internal::auxiliaryMap(AuxLinelMap& auxLinelMap,
     }
 }
 
+int CLinel::edgeBaseIndex(const int firstLinelVar,
+                          const int firstEdgeVar,
+                          const int linelIndex)
+{
+    int linelNum = (linelIndex - firstLinelVar);
+    return firstEdgeVar + (linelNum*2);
+}
+
+
 void CLinel::createLinelSet(LinelMap &linelMap,
                             const Domain &domain,
                             const PixelMap &pixelMap)
@@ -67,7 +76,7 @@ void CLinel::createLinelSet(LinelMap &linelMap,
     Internal::auxiliaryMap(auxLinelMap,domain,pixelMap);
 
 
-    unsigned int linelIndex=pixelMap.size();
+    unsigned long linelIndex=pixelMap.size();
     for(auto it=auxLinelMap.begin();it!=auxLinelMap.end();++it)
     {
         Internal::_Linel& l = it->second;

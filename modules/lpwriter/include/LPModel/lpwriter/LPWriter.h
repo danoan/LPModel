@@ -22,7 +22,7 @@ namespace LPModel
         void writeEdge(std::ofstream &ofs, const EdgeIncidence &ei);
 
         void writeConstraint(std::ofstream& ofs,
-                             int cIndexStart,
+                             int& cIndexStart,
                              const LinelConstraints& lc);
     }
 }

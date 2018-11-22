@@ -19,7 +19,7 @@ namespace LPModel
                 typedef Initialization::Grid Grid;
 
 
-                void prepare(const Parameters& prm,
+                Term prepare(const Parameters& prm,
                              const Grid& grid);
             }
         }

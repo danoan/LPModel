@@ -20,6 +20,16 @@ namespace LPModel
             typedef Edge::EdgeMap EdgeMap;
             typedef Linel::LinelMap LinelMap;
 
+            Grid(const PixelMap& pixelMap,
+                 const EdgeMap& edgeMap,
+                 const LinelMap& linelMap):_pixelMap(pixelMap),
+                                           _edgeMap(edgeMap),
+                                           _linelMap(linelMap),
+                                           pixelMap(_pixelMap),
+                                           edgeMap(_edgeMap),
+                                           linelMap(_linelMap)
+            {}
+
             Grid(const DigitalSet& ds):pixelMap(_pixelMap),
                                        edgeMap(_edgeMap),
                                        linelMap(_linelMap)

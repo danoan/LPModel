@@ -12,7 +12,7 @@ namespace LPModel
         {
             struct Term
             {
-                typedef unsigned int Index;
+                typedef unsigned long Index;
                 typedef Utils::MultiIndex<Index> UIntMultiIndex;
 
                 typedef std::map<UIntMultiIndex,double> UnaryMap;

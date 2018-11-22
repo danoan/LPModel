@@ -1,3 +1,4 @@
+#include <DGtal/io/writers/GenericWriter.h>
 #include "LPModel/initialization/API.h"
 
 using namespace LPModel::Initialization;
@@ -118,6 +119,7 @@ Parameters API::initParameters(const DigitalSet &originalDS)
     DigitalSet extendedOptRegion = Internal::extendedOptRegion(odrModel);
     DigitalSet extendedAppRegion = Internal::extendedAppRegion(odrModel);
 
+
     InterpixelSpaceHandle* ish = (InterpixelSpaceHandle*) odrInterpixels.handle();
 
     return Parameters( ODRModel(odrModel.domain,
@@ -176,5 +178,24 @@ int API::Internal::boundaryLinels(const DigitalSet &ds)
     }
 
     return linelCoordSet.size()/2;
+}
+
+void API::save(const DigitalSet& dsOriginal, const std::string& outputFile)
+{
+    typedef DIPaCUS::Representation::Image2D Image2D;
+
+    Image2D imgPRM( dsOriginal.domain() );
+    DIPaCUS::Representation::digitalSetToImage(imgPRM,dsOriginal);
+    DGtal::GenericWriter<Image2D>::exportFile(outputFile,imgPRM);
+}
+
+Parameters API::readParametersFromFile(const std::string &inputFile)
+{
+    typedef DIPaCUS::Representation::Image2D Image2D;
+    Image2D imgIn = DGtal::GenericReader<Image2D>::import(inputFile);
+    DigitalSet ds(imgIn.domain());
+    DIPaCUS::Representation::imageAsDigitalSet(ds,imgIn,1);
+
+    return initParameters(ds);
 }
 

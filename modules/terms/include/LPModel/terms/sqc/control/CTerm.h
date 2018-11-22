@@ -5,6 +5,8 @@
 #include <LPModel/initialization/model/Parameters.h>
 #include <LPModel/initialization/model/Grid.h>
 
+#include <LPModel/initialization/control/CLinel.h>
+
 #include <LPModel/terms/sqc/model/Term.h>
 #include <LPModel/terms/sqc/model/Constants.h>
 
@@ -60,6 +62,18 @@ namespace LPModel
                     void setTernaryMap(Term::TernaryMap& tm,
                                        const LinelContribution& lctbr,
                                        const Grid& grid);
+
+                    void addBinaryElement(Term::BinaryMap& bm,
+                                          const unsigned long n1,
+                                          const unsigned long n2,
+                                          const double value);
+
+                    void addTernaryElement(Term::TernaryMap& tm,
+                                           const unsigned long n1,
+                                           const unsigned long n2,
+                                           const unsigned long n3,
+                                           const double value);
+
                 }
 
             }

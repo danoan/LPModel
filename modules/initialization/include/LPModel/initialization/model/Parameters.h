@@ -16,7 +16,7 @@ namespace LPModel
 
             Parameters(const ODRModel& odrModel,
                        const InterpixelSpaceHandle& handle,
-                       const unsigned int radius=3,
+                       const unsigned long radius=3,
                        const double squaredCurvatureWeight=1,
                        const double dataWeight=0.2):odrModel(odrModel),
                                                     handle(handle),
@@ -27,7 +27,7 @@ namespace LPModel
 
             const ODRModel odrModel;
             const InterpixelSpaceHandle handle;
-            const unsigned int radius;
+            const unsigned long radius;
             const double squaredCurvatureWeight;
             const double dataWeight;
         };

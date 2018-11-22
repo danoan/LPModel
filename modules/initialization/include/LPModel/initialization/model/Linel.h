@@ -18,7 +18,7 @@ namespace LPModel
             Linel(const Pixel& p1,
                   const Pixel& p2,
                   const LinelOrientation& orientation,
-                  const unsigned int linelIndex):p1(p1),
+                  const unsigned long linelIndex):p1(p1),
                                         p2(p2),
                                         orientation(orientation),
                                         linelIndex(linelIndex)
@@ -31,7 +31,7 @@ namespace LPModel
 
             const Pixel &p1,&p2;
             const LinelOrientation orientation;
-            const unsigned int linelIndex;
+            const unsigned long linelIndex;
         };
     }
 }

@@ -31,6 +31,9 @@ namespace LPModel
             Grid createGrid(const DigitalSet& ds,
                             const Parameters& prm);
 
+            Parameters readParametersFromFile(const std::string& inputFile);
+            void save(const DigitalSet& dsOriginal, const std::string& outputFile);
+
             namespace Internal
             {
                 int boundaryLinels(const DigitalSet& ds);

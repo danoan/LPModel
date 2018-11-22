@@ -19,7 +19,7 @@ namespace LPModel
 
             Pixel(int row,
                   int col,
-                  unsigned int varIndex,
+                  unsigned long varIndex,
                   CellType ct):row(row),
                                col(col),
                                varIndex(varIndex),
@@ -29,7 +29,7 @@ namespace LPModel
 
             const int row,col;
             const CellOrientation orientation;
-            const unsigned int varIndex;
+            const unsigned long varIndex;
             const CellType ct;
         };
     }

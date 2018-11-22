@@ -30,7 +30,7 @@ bool ClosedAndConnected::Internal::positiveIncident(const Linel &linel,
                edge.orientation==Edge::EdgeOrientation::Right);
     }
 
-    return edge.orientation==linel.orientation;
+    return edge.orientation==( (Edge::EdgeOrientation) linel.orientation );
 
 }
 

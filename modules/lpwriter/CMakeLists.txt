@@ -7,4 +7,5 @@ add_library(lpwriter
 target_include_directories(lpwriter PRIVATE
         include
         ../constraints/include
-        ../initialization/include)
+        ../initialization/include
+        ${DGTAL_INCLUDE_DIRS})

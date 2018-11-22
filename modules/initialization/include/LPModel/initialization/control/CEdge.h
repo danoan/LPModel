@@ -8,6 +8,8 @@
 #include "LPModel/initialization/model/Linel.h"
 #include "LPModel/initialization/model/Pixel.h"
 
+#include <LPModel/initialization/control/CLinel.h>
+
 namespace LPModel
 {
     namespace Initialization
@@ -22,6 +24,13 @@ namespace LPModel
             void createEdgeMap(EdgeMap& edgeMap,
                                const PixelMap& pixelMap,
                                const LinelMap& linelMap);
+
+            int edgeBaseIndex(const int firstLinelVar,
+                              const int firstEdgeVar,
+                              const int linelIndex);
+
+            bool isSequence(const int firstEdgeVar,
+                            const EdgeMap& edgeMap);
         }
     }
 }
