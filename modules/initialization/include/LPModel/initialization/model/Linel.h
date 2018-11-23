@@ -15,13 +15,17 @@ namespace LPModel
             typedef std::map<KPoint,Linel> LinelMap;
             typedef std::pair<KPoint,Linel> MapElement;
 
-            Linel(const Pixel& p1,
+            Linel(const int x,
+                  const int y,
+                  const Pixel& p1,
                   const Pixel& p2,
                   const LinelOrientation& orientation,
-                  const unsigned long linelIndex):p1(p1),
-                                        p2(p2),
-                                        orientation(orientation),
-                                        linelIndex(linelIndex)
+                  const unsigned long linelIndex): x(x),
+                                                   y(y),
+                                                   p1(p1),
+                                                   p2(p2),
+                                                   orientation(orientation),
+                                                   linelIndex(linelIndex)
             {}
 
             bool operator<(const Linel& other) const
@@ -29,9 +33,12 @@ namespace LPModel
                 return this->linelIndex < other.linelIndex;
             }
 
+            const int x,y;
             const Pixel &p1,&p2;
             const LinelOrientation orientation;
             const unsigned long linelIndex;
+
+            friend std::ostream& operator<<(std::ostream& os, const Linel& linel);
         };
     }
 }

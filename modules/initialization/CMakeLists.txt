@@ -10,6 +10,7 @@ add_library(initialization SHARED
         src/control/CPixel.cpp
         src/control/CEdge.cpp
         src/control/CLinel.cpp
+        src/control/CGrid.cpp
         src/API.cpp)
 
 target_link_libraries(initialization

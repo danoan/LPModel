@@ -23,6 +23,8 @@ add_subdirectory(modules/solassign)
 add_subdirectory(modules/terms)
 add_subdirectory(modules/utils)
 
+add_subdirectory(lab)
+
 
 add_executable(export-lp export-lp.cpp)
 add_dependencies(export-lp constraints initialization linearization lpwriter objective solassign terms utils)
@@ -83,23 +85,5 @@ target_link_libraries(generate-initial-shapes
 target_include_directories(generate-initial-shapes PRIVATE
         ext/include
         modules/initialization/include
-        ${DIPACUS_INCLUDE_DIRS}
-        ${DGTAL_INCLUDE_DIRS})
-
-
-link_directories(/home-local/dantu1/GIT/RC/Clp-1.16.11/lib)
-
-add_executable(clp-solver clp-solver.cpp )
-
-target_link_libraries(clp-solver
-        -lOsi
-        -lClpSolver
-        -lClp
-        -lOsiClp
-        ${DGTAL_LIBRARIES})
-
-target_include_directories(clp-solver PRIVATE
-        ext/include
-        /home-local/dantu1/GIT/RC/Clp-1.16.11/include
         ${DIPACUS_INCLUDE_DIRS}
         ${DGTAL_INCLUDE_DIRS})

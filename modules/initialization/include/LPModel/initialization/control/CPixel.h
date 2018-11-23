@@ -17,6 +17,8 @@ namespace LPModel
 
             void createPixelMap(PixelMap &pxlMap,
                                 const DigitalSet &ds);
+
+            Pixel readPixel(std::istream& is);
         }
     }
 }

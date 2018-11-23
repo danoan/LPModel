@@ -31,8 +31,12 @@ namespace LPModel
             const CellOrientation orientation;
             const unsigned long varIndex;
             const CellType ct;
+
+            friend std::ostream& operator<<(std::ostream& os, const Pixel& pixel);
+
         };
     }
 }
+
 
 #endif //LPMODEL_PIXEL_H

@@ -15,14 +15,16 @@ namespace LPModel
 
             Edge(const Linel& l1,
                  const EdgeOrientation& orientation,
-                 const int varIndex):l1(l1),
+                 const unsigned long varIndex):l1(l1),
                                      orientation(orientation),
                                      varIndex(varIndex)
             {}
 
             const Linel &l1;
             const EdgeOrientation orientation;
-            const int varIndex;
+            const unsigned long varIndex;
+
+            friend std::ostream& operator<<(std::ostream& os, const Edge& edge);
         };
     }
 }

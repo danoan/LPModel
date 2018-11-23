@@ -12,6 +12,22 @@ void SolutionAssignment::reversePixelMap(ReversePixelMap &rpm,
     }
 }
 
+void skipCommentLines(std::ifstream& ifs)
+{
+    char buffer[256];
+    char firstChar;
+
+    ifs.get(firstChar);
+    while(firstChar=='#')
+    {
+        do{ ifs.getline(buffer, 256, '\n'); }while(ifs.gcount()==256);
+        ifs.get(firstChar);
+    };
+
+    ifs.unget();
+    
+}
+
 SolutionAssignment::DigitalSet SolutionAssignment::readSolution(const std::string &solutionFile,
                                                                 const Parameters &parameters,
                                                                 const Grid &grid)
@@ -25,15 +41,18 @@ SolutionAssignment::DigitalSet SolutionAssignment::readSolution(const std::strin
 
     std::ifstream ifs(solutionFile);
 
-    Index numVars,varIndex;
+    Index varIndex;
     Point pixelCoords;
     double value;
+    char xPrefix;
+    
+    skipCommentLines(ifs);
 
-    ifs >> numVars;
     std::vector<int> varValue;
     std::unordered_map<Point, unsigned int> pointToVar;
-    for(Index i=0;i<numVars;++i)
+    while(!ifs.eof())
     {
+        ifs >> xPrefix;
         ifs >> varIndex;
         ifs >> value;
 

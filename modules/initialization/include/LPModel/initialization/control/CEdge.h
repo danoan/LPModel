@@ -21,6 +21,8 @@ namespace LPModel
             typedef Pixel::PixelMap PixelMap;
             typedef Linel::LinelMap LinelMap;
 
+            typedef std::map<unsigned long,Linel> LinelIndexMap;
+
             void createEdgeMap(EdgeMap& edgeMap,
                                const PixelMap& pixelMap,
                                const LinelMap& linelMap);
@@ -28,6 +30,8 @@ namespace LPModel
             int edgeBaseIndex(const int firstLinelVar,
                               const int firstEdgeVar,
                               const int linelIndex);
+
+            Edge readEdge(std::istream& is, const LinelIndexMap& lim);
 
             bool isSequence(const int firstEdgeVar,
                             const EdgeMap& edgeMap);

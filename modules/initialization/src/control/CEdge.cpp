@@ -1,7 +1,18 @@
 #include "LPModel/initialization/control/CEdge.h"
 
-using namespace LPModel::Initialization;
+namespace LPModel{ namespace Initialization{
 
+    std::ostream& operator<<(std::ostream& os, const Edge& edge)
+    {
+        os.write( (char*) &edge.l1.linelIndex, sizeof(edge.l1.linelIndex));
+        os.write( (char*) &edge.orientation, sizeof(edge.orientation));
+        os.write( (char*) &edge.varIndex, sizeof(edge.varIndex));
+
+        return os;
+    }
+}}
+
+using namespace LPModel::Initialization;
 
 bool CEdge::isSequence(const int firstEdgeVar,
                        const EdgeMap& edgeMap)
@@ -57,4 +68,19 @@ void CEdge::createEdgeMap(EdgeMap &edgeMap,
 
 
     assert(isSequence(firstEdgeVar,edgeMap));
+}
+
+Edge CEdge::readEdge(std::istream& is, const LinelIndexMap& lim)
+{
+    unsigned long linelIndex, edgeIndex;
+    int orientation;
+
+    is.read( (char*) &linelIndex, sizeof(linelIndex));
+    is.read( (char*) &orientation, sizeof(orientation));
+    is.read( (char*) &edgeIndex, sizeof(edgeIndex) );
+
+    return Edge(lim.at(linelIndex),
+                (Edge::EdgeOrientation) orientation,
+                edgeIndex);
+
 }

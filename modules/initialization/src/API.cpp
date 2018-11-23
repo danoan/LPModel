@@ -106,7 +106,7 @@ Parameters API::initParameters(const DigitalSet &originalDS)
 
     ODRInterpixels odrInterpixels(ODRModel::AC_POINTEL,
                                   ODRModel::CM_PIXEL,
-                                  1,
+                                  2,
                                   ODRModel::FourNeighborhood);
 
     ODRModel odrModel = odrInterpixels.createODR(ODRModel::OM_OriginalBoundary,
@@ -194,8 +194,27 @@ Parameters API::readParametersFromFile(const std::string &inputFile)
     typedef DIPaCUS::Representation::Image2D Image2D;
     Image2D imgIn = DGtal::GenericReader<Image2D>::import(inputFile);
     DigitalSet ds(imgIn.domain());
-    DIPaCUS::Representation::imageAsDigitalSet(ds,imgIn,1);
+    DIPaCUS::Representation::imageAsDigitalSet(ds,imgIn);
 
     return initParameters(ds);
+}
+
+void API::save(const Grid &grid, const std::string &outputFile)
+{
+    std::ofstream ofs(outputFile,std::ios_base::out);
+    ofs << grid;
+
+    ofs.flush();
+    ofs.close();
+}
+
+Grid* API::readGridFromFile(const std::string &inputFile)
+{
+    std::ifstream ifs(inputFile);
+
+    Grid* grid;
+    ifs >> &grid;
+
+    return grid;
 }
 

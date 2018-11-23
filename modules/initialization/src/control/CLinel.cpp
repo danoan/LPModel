@@ -1,5 +1,19 @@
 #include "LPModel/initialization/control/CLinel.h"
 
+namespace LPModel{ namespace Initialization{
+    std::ostream& operator<<(std::ostream& os, const Linel& linel)
+    {
+        os.write( (char*) &linel.x, sizeof(linel.x) );
+        os.write( (char*) &linel.y, sizeof(linel.y) );
+        os.write( (char*) &linel.p1.varIndex, sizeof(linel.p1.varIndex) );
+        os.write( (char*) &linel.p2.varIndex, sizeof(linel.p2.varIndex) );
+        os.write( (char*) &linel.orientation ,sizeof(linel.orientation) );
+        os.write( (char*) &linel.linelIndex, sizeof(linel.linelIndex) );
+
+        return os;
+    }
+}}
+
 using namespace LPModel::Initialization;
 
 CLinel::Internal::IncidentLinels CLinel::Internal::incidentLinels(const KPoint &pixel)
@@ -80,10 +94,37 @@ void CLinel::createLinelSet(LinelMap &linelMap,
     for(auto it=auxLinelMap.begin();it!=auxLinelMap.end();++it)
     {
         Internal::_Linel& l = it->second;
-        linelMap.insert( Linel::MapElement(l.linelCoord, Linel( pixelMap.at(l.pCoord1),
+        linelMap.insert( Linel::MapElement(l.linelCoord, Linel( l.linelCoord(0),
+                                                                l.linelCoord(1),
+                                                                pixelMap.at(l.pCoord1),
                                                                 pixelMap.at(l.pCoord2),
                                                                 l.orientation,
                                                                 linelIndex++) ) );
     }
+
+}
+
+Linel CLinel::readLinel(std::istream& is, const PixelIndexMap& pim)
+{
+    int x,y;
+    unsigned long p1VarIndex,p2VarIndex,linelIndex;
+    int orientation;
+
+    is.read( (char*) &x, sizeof(x));
+    is.read( (char*) &y, sizeof(y));
+    is.read( (char*) &p1VarIndex, sizeof(p1VarIndex));
+    is.read( (char*) &p2VarIndex, sizeof(p2VarIndex));
+    is.read( (char*) &orientation, sizeof(orientation));
+    is.read( (char*) &linelIndex, sizeof(linelIndex));
+
+    if(linelIndex >= (unsigned long) -1)
+            std::cout << "OPS" << std::endl;
+
+    return Linel(x,
+                 y,
+                 pim.at(p1VarIndex),
+                 pim.at(p2VarIndex),
+                 (Linel::LinelOrientation) orientation,
+                 linelIndex);
 
 }

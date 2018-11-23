@@ -19,6 +19,8 @@ namespace LPModel
             typedef Linel::LinelMap LinelMap;
             typedef Pixel::PixelMap PixelMap;
 
+            typedef std::map<unsigned long, Pixel> PixelIndexMap;
+
             void createLinelSet(LinelMap& linelMap,
                                 const Domain& domain,
                                 const PixelMap& pixelMap);
@@ -26,6 +28,8 @@ namespace LPModel
             int edgeBaseIndex(const int firstLinelVar,
                               const int firstEdgeVar,
                               const int linelIndex);
+
+            Linel readLinel(std::istream& is, const PixelIndexMap& pim);
 
 
             namespace Internal

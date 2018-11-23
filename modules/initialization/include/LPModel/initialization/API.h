@@ -27,15 +27,24 @@ namespace LPModel
             typedef SCaBOliC::Core::ODRInterpixels ODRInterpixels;
             typedef SCaBOliC::Core::ODRModel ODRModel;
 
+            //For test only
+            Parameters initParameters(const DigitalSet &originalDS, bool fixedEvenIteration);
+            Parameters readParametersFromFile(const std::string& inputFile, bool fixedEvenIteration);
+
+
             Parameters initParameters(const DigitalSet &originalDS);
             Grid createGrid(const DigitalSet& ds,
                             const Parameters& prm);
 
             Parameters readParametersFromFile(const std::string& inputFile);
             void save(const DigitalSet& dsOriginal, const std::string& outputFile);
+            
+            Grid* readGridFromFile(const std::string& inputFile);
+            void save(const Grid& grid, const std::string& outputFile);
 
             namespace Internal
             {
+               
                 int boundaryLinels(const DigitalSet& ds);
 
                 DigitalSet extendedOptRegion(const ODRModel& odrModel);

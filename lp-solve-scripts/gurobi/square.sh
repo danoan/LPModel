@@ -14,16 +14,10 @@ mkdir -p $OUTPUT_FOLDER
 
 
 
-
 $BIN_FOLDER/generate-initial-shapes $INPUT_IMAGES $GRID_STEP
 
 
 $BIN_FOLDER/export-lp $INPUT_IMAGES/$IMAGE_NAME.pgm $OUTPUT_FOLDER
-glpsol --cpxlp $OUTPUT_FOLDER/lp-program.txt --tmlim 20 -o $OUTPUT_FOLDER/glpk-out.txt
+gurobi_cl ResultFile=$OUTPUT_FOLDER/${IMAGE_NAME}.sol $OUTPUT_FOLDER/${IMAGE_NAME}.lp
 
-sh $SCRIPT_FOLDER/read-glpk-output.sh $OUTPUT_FOLDER/glpk-out.txt $OUTPUT_FOLDER/var-assignment.txt
-
-$BIN_FOLDER/generate-solution $OUTPUT_FOLDER/prm.pgm $OUTPUT_FOLDER/var-assignment.txt $OUTPUT_FOLDER/solution.pgm
-
-rm $OUTPUT_FOLDER/prm.pgm
-rm $OUTPUT_FOLDER/grid.obj
+$BIN_FOLDER/generate-solution $OUTPUT_FOLDER/prm.pgm $OUTPUT_FOLDER/grid.obj $OUTPUT_FOLDER/${IMAGE_NAME}.sol $OUTPUT_FOLDER/solution.pgm

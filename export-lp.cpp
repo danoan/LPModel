@@ -33,24 +33,26 @@ DigitalSet loadImageAsDigitalSet(const std::string& imageFilePath)
 }
 
 void saveObjects(const std::string& outputPath,
-                 const DigitalSet& dsOriginal)
+                 const DigitalSet& dsOriginal,
+                 const Initialization::Grid& grid)
 {
     std::cerr << "Saving Objects\n";
 
     Initialization::API::save(dsOriginal,outputPath+"/prm.pgm");
+    Initialization::API::save(grid,outputPath+"/grid.obj");
 }
 
-void writeLP(const std::string& outputPath,
+void writeLP(const std::string& outputFilePath,
              const Initialization::Parameters& prm,
              const Initialization::Grid& grid,
              const MyLinearization& linearization)
 {
-    std::cerr << "Writing LP-Program\n";
+    std::cerr << "Writing LP-Program at " << outputFilePath << "\n";
 
-    boost::filesystem::path p(outputPath);
-    boost::filesystem::create_directories(outputPath);
+    boost::filesystem::path p(outputFilePath);
+    boost::filesystem::create_directories(p.remove_filename());
 
-    std::ofstream ofs(outputPath+"/lp-program.txt");
+    std::ofstream ofs(outputFilePath);
     Objective::writeObjective(ofs,linearization.begin(),linearization.end());
     ofs << "\nSubject To\n";
 
@@ -70,6 +72,13 @@ void writeLP(const std::string& outputPath,
     ofs.close();
 }
 
+std::string resolveLPOutputFilePath(const std::string& outputFolder,
+                                    const std::string& imageFilePath)
+{
+    boost::filesystem::path p(imageFilePath);
+    return outputFolder + "/" + p.stem().string() + ".lp";
+}
+
 int main(int argc, char* argv[])
 {
     if(argc<3)
@@ -82,6 +91,7 @@ int main(int argc, char* argv[])
     std::string outputPath = argv[2];
 
     DigitalSet ds = loadImageAsDigitalSet(pgmInputImage);
+    
 
     Initialization::Parameters prm = Initialization::API::initParameters(ds);
     Initialization::Grid grid = Initialization::API::createGrid(prm.odrModel.optRegion,
@@ -94,9 +104,13 @@ int main(int argc, char* argv[])
     linearization.linearize(term.binaryMap);
     linearization.linearize(term.ternaryMap);
 
+    std::string lpOutputFilePath = resolveLPOutputFilePath(outputPath,pgmInputImage);
+    writeLP(lpOutputFilePath,prm,grid,linearization);
 
-    writeLP(outputPath,prm,grid,linearization);
-    saveObjects(outputPath,ds);
+    saveObjects(outputPath,ds,grid);
+
+
+
 
     return 0;
 }

@@ -1,9 +1,13 @@
 #ifndef LPMODEL_GRID_H
 #define LPMODEL_GRID_H
 
+#include <istream>
+#include <ostream>
+
 #include <LPModel/initialization/control/CPixel.h>
 #include <LPModel/initialization/control/CLinel.h>
 #include <LPModel/initialization/control/CEdge.h>
+
 #include "Pixel.h"
 #include "Edge.h"
 #include "Linel.h"
@@ -15,10 +19,15 @@ namespace LPModel
         struct Grid
         {
             typedef DGtal::Z2i::DigitalSet DigitalSet;
+            typedef DGtal::Z2i::Point Point;
 
             typedef Pixel::PixelMap PixelMap;
             typedef Edge::EdgeMap EdgeMap;
             typedef Linel::LinelMap LinelMap;
+
+            typedef std::pair<Point,Pixel> PixelMapElement;
+            typedef std::pair<Point,Linel> LinelMapElement;
+            typedef std::pair<int,Edge> EdgeMapElement;
 
             Grid(const PixelMap& pixelMap,
                  const EdgeMap& edgeMap,
@@ -39,6 +48,9 @@ namespace LPModel
                 CEdge::createEdgeMap(_edgeMap,_pixelMap,_linelMap);
             }
 
+            friend std::ifstream& operator>>(std::ifstream& is, Grid** grid);
+            friend std::ofstream& operator<<(std::ofstream& os, const Grid& grid);
+
             const PixelMap& pixelMap;
             const EdgeMap& edgeMap;
             const LinelMap& linelMap;
@@ -48,6 +60,7 @@ namespace LPModel
             EdgeMap _edgeMap;
             LinelMap _linelMap;
         };
+
     }
 }
 
