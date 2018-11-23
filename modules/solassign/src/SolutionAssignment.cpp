@@ -71,5 +71,5 @@ SolutionAssignment::DigitalSet SolutionAssignment::readSolution(const std::strin
     DigitalSet backTransformed(parameters.odrModel.domain);
 
     parameters.handle.solutionSet(backTransformed,dsOutput,parameters.odrModel,varValue.data(),pointToVar);
-    return backTransformed;
+    return DIPaCUS::Transform::bottomLeftBoundingBoxAtOrigin(backTransformed);
 }
