@@ -8,7 +8,8 @@ add_library(objective SHARED
 
 target_include_directories(objective PRIVATE
         include
-        ../initialization/include
-        ../utils/include
+        ${CMAKE_SOURCE_DIR}/modules/initialization/include
+        ${CMAKE_SOURCE_DIR}/modules/utils/include
+        ${CMAKE_SOURCE_DIR}/modules/terms/include
         ${DGTAL_INCLUDE_DIRS})
 

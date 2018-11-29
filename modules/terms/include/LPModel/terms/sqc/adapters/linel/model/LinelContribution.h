@@ -1,5 +1,5 @@
-#ifndef LPMODEL_LINELCONTRIBUTION_H
-#define LPMODEL_LINELCONTRIBUTION_H
+#ifndef LPMODEL_TERMS_SQC_LINELCONTRIBUTION_H
+#define LPMODEL_TERMS_SQC_LINELCONTRIBUTION_H
 
 #include <DGtal/helpers/StdDefs.h>
 #include <LPModel/utils/model/MultiIndex.h>
@@ -40,4 +40,4 @@ namespace LPModel
     }
 }
 
-#endif //LPMODEL_LINELCONTRIBUTION_H
+#endif //LPMODEL_TERMS_SQC_LINELCONTRIBUTION_H

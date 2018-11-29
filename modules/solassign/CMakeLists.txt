@@ -10,7 +10,8 @@ add_dependencies(solassign initialization)
 
 target_include_directories(solassign PRIVATE
         include
-        ../initialization/include
+        ${CMAKE_SOURCE_DIR}/modules/initialization/include
+        ${CMAKE_SOURCE_DIR}/modules/terms/include
         ${DIPACUS_INCLUDE_DIRS}
         ${DGTAL_INCLUDE_DIRS})
 

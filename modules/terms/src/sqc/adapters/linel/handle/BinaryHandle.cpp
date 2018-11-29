@@ -13,6 +13,6 @@ void BinaryHandle::operator()(const Point &linel,
     linelMI << linel << pixel;
 
     if(this->bm.find(linelMI)==this->bm.end()) this->bm[linelMI]=0;
-    this->bm[linelMI]+=this->pctbr.binaryMap.at(pointelMI);
+    this->bm[linelMI]+=this->pctbr.binaryMap.at(pointelMI)/2.0;
 
 }

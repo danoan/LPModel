@@ -1,5 +1,5 @@
-#ifndef LPMODEL_BINARYHANDLE_H
-#define LPMODEL_BINARYHANDLE_H
+#ifndef LPMODEL_TERMS_SQC_LINEL_BINARYHANDLE_H
+#define LPMODEL_TERMS_SQC_LINEL_BINARYHANDLE_H
 
 #include <DGtal/helpers/StdDefs.h>
 #include <LPModel/terms/sqc/adapters/pointel/model/PointelContribution.h>
@@ -43,4 +43,4 @@ namespace LPModel
     }
 }
 
-#endif //LPMODEL_BINARYHANDLE_H
+#endif //LPMODEL_TERMS_SQC_LINEL_BINARYHANDLE_H

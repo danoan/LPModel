@@ -1,10 +1,12 @@
 #include "LPModel/terms/sqc/control/CTerm.h"
 
+using namespace LPModel::Terms;
 using namespace LPModel::Terms::SquaredCurvature;
 
 Term CTerm::setTerm(const Parameters &prm,
                     const Grid& grid,
-                    const Constants &sqc)
+                    const Constants &sqc,
+                    double weight)
 {
     PointelContribution pctbr = SquaredCurvature::Internal::Pointel::setContribution(prm,
                                                                                      sqc);
@@ -13,12 +15,14 @@ Term CTerm::setTerm(const Parameters &prm,
                                                                                  grid,
                                                                                  pctbr);
 
+
     Term::UnaryMap um;
     Term::BinaryMap bm;
     Term::TernaryMap tm;
 
-    Internal::setBinaryMap(bm,lctbr,grid);
-    Internal::setTernaryMap(tm,lctbr,grid);
+    Internal::setUnaryMap(um,sqc,prm,grid,weight);
+    Internal::setBinaryMap(bm,lctbr,grid,weight);
+    Internal::setTernaryMap(tm,lctbr,grid,weight);
 
     return Term(um,bm,tm);
 }
@@ -80,9 +84,49 @@ void CTerm::Internal::addTernaryElement(Term::TernaryMap& tm,
     tm[uiBI] += value;
 }
 
+void CTerm::Internal::setUnaryMap(Term::UnaryMap& um,
+                                  const Constants& sqc,
+                                  const Parameters& prm,
+                                  const Grid& grid,
+                                  double weight)
+{
+    unsigned long firstLinelVar = grid.pixelMap.size();
+    unsigned long firstEdgeVar = firstLinelVar + grid.linelMap.size();
+
+    DGtal::Z2i::KSpace kspace;
+    kspace.init(prm.odrModel.optRegion.domain().lowerBound(),
+                prm.odrModel.optRegion.domain().upperBound(),
+                true);
+
+    int edgeBaseIndex;
+    double unaryValue=0;
+    for(auto it=grid.linelMap.begin();it!=grid.linelMap.end();++it)
+    {
+        edgeBaseIndex = Initialization::CLinel::edgeBaseIndex(firstLinelVar,
+                                                              firstEdgeVar,
+                                                              it->second.linelIndex);
+
+        unaryValue=0;
+        DGtal::Z2i::SCells pointels = kspace.sLowerIncident( kspace.sCell(it->first,true) );
+        for(auto it2=pointels.begin();it2!=pointels.end();++it2)
+        {
+            unaryValue+=sqc.constantContribution.at(kspace.sKCoords(*it2));
+        }
+
+        Term::UIntMultiIndex unaryIndex1,unaryIndex2;
+        unaryIndex1 << edgeBaseIndex;
+        unaryIndex2 << edgeBaseIndex+1;
+
+        um[unaryIndex1]=weight*(unaryValue/2.0); //Divide by two because of two pointels contributions;
+        um[unaryIndex2]=weight*(unaryValue/2.0); //Divide by two because of two pointels contributions;
+
+    }
+}
+
 void CTerm::Internal::setBinaryMap(Term::BinaryMap& bm,
                                    const LinelContribution& lctbr,
-                                   const Grid& grid)
+                                   const Grid& grid,
+                                   double weight)
 {
     unsigned long firstLinelVar = grid.pixelMap.size();
     unsigned long firstEdgeVar = firstLinelVar + grid.linelMap.size();
@@ -98,8 +142,8 @@ void CTerm::Internal::setBinaryMap(Term::BinaryMap& bm,
                                                               firstEdgeVar,
                                                               grid.linelMap.at(linel).linelIndex);
 
-        addBinaryElement(bm,edgeBaseIndex,grid.pixelMap.at(pixel).varIndex,it->second);
-        addBinaryElement(bm,edgeBaseIndex+1,grid.pixelMap.at(pixel).varIndex,it->second);
+        addBinaryElement(bm,edgeBaseIndex,grid.pixelMap.at(pixel).varIndex,weight*it->second);
+        addBinaryElement(bm,edgeBaseIndex+1,grid.pixelMap.at(pixel).varIndex,weight*it->second);
     }
 
 }
@@ -107,7 +151,8 @@ void CTerm::Internal::setBinaryMap(Term::BinaryMap& bm,
 
 void CTerm::Internal::setTernaryMap(Term::TernaryMap& tm,
                                     const LinelContribution& lctbr,
-                                    const Grid& grid)
+                                    const Grid& grid,
+                                    double weight)
 {
     unsigned long firstLinelVar = grid.pixelMap.size();
     unsigned long firstEdgeVar = firstLinelVar + grid.linelMap.size();
@@ -123,8 +168,8 @@ void CTerm::Internal::setTernaryMap(Term::TernaryMap& tm,
                                                               firstEdgeVar,
                                                               grid.linelMap.at(linel).linelIndex);
 
-        addTernaryElement(tm,edgeBaseIndex,grid.pixelMap.at(pixel1).varIndex,grid.pixelMap.at(pixel2).varIndex,it->second);
-        addTernaryElement(tm,edgeBaseIndex+1,grid.pixelMap.at(pixel1).varIndex,grid.pixelMap.at(pixel2).varIndex,it->second);
+        addTernaryElement(tm,edgeBaseIndex,grid.pixelMap.at(pixel1).varIndex,grid.pixelMap.at(pixel2).varIndex,weight*it->second);
+        addTernaryElement(tm,edgeBaseIndex+1,grid.pixelMap.at(pixel1).varIndex,grid.pixelMap.at(pixel2).varIndex,weight*it->second);
     }
 
 }

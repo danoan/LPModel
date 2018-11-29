@@ -1,5 +1,5 @@
-#ifndef LPMODEL_CEDGE_H
-#define LPMODEL_CEDGE_H
+#ifndef LPMODEL_INITIALIZATION_CEDGE_H
+#define LPMODEL_INITIALIZATION_CEDGE_H
 
 #include <set>
 #include <map>
@@ -39,4 +39,4 @@ namespace LPModel
     }
 }
 
-#endif //LPMODEL_CEDGE_H
+#endif //LPMODEL_INITIALIZATION_CEDGE_H

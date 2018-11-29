@@ -14,7 +14,9 @@ add_library(terms SHARED
         src/sqc/adapters/linel/handle/TernaryHandle.cpp
         src/sqc/control/CTerm.cpp
         src/sqc/control/CConstants.cpp
-        src/sqc/API.cpp)
+        src/sqc/CSqc.cpp
+        src/data/CData.cpp
+        src/API.cpp)
 
 add_dependencies(terms initialization)
 add_dependencies(terms utils)

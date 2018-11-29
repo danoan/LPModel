@@ -1,5 +1,5 @@
-#ifndef LPMODEL_CCONSTANTS_H
-#define LPMODEL_CCONSTANTS_H
+#ifndef LPMODEL_TERMS_SQC_CCONSTANTS_H
+#define LPMODEL_TERMS_SQC_CCONSTANTS_H
 
 #include <LPModel/terms/sqc/model/Constants.h>
 #include <LPModel/initialization/model/Parameters.h>
@@ -24,4 +24,4 @@ namespace LPModel
     }
 }
 
-#endif //LPMODEL_CCONSTANTS_H
+#endif //LPMODEL_TERMS_SQC_CCONSTANTS_H

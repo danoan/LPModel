@@ -1,5 +1,5 @@
-#ifndef LPMODEL_TERNARYHANDLE_H
-#define LPMODEL_TERNARYHANDLE_H
+#ifndef LPMODEL_SQC_TERMS_POINTEL_TERNARYHANDLE_H
+#define LPMODEL_SQC_TERMS_POINTEL_TERNARYHANDLE_H
 
 #include <DGtal/helpers/StdDefs.h>
 #include <LPModel/initialization/model/Parameters.h>
@@ -47,4 +47,4 @@ namespace LPModel
     }
 }
 
-#endif //LPMODEL_TERNARYHANDLE_H
+#endif //LPMODEL_SQC_TERMS_POINTEL_TERNARYHANDLE_H

@@ -11,6 +11,7 @@ link_directories(cmake-build-debug/modules/constraints
         cmake-build-debug/modules/objective
         cmake-build-debug/modules/solassign
         cmake-build-debug/modules/terms
+        cmake-build-debug/modules/utils
         ${CMAKE_PREFIX_PATH}
         ${DIPACUS_LIBS_DIR})
 
@@ -39,6 +40,7 @@ target_link_libraries(export-lp
         -ldipacus-derivates
         -ldipacus-components
         -ldipacus-base
+        -lutils
         -lboost_system
         -lboost_filesystem
         ${DGTAL_LIBRARIES}
@@ -61,6 +63,7 @@ add_executable(generate-solution generate-solution.cpp)
 add_dependencies(generate-solution initialization solassign utils)
 
 target_link_libraries(generate-solution
+        -lterms
         -lsolassign
         -linitialization
         -ldipacus-base
@@ -71,6 +74,7 @@ target_include_directories(generate-solution PRIVATE
         modules/solassign/include
         modules/initialization/include
         modules/utils/include
+        modules/terms/include
         ${DGTAL_INCLUDE_DIRS})
 
 

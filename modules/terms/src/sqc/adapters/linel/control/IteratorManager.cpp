@@ -2,7 +2,6 @@
 
 using namespace LPModel::Terms::SquaredCurvature::Internal::Linel;
 
-#include "DGtal/io/boards/Board2D.h"
 void IteratorManager::run(const Parameters &prm,
                           const Grid& grid,
                           const BinaryCallback &bcbk,
@@ -11,6 +10,7 @@ void IteratorManager::run(const Parameters &prm,
     DGtal::Z2i::DigitalSet temp(prm.odrModel.domain);
     DIPaCUS::Misc::DigitalBallIntersection DBIOptimization = prm.handle.intersectionComputer(prm.radius,
                                                                                              prm.odrModel.optRegion);
+
     KSpace kspace;
     kspace.init(prm.odrModel.domain.lowerBound(),prm.odrModel.domain.upperBound(),true);
     for(auto linelPtr=grid.linelMap.begin();linelPtr!=grid.linelMap.end();++linelPtr)
@@ -42,6 +42,5 @@ void IteratorManager::run(const Parameters &prm,
         }
 
     }
-
 
 }

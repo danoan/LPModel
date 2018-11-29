@@ -20,7 +20,8 @@ namespace LPModel
 
 
                 Term prepare(const Parameters& prm,
-                             const Grid& grid);
+                             const Grid& grid,
+                             double weight);
             }
         }
     }

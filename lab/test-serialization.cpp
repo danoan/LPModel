@@ -1,6 +1,4 @@
-#include <string>
-#include <DIPaCUS/base/Representation.h>
-#include <LPModel/initialization/API.h>
+#include <LPModel/initialization/CData.h>
 
 using namespace LPModel;
 
@@ -8,7 +6,9 @@ typedef DIPaCUS::Representation::Image2D Image2D;
 typedef DGtal::Z2i::DigitalSet DigitalSet;
 
 namespace LPModel{ namespace Initialization{
-    Parameters API::initParameters(const DigitalSet &originalDS,bool evenIteration)
+    Parameters API::initParameters(const DigitalSet &originalDS,
+                                   int levels,
+                                   bool evenIteration)
     {
         const Domain &domain = originalDS.domain();
         DigitalSet boundary(domain);
@@ -16,7 +16,7 @@ namespace LPModel{ namespace Initialization{
 
         ODRInterpixels odrInterpixels(ODRModel::AC_POINTEL,
                                       ODRModel::CM_PIXEL,
-                                      1,
+                                      levels,
                                       ODRModel::FourNeighborhood,
                                       evenIteration);
 
@@ -29,6 +29,8 @@ namespace LPModel{ namespace Initialization{
 
         DigitalSet extendedOptRegion = Internal::extendedOptRegion(odrModel);
         DigitalSet extendedAppRegion = Internal::extendedAppRegion(odrModel);
+        DigitalSet reducedTrustFrg(odrModel.trustFRG.domain());
+        DIPaCUS::SetOperations::setDifference(reducedTrustFrg,odrModel.trustFRG,extendedOptRegion);
 
 
         InterpixelSpaceHandle* ish = (InterpixelSpaceHandle*) odrInterpixels.handle();
@@ -36,21 +38,21 @@ namespace LPModel{ namespace Initialization{
         return Parameters( ODRModel(odrModel.domain,
                                     odrModel.original,
                                     extendedOptRegion,
-                                    odrModel.trustFRG,
+                                    reducedTrustFrg,//odrModel.trustFRG,
                                     odrModel.trustBKG,
                                     extendedAppRegion,
                                     odrModel.toImageCoordinates),
                            *ish );
     }
 
-    Parameters API::readParametersFromFile(const std::string &inputFile, bool fixedEvenIteration)
+    Parameters API::readParametersFromFile(const std::string &inputFile, int levels, bool fixedEvenIteration)
     {
         typedef DIPaCUS::Representation::Image2D Image2D;
         Image2D imgIn = DGtal::GenericReader<Image2D>::import(inputFile);
         DigitalSet ds(imgIn.domain());
         DIPaCUS::Representation::imageAsDigitalSet(ds,imgIn);
 
-        return initParameters(ds,fixedEvenIteration);
+        return initParameters(ds,levels,fixedEvenIteration);
     }
 }}
 
@@ -106,25 +108,26 @@ bool compareGrid(const Initialization::Grid& g1, const Initialization::Grid& g2)
 
 int main(int argc, char* argv[])
 {
-    if(argc<3)
+    if(argc<4)
     {
-        std::cerr <<"Expected pgm-input-image output-path\n";
+        std::cerr <<"Expected pgm-input-image levels output-path\n";
         exit(1);
     }
 
     std::string pgmInputImage = argv[1];
-    std::string outputPath = argv[2];
+    int levels = std::atoi(argv[2]);
+    std::string outputPath = argv[3];
 
     DigitalSet ds = loadImageAsDigitalSet(pgmInputImage);
 
 
-    Initialization::Parameters prm = Initialization::API::initParameters(ds,true);
+    Initialization::Parameters prm = Initialization::API::initParameters(ds,levels,true);
     Initialization::Grid grid = Initialization::API::createGrid(prm.odrModel.optRegion,
                                                                 prm);
 
     saveObjects(outputPath,ds,grid);
 
-    Initialization::Parameters readParameters = Initialization::API::readParametersFromFile(outputPath + "/prm.pgm",true);
+    Initialization::Parameters readParameters = Initialization::API::readParametersFromFile(outputPath + "/prm.pgm",levels,true);
     Initialization::Grid* readGrid = Initialization::API::readGridFromFile(outputPath + "/grid.obj");
 
 

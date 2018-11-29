@@ -1,5 +1,5 @@
-#ifndef LPMODEL_CLINEL_H
-#define LPMODEL_CLINEL_H
+#ifndef LPMODEL_INITIALIZATION_CLINEL_H
+#define LPMODEL_INITIALIZATION_CLINEL_H
 
 #include "DGtal/helpers/StdDefs.h"
 
@@ -76,4 +76,4 @@ namespace LPModel
         }
     }
 }
-#endif //LPMODEL_CLINEL_H
+#endif //LPMODEL_INITIALIZATION_CLINEL_H

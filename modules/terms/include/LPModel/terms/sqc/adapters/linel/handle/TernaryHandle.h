@@ -1,5 +1,5 @@
-#ifndef LPMODEL_TERNARYHANDLE_H
-#define LPMODEL_TERNARYHANDLE_H
+#ifndef LPMODEL_TERMS_SQC_LINEL_TERNARYHANDLE_H
+#define LPMODEL_TERMS_SQC_LINEL_TERNARYHANDLE_H
 
 #include <LPModel/terms/sqc/adapters/pointel/model/PointelContribution.h>
 #include <LPModel/terms/sqc/adapters/linel/model/LinelContribution.h>
@@ -43,4 +43,4 @@ namespace LPModel
     }
 }
 
-#endif //LPMODEL_TERNARYHANDLE_H
+#endif //LPMODEL_TERMS_SQC_LINEL_TERNARYHANDLE_H

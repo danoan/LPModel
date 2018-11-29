@@ -1,5 +1,5 @@
-#ifndef LPMODEL_EDGE_H
-#define LPMODEL_EDGE_H
+#ifndef LPMODEL_INITIALIZATION_EDGE_H
+#define LPMODEL_INITIALIZATION_EDGE_H
 
 #include "Linel.h"
 
@@ -29,4 +29,4 @@ namespace LPModel
     }
 }
 
-#endif //LPMODEL_EDGE_H
+#endif //LPMODEL_INITIALIZATION_EDGE_H

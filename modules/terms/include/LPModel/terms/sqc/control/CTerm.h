@@ -1,5 +1,5 @@
-#ifndef LPMODEL_CTERM_H
-#define LPMODEL_CTERM_H
+#ifndef LPMODEL_TERMS_SQC_CTERM_H
+#define LPMODEL_TERMS_SQC_CTERM_H
 
 
 #include <LPModel/initialization/model/Parameters.h>
@@ -7,7 +7,7 @@
 
 #include <LPModel/initialization/control/CLinel.h>
 
-#include <LPModel/terms/sqc/model/Term.h>
+#include <LPModel/terms/model/Term.h>
 #include <LPModel/terms/sqc/model/Constants.h>
 
 #include <LPModel/terms/sqc/adapters/pointel/model/PointelContribution.h>
@@ -35,7 +35,8 @@ namespace LPModel
 
                 Term setTerm(const Parameters &prm,
                              const Grid& grid,
-                             const Constants &sqc);
+                             const Constants &sqc,
+                             double weight);
 
 
                 namespace Internal
@@ -55,13 +56,21 @@ namespace LPModel
                                   Point &pixel2,
                                   const PointMultiIndex &pmi);
 
+                    void setUnaryMap(Term::UnaryMap& um,
+                                     const Constants& sqc,
+                                     const Parameters& prm,
+                                     const Grid& grid,
+                                     double weight);                    
+
                     void setBinaryMap(Term::BinaryMap& bm,
                                       const LinelContribution& lctbr,
-                                      const Grid& grid);
+                                      const Grid& grid,
+                                      double weight);
 
                     void setTernaryMap(Term::TernaryMap& tm,
                                        const LinelContribution& lctbr,
-                                       const Grid& grid);
+                                       const Grid& grid,
+                                       double weight);
 
                     void addBinaryElement(Term::BinaryMap& bm,
                                           const unsigned long n1,
@@ -82,4 +91,4 @@ namespace LPModel
 }
 
 
-#endif //LPMODEL_CTERM_H
+#endif //LPMODEL_TERMS_SQC_CTERM_H

@@ -1,6 +1,10 @@
-#ifndef LPMODEL_API_H
-#define LPMODEL_API_H
+#ifndef LPMODEL_INITIALIZATION_API_H
+#define LPMODEL_INITIALIZATION_API_H
 
+#include <DGtal/io/writers/GenericWriter.h>
+#include <string>
+
+#include <DIPaCUS/base/Representation.h>
 #include "SCaBOliC/Core/ODRModel.h"
 #include "SCaBOliC/Core/ODRInterpixels.h"
 #include "DIPaCUS/derivates/Misc.h"
@@ -28,15 +32,15 @@ namespace LPModel
             typedef SCaBOliC::Core::ODRModel ODRModel;
 
             //For test only
-            Parameters initParameters(const DigitalSet &originalDS, bool fixedEvenIteration);
-            Parameters readParametersFromFile(const std::string& inputFile, bool fixedEvenIteration);
+            Parameters initParameters(const DigitalSet &originalDS, int levels, bool fixedEvenIteration);
+            Parameters readParametersFromFile(const std::string& inputFile, int levels, bool fixedEvenIteration);
 
 
-            Parameters initParameters(const DigitalSet &originalDS);
+            Parameters initParameters(const DigitalSet &originalDS, int levels);
             Grid createGrid(const DigitalSet& ds,
                             const Parameters& prm);
 
-            Parameters readParametersFromFile(const std::string& inputFile);
+            Parameters readParametersFromFile(const std::string& inputFile, int levels);
             void save(const DigitalSet& dsOriginal, const std::string& outputFile);
             
             Grid* readGridFromFile(const std::string& inputFile);
@@ -59,4 +63,4 @@ namespace LPModel
     }
 }
 
-#endif //LPMODEL_API_H
+#endif //LPMODEL_INITIALIZATION_API_H

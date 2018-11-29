@@ -2,12 +2,27 @@
 
 using namespace LPModel;
 
+void Objective::writeObjective(std::ofstream& ofs,
+                               Terms::Term::GeneralMap::const_iterator begin,
+                               Terms::Term::GeneralMap::const_iterator end)
+{
+    for(auto it=begin;it!=end;++it)
+    {
+        if(it->second>0)
+            ofs << " + ";
+        else if(it->second<0)
+            ofs << " - ";
+        else
+            continue;
+
+        ofs << fabs(it->second) << " " << "x" << *( it->first.begin() );
+    }
+}
+
 void Objective::writeObjective(std::ofstream &ofs,
                                VariableMapIterator begin,
                                VariableMapIterator end)
 {
-    ofs << "Minimize\n obj: ";
-
     for(auto it=begin;it!=end;++it)
     {
         if(it->second>0)

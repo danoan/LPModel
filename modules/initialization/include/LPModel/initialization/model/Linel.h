@@ -1,5 +1,5 @@
-#ifndef LPMODEL_LINEL_H
-#define LPMODEL_LINEL_H
+#ifndef LPMODEL_INITIALIZATION_LINEL_H
+#define LPMODEL_INITIALIZATION_LINEL_H
 
 #include "Pixel.h"
 

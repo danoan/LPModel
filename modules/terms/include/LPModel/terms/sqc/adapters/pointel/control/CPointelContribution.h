@@ -1,5 +1,5 @@
-#ifndef LPMODEL_CPOINTELCONTRIBUTION_H
-#define LPMODEL_CPOINTELCONTRIBUTION_H
+#ifndef LPMODEL_TERMS_SQC_CPOINTELCONTRIBUTION_H
+#define LPMODEL_TERMS_SQC_CPOINTELCONTRIBUTION_H
 
 #include "LPModel/initialization/model/Parameters.h"
 #include "LPModel/initialization/model/Grid.h"
@@ -43,4 +43,4 @@ namespace LPModel
     }
 }
 
-#endif //LPMODEL_CPOINTELCONTRIBUTION_H
+#endif //LPMODEL_TERMS_SQC_CPOINTELCONTRIBUTION_H

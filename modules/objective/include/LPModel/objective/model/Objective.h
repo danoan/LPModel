@@ -5,6 +5,7 @@
 #include <LPModel/utils/model/MultiIndex.h>
 #include <map>
 #include <LPModel/initialization/model/Grid.h>
+#include "LPModel/terms/model/Term.h"
 
 namespace LPModel
 {
@@ -21,6 +22,10 @@ namespace LPModel
         typedef std::map<MyMultiIndex,Index> MultiToUniqueMap;
         typedef MultiToUniqueMap::const_iterator MultiToUniqueMapIterator;
 
+
+        void writeObjective(std::ofstream& ofs,
+                            Terms::Term::GeneralMap::const_iterator begin,
+                            Terms::Term::GeneralMap::const_iterator end);
 
         void writeObjective(std::ofstream& ofs,
                             VariableMapIterator begin,

@@ -1,5 +1,5 @@
-#ifndef LPMODEL_GRID_H
-#define LPMODEL_GRID_H
+#ifndef LPMODEL_INITIALIZATION_GRID_H
+#define LPMODEL_INITIALIZATION_GRID_H
 
 #include <istream>
 #include <ostream>
@@ -64,4 +64,4 @@ namespace LPModel
     }
 }
 
-#endif //LPMODEL_GRID_H
+#endif //LPMODEL_INITIALIZATION_GRID_H

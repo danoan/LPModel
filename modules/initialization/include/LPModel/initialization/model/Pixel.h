@@ -1,5 +1,5 @@
-#ifndef LPMODEL_PIXEL_H
-#define LPMODEL_PIXEL_H
+#ifndef LPMODEL_INITIALIZATION_PIXEL_H
+#define LPMODEL_INITIALIZATION_PIXEL_H
 
 #include "DGtal/helpers/StdDefs.h"
 
@@ -39,4 +39,4 @@ namespace LPModel
 }
 
 
-#endif //LPMODEL_PIXEL_H
+#endif //LPMODEL_INITIALIZATION_PIXEL_H

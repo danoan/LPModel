@@ -1,5 +1,5 @@
-#ifndef LPMODEL_PARAMETERS_H
-#define LPMODEL_PARAMETERS_H
+#ifndef LPMODEL_INITIALIZATION_PARAMETERS_H
+#define LPMODEL_INITIALIZATION_PARAMETERS_H
 
 #include "SCaBOliC/Core/ODRModel.h"
 #include "SCaBOliC/Core/InterpixelSpaceHandle.h"
@@ -34,4 +34,4 @@ namespace LPModel
     }
 }
 
-#endif //LPMODEL_PARAMETERS_H
+#endif //LPMODEL_INITIALIZATION_PARAMETERS_H

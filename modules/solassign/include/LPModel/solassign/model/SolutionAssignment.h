@@ -7,6 +7,9 @@
 #include <LPModel/initialization/model/Grid.h>
 #include <LPModel/initialization/model/Parameters.h>
 
+#include "LPModel/terms/sqc/control/CConstants.h"
+#include "LPModel/terms/sqc/model/Constants.h"
+
 
 namespace LPModel
 {
@@ -21,6 +24,9 @@ namespace LPModel
 
         typedef unsigned long Index;
         typedef std::map<Index,Pixel> ReversePixelMap;
+
+        double skipCommentLines(std::ifstream& ifs,
+                                const Terms::SquaredCurvature::Constants& sqc);
 
         void reversePixelMap(ReversePixelMap& rpm,
                              const Grid& grid);

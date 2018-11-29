@@ -16,6 +16,8 @@ Constants CConstants::setConstants(const Parameters &prm)
                                                                                  prm.odrModel.trustFRG);
 
     Constants::UnaryContribution uc;
+    Constants::ConstantContribution cc;
+    
     Domain domain = prm.odrModel.trustFRG.domain();
     DigitalSet temp(domain);
     for (auto it = prm.odrModel.applicationRegion.begin(); it != prm.odrModel.applicationRegion.end(); ++it) {
@@ -24,12 +26,11 @@ Constants CConstants::setConstants(const Parameters &prm)
 
         double Ij = temp.size();
 
-        W += pow(C, 2);
-        W += pow(Ij, 2);
-        W += -2 * C * Ij;
+        cc[*it] = pow(C, 2) + pow(Ij, 2) -2 * C * Ij; 
+        W += cc[*it];
 
         uc[*it] = 1 - 2 * C + 2 * Ij;
     }
 
-    return Constants(W,C,F,R,uc);
+    return Constants(W,C,F,R,cc,uc);
 }

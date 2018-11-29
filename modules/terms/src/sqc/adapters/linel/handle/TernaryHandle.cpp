@@ -14,5 +14,5 @@ void TernaryHandle::operator()(const Point &linel,
     linelMI << linel << pixel1 << pixel2;
 
     if(this->tm.find(linelMI)==this->tm.end()) this->tm[linelMI]=0;
-    this->tm[linelMI]+=this->pctbr.ternaryMap.at(pointelMI);
+    this->tm[linelMI]+=this->pctbr.ternaryMap.at(pointelMI)/2.0;
 }
