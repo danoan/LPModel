@@ -1,5 +1,5 @@
 #include <DGtal/helpers/StdDefs.h>
-#include <LPModel/initialization/CData.h>
+#include <LPModel/initialization/API.h>
 #include "LPModel/solassign/model/SolutionAssignment.h"
 
 /*

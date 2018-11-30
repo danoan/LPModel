@@ -3,7 +3,7 @@
 
 #include <map>
 #include <DGtal/helpers/StdDefs.h>
-#include "LPModel/utils/model/MultiIndex.h"
+#include "LPModel/terms/model/MultiIndex.h"
 
 namespace LPModel
 {

@@ -2,7 +2,7 @@
 #define LPMODEL_TERMS_SQC_TERM_H
 
 #include <map>
-#include "LPModel/utils/model/MultiIndex.h"
+#include "MultiIndex.h"
 
 namespace LPModel
 {

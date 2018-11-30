@@ -2,7 +2,15 @@
 #define LPMODEL_LPWRITER_H
 
 #include <fstream>
+
+#include <boost/filesystem/path.hpp>
+#include <boost/filesystem/operations.hpp>
+
+#include "LPModel/initialization/model/Parameters.h"
+#include "LPModel/linearization/model/Linearization.h"
 #include "LPModel/constraints/ClosedAndConnected.h"
+#include "LPModel/objective/model/Objective.h"
+#include "LPModel/terms/model/Term.h"
 
 namespace LPModel
 {
@@ -18,12 +26,20 @@ namespace LPModel
         typedef Constraints::ClosedAndConnected::PixelIncidence PixelIncidence;
         typedef Constraints::ClosedAndConnected::EdgeIncidence EdgeIncidence;
 
+        typedef Linearization< Terms::Term::UIntMultiIndex,double > MyLinearization;
+
         void writePixel(std::ofstream& ofs,const PixelIncidence& pi);
         void writeEdge(std::ofstream &ofs, const EdgeIncidence &ei);
 
         void writeConstraint(std::ofstream& ofs,
                              int& cIndexStart,
                              const LinelConstraints& lc);
+
+        void writeLP(const std::string& outputFilePath,
+                     const Initialization::Parameters& prm,
+                     const Initialization::Grid& grid,
+                     const Terms::Term::UnaryMap& um,
+                     const MyLinearization& linearization);
     }
 }
 

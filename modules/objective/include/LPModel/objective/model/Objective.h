@@ -2,7 +2,7 @@
 #define LPMODEL_OBJECTIVE_H
 
 #include <fstream>
-#include <LPModel/utils/model/MultiIndex.h>
+#include <LPModel/terms/model/MultiIndex.h>
 #include <map>
 #include <LPModel/initialization/model/Grid.h>
 #include "LPModel/terms/model/Term.h"

@@ -41,8 +41,8 @@ void ClosedAndConnected::Internal::pixelIncident(PartialPixelIncidence& ppi,
     {
         const Linel& l = it->second;
 
-        PixelIncidence p1(l.p1,Internal::positiveIncident(l,l.p1));
-        PixelIncidence p2(l.p2,Internal::positiveIncident(l,l.p2));
+        PixelIncidence p1(l.p1,Internal::positiveIncident(l,l.p1)); //Reference pixel
+        PixelIncidence p2(l.p2,!Internal::positiveIncident(l,l.p2)); //The other pixel.
 
         ppi[l] = std::vector<PixelIncidence>({p1,p2});
     }

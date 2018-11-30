@@ -6,7 +6,7 @@ find_package(DGtal REQUIRED)
 add_library(solassign SHARED
         src/SolutionAssignment.cpp)
 
-add_dependencies(solassign initialization)
+add_dependencies(solassign initialization terms)
 
 target_include_directories(solassign PRIVATE
         include
@@ -16,4 +16,5 @@ target_include_directories(solassign PRIVATE
         ${DGTAL_INCLUDE_DIRS})
 
 target_link_libraries(solassign PRIVATE
-        -linitialization)
+        -linitialization
+        -lterms)

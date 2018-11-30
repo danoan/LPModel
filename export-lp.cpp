@@ -7,7 +7,7 @@
 #include <LPModel/utils/dispUtils.h>
 #include <LPModel/terms/API.h>
 
-#include "LPModel/initialization/CData.h"
+#include "LPModel/initialization/API.h"
 #include "LPModel/initialization/Shapes.h"
 
 #include "LPModel/terms/sqc/CSqc.h"
@@ -22,8 +22,6 @@ using namespace LPModel::Terms;
 
 typedef DIPaCUS::Representation::Image2D Image2D;
 typedef DGtal::Z2i::DigitalSet DigitalSet;
-
-typedef Linearization< Terms::Term::UIntMultiIndex,double > MyLinearization;
 
 DigitalSet loadImageAsDigitalSet(const std::string& imageFilePath)
 {
@@ -44,41 +42,6 @@ void saveObjects(const std::string& outputPath,
 
     Initialization::API::save(dsOriginal,outputPath+"/prm.pgm");
     Initialization::API::save(grid,outputPath+"/grid.obj");
-}
-
-void writeLP(const std::string& outputFilePath,
-             const Initialization::Parameters& prm,
-             const Initialization::Grid& grid,
-             const Terms::Term::UnaryMap& um,
-             const MyLinearization& linearization)
-{
-    std::cerr << "Writing LP-Program at " << outputFilePath << "\n";
-
-    boost::filesystem::path p(outputFilePath);
-    boost::filesystem::create_directories(p.remove_filename());
-
-    std::ofstream ofs(outputFilePath);
-    ofs << "Minimize\n obj: ";
-
-    Objective::writeObjective(ofs,um.begin(),um.end());
-    Objective::writeObjective(ofs,linearization.begin(),linearization.end());
-
-
-    ofs << "\nSubject To\n";
-    int constraintNum=1;
-    Objective::writeLinearizationConstraints(ofs,constraintNum,linearization.ubegin(),linearization.uend());
-
-
-    Constraints::ClosedAndConnected::LinelConstraints lc;
-    Constraints::ClosedAndConnected::closedConnectedContraints(lc,grid);
-    LPWriter::writeConstraint(ofs,constraintNum,lc);
-
-    ofs << "\nBounds\n";
-    Objective::writeBounds(ofs,grid,linearization.begin(),linearization.end());
-    ofs << "\nEnd";
-
-    ofs.flush();
-    ofs.close();
 }
 
 std::string resolveLPOutputFilePath(const std::string& outputFolder,
@@ -123,12 +86,13 @@ int main(int argc, char* argv[])
 
 
     unsigned long nextIndex = grid.pixelMap.size()+grid.linelMap.size()+grid.edgeMap.size();
-    MyLinearization linearization(nextIndex);
+
+    LPWriter::MyLinearization linearization(nextIndex);
     linearization.linearize(mergedTerm.binaryMap);
     linearization.linearize(mergedTerm.ternaryMap);
 
     std::string lpOutputFilePath = resolveLPOutputFilePath(outputPath,pgmInputImage);
-    writeLP(lpOutputFilePath,prm,grid,mergedTerm.unaryMap,linearization);
+    LPWriter::writeLP(lpOutputFilePath,prm,grid,mergedTerm.unaryMap,linearization);
 
     saveObjects(outputPath,ds,grid);
 

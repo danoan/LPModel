@@ -1,7 +1,7 @@
 #include "DGtal/helpers/StdDefs.h"
 #include "DGtal/io/boards/Board2D.h"
 
-#include <LPModel/initialization/CData.h>
+#include <LPModel/initialization/API.h>
 #include <DGtal/io/writers/GenericWriter.h>
 #include "LPModel/solassign/model/SolutionAssignment.h"
 #include "modules/terms/include/LPModel/terms/sqc/control/CConstants.h"

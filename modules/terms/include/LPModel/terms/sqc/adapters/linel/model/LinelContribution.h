@@ -2,7 +2,7 @@
 #define LPMODEL_TERMS_SQC_LINELCONTRIBUTION_H
 
 #include <DGtal/helpers/StdDefs.h>
-#include <LPModel/utils/model/MultiIndex.h>
+#include <LPModel/terms/model/MultiIndex.h>
 
 namespace LPModel
 {

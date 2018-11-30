@@ -10,6 +10,6 @@ add_dependencies(constraints initialization terms)
 
 target_include_directories(constraints PRIVATE
         include
-        ../initialization/include
-        ../terms/include
+        ${CMAKE_SOURCE_DIR}/modules/initialization/include
+        ${CMAKE_SOURCE_DIR}/modules/terms/include
         ${DGTAL_INCLUDE_DIRS})

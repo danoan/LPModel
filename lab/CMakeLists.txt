@@ -47,3 +47,34 @@ target_link_libraries(test-levels PRIVATE
         ${DGTAL_LIBRARIES})
 
 
+
+
+
+add_executable(test-lp-creation test-lp-creation.cpp)
+add_dependencies(test-lp-creation initialization utils terms linearization lpwriter)
+
+target_include_directories(test-lp-creation PRIVATE
+        ${CMAKE_SOURCE_DIR}/modules/initialization/include
+        ${CMAKE_SOURCE_DIR}/modules/terms/include
+        ${CMAKE_SOURCE_DIR}/modules/constraints/include
+        ${CMAKE_SOURCE_DIR}/modules/objective/include
+        ${CMAKE_SOURCE_DIR}/modules/linearization/include
+        ${CMAKE_SOURCE_DIR}/modules/lpwriter/include
+        ${CMAKE_SOURCE_DIR}/modules/utils/include
+        ${DIPACUS_INCLUDE_DIRS}
+        ${DGTAL_INCLUDE_DIRS})
+
+target_link_libraries(test-lp-creation PRIVATE
+        -lutils
+        -llpwriter
+        -lconstraints
+        -lobjective
+        -lterms
+        -linitialization
+        -lscabolic-core
+        -ldipacus-components
+        -lboost_system
+        -lboost_filesystem
+        ${DIPACUS_LIBS_DIR}
+        ${DGTAL_LIBRARIES})
+

@@ -19,11 +19,9 @@ add_library(terms SHARED
         src/API.cpp)
 
 add_dependencies(terms initialization)
-add_dependencies(terms utils)
 
 target_include_directories(terms PRIVATE
         include
-        ../utils/include
-        ../initialization/include
+        ${CMAKE_SOURCE_DIR}/modules/initialization/include
         ${DIPACUS_INCLUDE_DIRS}
         ${DGTAL_INCLUDE_DIRS})

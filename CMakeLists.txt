@@ -31,8 +31,8 @@ add_executable(export-lp export-lp.cpp)
 add_dependencies(export-lp constraints initialization linearization lpwriter objective solassign terms utils)
 
 target_link_libraries(export-lp
-        -lobjective
         -llpwriter
+        -lobjective
         -lconstraints
         -lterms
         -linitialization
