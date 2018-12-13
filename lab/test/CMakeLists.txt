@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.8)
-project(lpmodel-lab-serialization)
+project(lpmodel-lab-test)
 
 find_package(DGtal REQUIRED)
 

@@ -24,7 +24,8 @@ add_subdirectory(modules/solassign)
 add_subdirectory(modules/terms)
 add_subdirectory(modules/utils)
 
-add_subdirectory(lab)
+add_subdirectory(lab/test)
+add_subdirectory(lab/exp)
 
 
 add_executable(export-lp export-lp.cpp)

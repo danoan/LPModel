@@ -25,12 +25,12 @@ CLinel::Internal::IncidentLinels CLinel::Internal::incidentLinels(const KPoint &
                        SignedKPoint( pixel+KPoint(0,-1), true) } );
 }
 
-CLinel::KPoint CLinel::Internal::findOutRangePixelCoord(const PixelMap& pixelMap)
+CLinel::KPoint CLinel::Internal::findAuxiliarPixelCoord(const PixelMap& pixelMap,
+                                                        Pixel::CellType ct)
 {
-    KPoint outRangePixelCoord;
     for(auto it=pixelMap.begin();it!=pixelMap.end();++it)
     {
-        if(it->second.varIndex==-1) return it->first;
+        if(it->second.ct==ct) return it->first;
     }
 }
 
@@ -41,14 +41,14 @@ void CLinel::Internal::auxiliaryMap(AuxLinelMap& auxLinelMap,
     KSpace kspace;
     kspace.init(domain.lowerBound(),domain.upperBound(),true);
 
-    KPoint outRangePixelCoord = findOutRangePixelCoord(pixelMap);
+    KPoint auxInvalidPixelCoord  = findAuxiliarPixelCoord(pixelMap,Pixel::CellType::AuxiliarInvalid);
     DGtal::Z2i::SCell pixelModel = kspace.sCell( DGtal::Z2i::Point(1,1),true);
 
     std::set<KPoint> testSet;
     int j=0;
     for(auto it1=pixelMap.begin();it1!=pixelMap.end();++it1)
     {
-        if(it1->second.varIndex==-1) continue;
+        if(it1->second.ct!=Pixel::CellType::Variable) continue;
         DGtal::Z2i::Point pCoord = it1->first;
         Internal::IncidentLinels incLinels = Internal::incidentLinels(pCoord);
 
@@ -59,9 +59,9 @@ void CLinel::Internal::auxiliaryMap(AuxLinelMap& auxLinelMap,
             if( auxLinelMap.find(coord)==auxLinelMap.end() )
             {
                 if(coord(0)%2==0) //Vertical
-                    auxLinelMap.insert( AuxMapElement(coord,_Linel(coord,outRangePixelCoord,Linel::LinelOrientation::Up)) );
+                    auxLinelMap.insert( AuxMapElement(coord,_Linel(coord,auxInvalidPixelCoord ,Linel::LinelOrientation::Up)) );
                 else
-                    auxLinelMap.insert( AuxMapElement(coord,_Linel(coord,outRangePixelCoord,Linel::LinelOrientation::Right) ) );
+                    auxLinelMap.insert( AuxMapElement(coord,_Linel(coord,auxInvalidPixelCoord  ,Linel::LinelOrientation::Right) ) );
             }
             _Linel& l = auxLinelMap.at(coord);
 
@@ -70,6 +70,76 @@ void CLinel::Internal::auxiliaryMap(AuxLinelMap& auxLinelMap,
         }
 
     }
+}
+
+void CLinel::Internal::fixInvalidAuxPixels(AuxLinelMap& auxLinelMap,
+                                           const PixelMap& pixelMap,
+                                           const Domain& domain,
+                                           const DigitalSet& trustFrg)
+{
+    KSpace kspace;
+    kspace.init(domain.lowerBound(),domain.upperBound(),true);
+
+    KPoint auxInvalidPixelCoord  = findAuxiliarPixelCoord(pixelMap,Pixel::CellType::AuxiliarInvalid);
+    KPoint auxBkgPixelCoord  = findAuxiliarPixelCoord(pixelMap,Pixel::CellType::AuxiliarBkg);
+    KPoint auxFrgPixelCoord  = findAuxiliarPixelCoord(pixelMap,Pixel::CellType::AuxiliarFrg);
+
+    for(auto it=auxLinelMap.begin();it!=auxLinelMap.end();++it)
+    {
+        KSpace::SCells pixels = kspace.sUpperIncident( kspace.sCell( it->second.linelCoord,true ) );
+        for(auto itp=pixels.begin();itp!=pixels.end();++itp)
+        {
+
+            if(it->second.pCoord1==auxInvalidPixelCoord)
+            {
+                if( trustFrg.operator()( kspace.sKCoords( *itp ) ) )
+                {
+                    it->second.pCoord1 = auxFrgPixelCoord;
+                }
+                else
+                {
+                    it->second.pCoord1 = auxBkgPixelCoord;
+                }
+            }
+
+
+            if(it->second.pCoord2==auxInvalidPixelCoord)
+            {
+                if( trustFrg.operator()( kspace.sKCoords( *itp ) ) )
+                {
+                    it->second.pCoord2 = auxFrgPixelCoord;
+                }
+                else
+                {
+                    it->second.pCoord2 = auxBkgPixelCoord;
+                }
+            }
+
+
+        }
+
+
+
+    }
+}
+
+bool CLinel::Internal::validAuxLinelMap(const AuxLinelMap &auxLinelMap,
+                                        const PixelMap& pixelMap)
+{
+    KPoint auxInvalidPixelCoord  = findAuxiliarPixelCoord(pixelMap,Pixel::CellType::AuxiliarInvalid);
+    for(auto it=auxLinelMap.begin();it!=auxLinelMap.end();++it)
+    {
+        if( it->second.pCoord1 == auxInvalidPixelCoord )
+        {
+            return false;
+        }
+        if( it->second.pCoord2 == auxInvalidPixelCoord )
+        {
+            return false;
+        }
+    }
+
+    return true;
 }
 
 int CLinel::edgeBaseIndex(const int firstLinelVar,
@@ -82,12 +152,16 @@ int CLinel::edgeBaseIndex(const int firstLinelVar,
 
 
 void CLinel::createLinelSet(LinelMap &linelMap,
+                            const DigitalSet& trustFrg,
                             const Domain &domain,
                             const PixelMap &pixelMap)
 {
 
     Internal::AuxLinelMap auxLinelMap;
     Internal::auxiliaryMap(auxLinelMap,domain,pixelMap);
+
+    Internal::fixInvalidAuxPixels(auxLinelMap,pixelMap,domain,trustFrg);
+    assert( Internal::validAuxLinelMap(auxLinelMap,pixelMap) );
 
 
     unsigned long linelIndex=pixelMap.size();
@@ -116,9 +190,6 @@ Linel CLinel::readLinel(std::istream& is, const PixelIndexMap& pim)
     is.read( (char*) &p2VarIndex, sizeof(p2VarIndex));
     is.read( (char*) &orientation, sizeof(orientation));
     is.read( (char*) &linelIndex, sizeof(linelIndex));
-
-    if(linelIndex >= (unsigned long) -1)
-            std::cout << "OPS" << std::endl;
 
     return Linel(x,
                  y,

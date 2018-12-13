@@ -24,6 +24,10 @@ Initialization::Parameters initParameters()
     original.insert(Point(6,4));
     original.insert(Point(5,4));
 
+    DGtal::Board2D board;
+    board << original;
+    board.saveEPS("output/input-set.eps");
+
 
     ODRInterpixels odrInterpixels(ODRModel::AC_POINTEL,
                                   ODRModel::CM_PIXEL,

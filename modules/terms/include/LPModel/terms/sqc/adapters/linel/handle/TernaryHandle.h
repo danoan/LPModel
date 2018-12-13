@@ -1,8 +1,11 @@
-#ifndef LPMODEL_TERMS_SQC_LINEL_TERNARYHANDLE_H
-#define LPMODEL_TERMS_SQC_LINEL_TERNARYHANDLE_H
+#ifndef LPMODEL_SQC_TERMS_LINEL_TERNARYHANDLE_H
+#define LPMODEL_SQC_TERMS_LINEL_TERNARYHANDLE_H
 
-#include <LPModel/terms/sqc/adapters/pointel/model/PointelContribution.h>
+#include <DGtal/helpers/StdDefs.h>
+#include <LPModel/initialization/model/Parameters.h>
+#include <LPModel/initialization/model/Grid.h>
 #include <LPModel/terms/sqc/adapters/linel/model/LinelContribution.h>
+#include <LPModel/terms/sqc/model/Constants.h>
 
 namespace LPModel
 {
@@ -17,30 +20,31 @@ namespace LPModel
                     class TernaryHandle
                     {
                     public:
+                        typedef LinelContribution::PointMultiIndex PointMultiIndex;
+                        typedef std::map<PointMultiIndex,double> TernaryMap;
+                        
+                        typedef Initialization::Parameters Parameters;
+                        typedef SquaredCurvature::Constants Constants;
+
+                        typedef DGtal::Z2i::KSpace KSpace;
                         typedef DGtal::Z2i::Point Point;
 
-                        typedef LinelContribution::TernaryMap TernaryMap;
-                        typedef Internal::Pointel::PointelContribution PointelContribution;
-
-                    public:
                         TernaryHandle(TernaryMap& tm,
-                                     const PointelContribution& pctbr):tm(tm),
-                                                                       pctbr(pctbr)
+                                      const Constants& sqc):tm(tm),
+                                                            sqc(sqc)
                         {}
 
-                        void operator()(const Point& linel,
-                                        const Point& pointel,
-                                        const Point& pixel1,
-                                        const Point& pixel2);
+                        void operator()(const Point& p1, const Point& p2, const Point &p3);
 
                     private:
-                        const PointelContribution& pctbr;
+                        const Constants& sqc;
                         TernaryMap& tm;
                     };
                 }
             }
+
         }
     }
 }
 
-#endif //LPMODEL_TERMS_SQC_LINEL_TERNARYHANDLE_H
+#endif //LPMODEL_SQC_TERMS_LINEL_TERNARYHANDLE_H

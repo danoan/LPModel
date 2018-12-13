@@ -3,26 +3,38 @@
 using namespace LPModel::Terms;
 using namespace LPModel::Terms::SquaredCurvature;
 
+
+
 Term CTerm::setTerm(const Parameters &prm,
                     const Grid& grid,
                     const Constants &sqc,
                     double weight)
 {
-    PointelContribution pctbr = SquaredCurvature::Internal::Pointel::setContribution(prm,
-                                                                                     sqc);
-
     LinelContribution lctbr = SquaredCurvature::Internal::Linel::setContribution(prm,
-                                                                                 grid,
-                                                                                 pctbr);
+                                                                                 sqc);
 
 
     Term::UnaryMap um;
     Term::BinaryMap bm;
     Term::TernaryMap tm;
 
+    LinelFullContrib lfc;
+
     Internal::setUnaryMap(um,sqc,prm,grid,weight);
-    Internal::setBinaryMap(bm,lctbr,grid,weight);
-    Internal::setTernaryMap(tm,lctbr,grid,weight);
+    Internal::setBinaryMap(bm,lfc,sqc,lctbr,grid,weight);
+    Internal::setTernaryMap(tm,lfc,sqc,lctbr,grid,weight);
+
+
+    std::function<bool(const LinelFullContrib&)> checkFn = [](const LinelFullContrib& lfc){
+        for(auto it=lfc.begin();it!=lfc.end();++it)
+        {
+            if(it->second<0) return false;
+        }
+        return true;
+    };
+
+    assert(checkFn(lfc));
+
 
     return Term(um,bm,tm);
 }
@@ -106,24 +118,21 @@ void CTerm::Internal::setUnaryMap(Term::UnaryMap& um,
                                                               firstEdgeVar,
                                                               it->second.linelIndex);
 
-        unaryValue=0;
-        DGtal::Z2i::SCells pointels = kspace.sLowerIncident( kspace.sCell(it->first,true) );
-        for(auto it2=pointels.begin();it2!=pointels.end();++it2)
-        {
-            unaryValue+=sqc.constantContribution.at(kspace.sKCoords(*it2));
-        }
+        unaryValue=sqc.constantContribution.at(it->first);
 
         Term::UIntMultiIndex unaryIndex1,unaryIndex2;
         unaryIndex1 << edgeBaseIndex;
         unaryIndex2 << edgeBaseIndex+1;
 
-        um[unaryIndex1]=weight*(unaryValue/2.0); //Divide by two because of two pointels contributions;
-        um[unaryIndex2]=weight*(unaryValue/2.0); //Divide by two because of two pointels contributions;
+        um[unaryIndex1]=weight*unaryValue;
+        um[unaryIndex2]=weight*unaryValue;
 
     }
 }
 
 void CTerm::Internal::setBinaryMap(Term::BinaryMap& bm,
+                                   LinelFullContrib& lfc,
+                                   const Constants& sqc,
                                    const LinelContribution& lctbr,
                                    const Grid& grid,
                                    double weight)
@@ -142,6 +151,9 @@ void CTerm::Internal::setBinaryMap(Term::BinaryMap& bm,
                                                               firstEdgeVar,
                                                               grid.linelMap.at(linel).linelIndex);
 
+        if(lfc.find(linel)==lfc.end()) lfc[linel]=sqc.constantContribution.at(linel);
+        lfc[linel]+=weight*it->second;
+
         addBinaryElement(bm,edgeBaseIndex,grid.pixelMap.at(pixel).varIndex,weight*it->second);
         addBinaryElement(bm,edgeBaseIndex+1,grid.pixelMap.at(pixel).varIndex,weight*it->second);
     }
@@ -150,6 +162,8 @@ void CTerm::Internal::setBinaryMap(Term::BinaryMap& bm,
 
 
 void CTerm::Internal::setTernaryMap(Term::TernaryMap& tm,
+                                    LinelFullContrib& lfc,
+                                    const Constants& sqc,
                                     const LinelContribution& lctbr,
                                     const Grid& grid,
                                     double weight)
@@ -167,6 +181,8 @@ void CTerm::Internal::setTernaryMap(Term::TernaryMap& tm,
         edgeBaseIndex = Initialization::CLinel::edgeBaseIndex(firstLinelVar,
                                                               firstEdgeVar,
                                                               grid.linelMap.at(linel).linelIndex);
+
+        lfc[linel]+=weight*it->second;
 
         addTernaryElement(tm,edgeBaseIndex,grid.pixelMap.at(pixel1).varIndex,grid.pixelMap.at(pixel2).varIndex,weight*it->second);
         addTernaryElement(tm,edgeBaseIndex+1,grid.pixelMap.at(pixel1).varIndex,grid.pixelMap.at(pixel2).varIndex,weight*it->second);

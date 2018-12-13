@@ -39,7 +39,6 @@ namespace LPModel{ namespace Initialization{
         {
             pim.insert( std::pair<unsigned long,Pixel>(it->second.varIndex,it->second) );
         }
-        pim.insert( std::pair<unsigned long,Pixel>(-1,Pixel(0,0,-1,Pixel::CellType::Auxiliar)));
 
         unsigned long linelMapSize;
         is.read( (char*) &linelMapSize, sizeof(unsigned long) );

@@ -10,10 +10,6 @@
 #include <LPModel/terms/model/Term.h>
 #include <LPModel/terms/sqc/model/Constants.h>
 
-#include <LPModel/terms/sqc/adapters/pointel/model/PointelContribution.h>
-#include <LPModel/terms/sqc/adapters/pointel/control/CPointelContribution.h>
-#include <LPModel/terms/sqc/adapters/pointel/control/IteratorManager.h>
-
 #include <LPModel/terms/sqc/adapters/linel/model/LinelContribution.h>
 #include <LPModel/terms/sqc/adapters/linel/control/CLinelContribution.h>
 
@@ -30,8 +26,9 @@ namespace LPModel
                 typedef Initialization::Grid Grid;
                 typedef SquaredCurvature::Constants Constants;
 
-                typedef Internal::Pointel::PointelContribution PointelContribution;
                 typedef Internal::Linel::LinelContribution LinelContribution;
+
+                typedef std::map<DGtal::Z2i::Point,double> LinelFullContrib;
 
                 Term setTerm(const Parameters &prm,
                              const Grid& grid,
@@ -63,11 +60,15 @@ namespace LPModel
                                      double weight);                    
 
                     void setBinaryMap(Term::BinaryMap& bm,
+                                      LinelFullContrib& lfc,
+                                      const Constants& sqc,
                                       const LinelContribution& lctbr,
                                       const Grid& grid,
                                       double weight);
 
                     void setTernaryMap(Term::TernaryMap& tm,
+                                       LinelFullContrib& lfc,
+                                       const Constants& sqc,
                                        const LinelContribution& lctbr,
                                        const Grid& grid,
                                        double weight);

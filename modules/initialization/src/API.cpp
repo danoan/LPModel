@@ -6,7 +6,7 @@ API::DigitalSet API::Internal::extendedOptRegion(const ODRModel &odrModel)
 {
     typedef DGtal::Z2i::Point Point;
 
-    Point neighPixel[4] = {Point(1,1),Point(-1,-1),Point(1,-1),Point(-1,1)};
+    Point neighPixel[4] = {Point(1,0),Point(0,1),Point(-1,0),Point(0,-1)};
     std::map<Point,int> incidence;
 
     DigitalSet extOptRegion = odrModel.optRegion;
@@ -16,6 +16,7 @@ API::DigitalSet API::Internal::extendedOptRegion(const ODRModel &odrModel)
         for(int i=0;i<4;++i)
         {
             Point np = *it+neighPixel[i];
+            if( !(np(0)%2==1 && np(1)%2==1) ) continue; //If is not a pixel
             if(incidence.find(np)==incidence.end()) incidence[np]=0;
             incidence[np]+=1;
         }
@@ -32,7 +33,7 @@ API::DigitalSet API::Internal::extendedOptRegion(const ODRModel &odrModel)
 API::DigitalSet API::Internal::extendedAppRegion(const ODRModel &odrModel)
 {
     typedef DGtal::Z2i::Point Point;
-    Point neighPointel[4] = {Point(1,1),Point(-1,-1),Point(1,-1),Point(-1,1) };
+    Point neighPointel[4] = {Point(1,0),Point(0,1),Point(-1,0),Point(0,-1) };
 
     DigitalSet extAppRegion = odrModel.applicationRegion;
     for(auto it=odrModel.optRegion.begin();it!=odrModel.optRegion.end();++it)
@@ -88,7 +89,7 @@ bool API::Internal::consistentGrid(const Parameters& prm,
 
     for(auto it=grid.pixelMap.begin();it!=grid.pixelMap.end();++it)
     {
-        if(it->second.varIndex==-1) continue;
+        if(it->second.ct!=Pixel::CellType::Variable) continue;
         gridSet.insert(it->first);
     }
 
@@ -103,7 +104,7 @@ Parameters API::initParameters(const DigitalSet &originalDS, int levels)
     DigitalSet boundary(domain);
     DigitalSet optRegion(domain);
 
-    ODRInterpixels odrInterpixels(ODRModel::AC_POINTEL,
+    ODRInterpixels odrInterpixels(ODRModel::AC_LINEL,
                                   ODRModel::CM_PIXEL,
                                   levels,
                                   ODRModel::FourNeighborhood,
@@ -137,8 +138,8 @@ Parameters API::initParameters(const DigitalSet &originalDS, int levels)
 Grid API::createGrid(const DigitalSet &ds,
                      const Parameters& prm)
 {
-    Grid grid(ds);
-    assert(grid.pixelMap.size()==ds.size()+1);
+    Grid grid(ds,prm.odrModel.trustFRG);
+    assert(grid.pixelMap.size()==ds.size()+3);
 
     int boundaryLinels = Internal::boundaryLinels(ds);
 

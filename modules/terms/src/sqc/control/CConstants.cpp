@@ -7,6 +7,8 @@ Constants CConstants::setConstants(const Parameters &prm)
     DigitalSet tempBall( Domain( 2*Point(-prm.radius,-prm.radius), 2*Point(prm.radius,prm.radius) ) );
     DIPaCUS::Misc::DigitalBallIntersection::digitalBall(tempBall,Point(0,0),prm.radius);
 
+
+
     double W = 0;
     double C = tempBall.size() / 2.0;
     double F = 9.0 / pow(prm.radius, 6.0);

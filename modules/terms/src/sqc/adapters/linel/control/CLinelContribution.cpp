@@ -2,18 +2,18 @@
 
 using namespace LPModel::Terms::SquaredCurvature::Internal;
 
-Linel::LinelContribution Linel::setContribution(const Parameters& prm,
-                                                const Grid& grid,
-                                                const PointelContribution& pctbr)
+Linel::LinelContribution Linel::setContribution(const Parameters &prm,
+                                                const Constants &sqc)
 {
     LinelContribution::UnaryMap um;
     LinelContribution::BinaryMap bm;
     LinelContribution::TernaryMap tm;
 
-    BinaryHandle bh(bm,pctbr);
-    TernaryHandle th(tm,pctbr);
+    BinaryHandle bh(bm,sqc);
+    TernaryHandle th(tm,sqc);
 
-    IteratorManager::run(prm,grid,bh,th);
+    IteratorManager::run(prm,bh,th);
 
-    return LinelContribution (um,bm,tm);
+
+    return LinelContribution(um,bm,tm);
 }

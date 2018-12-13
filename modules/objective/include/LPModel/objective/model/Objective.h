@@ -43,9 +43,11 @@ namespace LPModel
                                           const Index& uniqueIndex);
 
         void writeBounds(std::ofstream& ofs,
-                         const Grid& grid,
                          VariableMapIterator begin,
                          VariableMapIterator end);
+
+        void writeBinaries(std::ofstream& ofs,
+                           const Grid& grid);
     }
 }
 

@@ -2,8 +2,10 @@
 #define LPMODEL_TERMS_SQC_LINEL_BINARYHANDLE_H
 
 #include <DGtal/helpers/StdDefs.h>
-#include <LPModel/terms/sqc/adapters/pointel/model/PointelContribution.h>
-#include <LPModel/terms/sqc/adapters/linel/model/LinelContribution.h>
+#include <LPModel/initialization/model/Parameters.h>
+#include <LPModel/initialization/model/Grid.h>
+#include <LPModel/terms/sqc/model/Constants.h>
+#include "LPModel/terms/sqc/adapters/linel/model/LinelContribution.h"
 
 namespace LPModel
 {
@@ -18,28 +20,31 @@ namespace LPModel
                     class BinaryHandle
                     {
                     public:
+                        typedef LinelContribution::PointMultiIndex PointMultiIndex;
+                        typedef std::map<PointMultiIndex,double> BinaryMap;
+
+                        typedef SquaredCurvature::Constants Constants;
+                        typedef Initialization::Parameters Parameters;
+
+                        typedef DGtal::Z2i::KSpace KSpace;
                         typedef DGtal::Z2i::Point Point;
 
-                        typedef LinelContribution::BinaryMap BinaryMap;
-                        typedef Internal::Pointel::PointelContribution PointelContribution;
-
-                    public:
                         BinaryHandle(BinaryMap& bm,
-                                     const PointelContribution& pctbr):bm(bm),
-                                                                       pctbr(pctbr)
+                                     const Constants& sqc):bm(bm),
+                                                           sqc(sqc)
                         {}
 
-                        void operator()(const Point& linel,
-                                        const Point& pointel,
-                                        const Point& pixel);
+                        void operator()(const Point& p1, const Point& p2);
 
                     private:
-                        const PointelContribution& pctbr;
+                        const Constants& sqc;
                         BinaryMap& bm;
                     };
                 }
             }
+
         }
+        
     }
 }
 

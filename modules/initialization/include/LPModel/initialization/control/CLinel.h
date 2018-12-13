@@ -13,6 +13,7 @@ namespace LPModel
         namespace CLinel
         {
             typedef DGtal::Z2i::Domain Domain;
+            typedef DGtal::Z2i::DigitalSet DigitalSet;
             typedef DGtal::Z2i::KSpace KSpace;
             typedef DGtal::Z2i::Point KPoint;
 
@@ -22,6 +23,7 @@ namespace LPModel
             typedef std::map<unsigned long, Pixel> PixelIndexMap;
 
             void createLinelSet(LinelMap& linelMap,
+                                const DigitalSet& trustFrg,
                                 const Domain& domain,
                                 const PixelMap& pixelMap);
 
@@ -69,7 +71,15 @@ namespace LPModel
                                   const PixelMap& pixelMap);
 
                 IncidentLinels incidentLinels(const KPoint& pixel);
-                KPoint findOutRangePixelCoord(const PixelMap& pixelMap);
+
+                KPoint findAuxiliarPixelCoord(const PixelMap& pixelMap,
+                                              Pixel::CellType ct);
+                void fixInvalidAuxPixels(AuxLinelMap& auxLinelMap,
+                                         const PixelMap& pixelMap,
+                                         const Domain& domain,
+                                         const DigitalSet& trustFrg);
+                bool validAuxLinelMap(const AuxLinelMap& auxLinelMap,
+                                      const PixelMap& pixelMap);
 
 
             }

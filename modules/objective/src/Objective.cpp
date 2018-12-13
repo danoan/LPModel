@@ -67,7 +67,6 @@ void Objective::writeLinearizationConstraints(std::ofstream &ofs,
 }
 
 void Objective::writeBounds(std::ofstream &ofs,
-                            const Grid& grid,
                             VariableMapIterator begin,
                             VariableMapIterator end)
 {
@@ -75,16 +74,22 @@ void Objective::writeBounds(std::ofstream &ofs,
     {
         ofs << "0 <= x" << it->first << " <= 1\n";
     }
+}
 
+void Objective::writeBinaries(std::ofstream& ofs,
+                              const Grid& grid)
+{
     for(auto it=grid.pixelMap.begin();it!=grid.pixelMap.end();++it)
     {
-        if(it->second.ct==Initialization::Pixel::CellType::Auxiliar) continue;
-        ofs << "0 <= x" << it->second.varIndex << " <= 1\n";
+        if(it->second.ct!=Initialization::Pixel::CellType::Variable) continue;
+        ofs << "x" << it->second.varIndex << " ";
     }
 
 
     for(auto it=grid.edgeMap.begin();it!=grid.edgeMap.end();++it)
     {
-        ofs << "0 <= x" << it->second.varIndex << " <= 1\n";
+        ofs << "x" << it->second.varIndex << " ";
     }
+
+    ofs << "\n";
 }

@@ -2,36 +2,61 @@
 
 using namespace LPModel;
 
-void LPWriter::writePixel(std::ofstream &ofs,
+void LPWriter::writePixel(StringConstraint& sc,
                           const PixelIncidence &pi)
 {
-    if(pi.pixel.ct==Pixel::CellType::Auxiliar) return;
-    char s = pi.posIncidence?' ':'-';
-    ofs << " " <<  s << " " << "x" << pi.pixel.varIndex;
+    std::ostringstream oss;
+    char s=pi.posIncidence?'+':'-';
+    if(pi.pixel.ct==Pixel::CellType::AuxiliarFrg)
+    {
+        double v = sc.rhs.top();sc.rhs.pop();
+
+        if(pi.posIncidence) sc.rhs.push(v-1);
+        else sc.rhs.push(v+1);
+    }
+    else if(pi.pixel.ct==Pixel::CellType::Variable)
+    {
+        oss << " " <<  s << " " << "x" << pi.pixel.varIndex;
+
+        sc.lhs.push(oss.str());
+    }
 }
 
-void LPWriter::writeEdge(std::ofstream &ofs,
+void LPWriter::writeEdge(StringConstraint& sc,
                          const EdgeIncidence &ei)
 {
+    std::ostringstream oss;
     char s = ei.posIncidence?'+':'-';
-    ofs << " " <<  s << " " << "x" << ei.edge.varIndex;
+    oss << " " <<  s << " " << "x" << ei.edge.varIndex;
+
+    sc.lhs.push(oss.str());
 }
 
 void LPWriter::writeConstraint(std::ofstream &ofs,
                                int& cIndexStart,
                                const LinelConstraints &lc)
 {
+
     for(auto it=lc.begin();it!=lc.end();++it)
     {
         const Linel& linel = it->first;
         const LinelIncidence li = it->second;
 
+        StringConstraint sc;
+        sc.rhs.push(0);
+
+
+        writePixel(sc,li.pixel1);
+        writePixel(sc,li.pixel2);
+        writeEdge(sc,li.edge1);
+        writeEdge(sc,li.edge2);
+
         ofs << "c" << cIndexStart++ << ":";
-        writePixel(ofs,li.pixel1);
-        writePixel(ofs,li.pixel2);
-        writeEdge(ofs,li.edge1);
-        writeEdge(ofs,li.edge2);
-        ofs << " = 0\n";
+        while(!sc.lhs.empty()){ ofs << sc.lhs.top(); sc.lhs.pop();}
+        ofs << " = ";
+        while(!sc.rhs.empty()){ ofs << sc.rhs.top(); sc.rhs.pop();}
+        ofs << "\n";
+
     }
 }
 
@@ -63,7 +88,11 @@ void LPWriter::writeLP(const std::string& outputFilePath,
     LPWriter::writeConstraint(ofs,constraintNum,lc);
 
     ofs << "\nBounds\n";
-    Objective::writeBounds(ofs,grid,linearization.begin(),linearization.end());
+    Objective::writeBounds(ofs,linearization.begin(),linearization.end());
+
+    ofs << "\nBinaries\n";
+    Objective::writeBinaries(ofs,grid);
+
     ofs << "\nEnd";
 
     ofs.flush();

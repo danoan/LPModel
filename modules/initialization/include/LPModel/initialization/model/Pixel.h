@@ -10,7 +10,7 @@ namespace LPModel
         struct Pixel
         {
             enum CellOrientation{Clockwise,Counterclockwise};
-            enum CellType{Variable,Auxiliar};
+            enum CellType{Variable,AuxiliarBkg,AuxiliarFrg,AuxiliarInvalid};
 
             typedef DGtal::Z2i::Point KPoint;
 

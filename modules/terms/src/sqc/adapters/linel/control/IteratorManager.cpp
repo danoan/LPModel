@@ -2,45 +2,37 @@
 
 using namespace LPModel::Terms::SquaredCurvature::Internal::Linel;
 
-void IteratorManager::run(const Parameters &prm,
-                          const Grid& grid,
-                          const BinaryCallback &bcbk,
-                          const TernaryCallback &tcbk)
+void IteratorManager::run(const Parameters &prm, const BinaryCallback &bcbk, const TernaryCallback &tcbk)
 {
     DGtal::Z2i::DigitalSet temp(prm.odrModel.domain);
     DIPaCUS::Misc::DigitalBallIntersection DBIOptimization = prm.handle.intersectionComputer(prm.radius,
                                                                                              prm.odrModel.optRegion);
 
-    KSpace kspace;
-    kspace.init(prm.odrModel.domain.lowerBound(),prm.odrModel.domain.upperBound(),true);
-    for(auto linelPtr=grid.linelMap.begin();linelPtr!=grid.linelMap.end();++linelPtr)
+    double bSum=0;
+    double tSum=0;
+
+
+    for(auto linelPtr=prm.odrModel.applicationRegion.begin();linelPtr!=prm.odrModel.applicationRegion.end();++linelPtr)
     {
-        KSpace::SCell linel =  kspace.sCell( linelPtr->first,true);
-        Point linelCoord = linel.preCell().coordinates;
+        DGtal::Z2i::Point linel = *linelPtr;
 
-        KSpace::SCells pointels = kspace.sLowerIncident(linel);
+        temp.clear();
+        DBIOptimization(temp, linel);
 
-        for(auto pointelPtr=pointels.begin();pointelPtr!=pointels.end();++pointelPtr)
+        tSum += (temp.size()*(temp.size()-1))/2;
+        bSum += temp.size();
+
+        for (auto pit = temp.begin(); pit != temp.end(); ++pit)
         {
-            KSpace::SCell pointel = *pointelPtr;
-            Point pointelCoord = pointel.preCell().coordinates;
+            bcbk(linel,*pit);
 
-            temp.clear();
-            DBIOptimization(temp, pointelCoord);
-
-            for (auto pit = temp.begin(); pit != temp.end(); ++pit)
+            auto npit = pit;
+            ++npit;
+            for(;npit!=temp.end();++npit)
             {
-                bcbk(linelCoord,pointelCoord,*pit);
-
-                auto npit = pit;
-                ++npit;
-                for(;npit!=temp.end();++npit)
-                {
-                    tcbk(linelCoord,pointelCoord,*pit,*npit);
-                }
+                tcbk(linel,*pit,*npit);
             }
         }
-
     }
 
 }

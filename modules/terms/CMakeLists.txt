@@ -4,10 +4,6 @@ project(lpmodel-terms)
 find_package(DGtal REQUIRED)
 
 add_library(terms SHARED
-        src/sqc/adapters/pointel/control/CPointelContribution.cpp
-        src/sqc/adapters/pointel/control/IteratorManager.cpp
-        src/sqc/adapters/pointel/handle/BinaryHandle.cpp
-        src/sqc/adapters/pointel/handle/TernaryHandle.cpp
         src/sqc/adapters/linel/control/CLinelContribution.cpp
         src/sqc/adapters/linel/control/IteratorManager.cpp
         src/sqc/adapters/linel/handle/BinaryHandle.cpp

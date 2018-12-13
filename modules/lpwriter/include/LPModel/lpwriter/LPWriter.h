@@ -28,8 +28,17 @@ namespace LPModel
 
         typedef Linearization< Terms::Term::UIntMultiIndex,double > MyLinearization;
 
-        void writePixel(std::ofstream& ofs,const PixelIncidence& pi);
-        void writeEdge(std::ofstream &ofs, const EdgeIncidence &ei);
+        struct StringConstraint
+        {
+            std::stack<std::string> lhs;
+            std::stack<double> rhs;
+        };
+
+        void writePixel(StringConstraint& sc,
+                        const PixelIncidence& pi);
+
+        void writeEdge(StringConstraint& sc,
+                       const EdgeIncidence &ei);
 
         void writeConstraint(std::ofstream& ofs,
                              int& cIndexStart,

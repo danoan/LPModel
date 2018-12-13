@@ -39,12 +39,16 @@ namespace LPModel
                                            linelMap(_linelMap)
             {}
 
-            Grid(const DigitalSet& ds):pixelMap(_pixelMap),
-                                       edgeMap(_edgeMap),
-                                       linelMap(_linelMap)
+            Grid(const DigitalSet& ds,
+                 const DigitalSet& trustFrg):pixelMap(_pixelMap),
+                                             edgeMap(_edgeMap),
+                                             linelMap(_linelMap)
             {
                 CPixel::createPixelMap(_pixelMap,ds);
-                CLinel::createLinelSet(_linelMap,ds.domain(),_pixelMap);
+                CLinel::createLinelSet(_linelMap,
+                                       trustFrg,
+                                       ds.domain(),
+                                       _pixelMap);
                 CEdge::createEdgeMap(_edgeMap,_pixelMap,_linelMap);
             }
 

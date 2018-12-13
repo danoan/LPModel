@@ -50,6 +50,8 @@ SolutionAssignment::DigitalSet SolutionAssignment::readSolution(const std::strin
     DigitalSet dsOutput(parameters.odrModel.domain);
     dsOutput.insert(parameters.odrModel.trustFRG.begin(),parameters.odrModel.trustFRG.end());
 
+    typedef std::pair<Index,double> SolutionPair;
+    std::vector<SolutionPair> spVector;
 
     std::ifstream ifs(solutionFile);
 
@@ -60,6 +62,7 @@ SolutionAssignment::DigitalSet SolutionAssignment::readSolution(const std::strin
     
     double objectiveValue = skipCommentLines(ifs,sqc);
 
+    int n=0;
     std::vector<int> varValue;
     std::unordered_map<Point, unsigned int> pointToVar;
     while(!ifs.eof())
@@ -68,6 +71,8 @@ SolutionAssignment::DigitalSet SolutionAssignment::readSolution(const std::strin
         ifs >> varIndex;
         ifs >> value;
 
+        spVector.push_back( SolutionPair(varIndex,value));
+        
 
         if(rpm.find(varIndex)==rpm.end()) continue; //Not pixel variable;
 
@@ -87,6 +92,16 @@ SolutionAssignment::DigitalSet SolutionAssignment::readSolution(const std::strin
 
         pointToVar[pixelCoords]=varValue.size()-1;
     }
+
+    std::sort(spVector.begin(),spVector.end(),[](const SolutionPair& e1, const SolutionPair& e2){ return e1.first < e2.first;});
+    std::ofstream ofs(solutionFile+".sorted");
+    for(auto it=spVector.begin();it!=spVector.end();++it)
+    {
+        ofs << it->first << "\t" << it->second << "\n";
+    }
+    ofs.flush();
+    ofs.close();
+
 
     DigitalSet backTransformed(parameters.odrModel.domain);
 
