@@ -63,17 +63,23 @@ int main(int argc, char* argv[])
     int levels = std::atoi(argv[2]);
     double sqWeight = std::atof( argv[3] );
     double dataWeight = std::atof( argv[4] );
-    std::string outputPath = argv[5];
+    LPWriter::RelaxationLevel relLevel = (LPWriter::RelaxationLevel) std::atoi( argv[5] );
+    std::string outputPath = argv[6];
 
+    boost::filesystem::create_directories(outputPath);
     std::cerr << "Preparing LP for image: " << pgmInputImage << "\n"
-              << "with sq-weight=" << sqWeight << "; data-weight=" << dataWeight
+              << "with sq-weight=" << sqWeight << "; data-weight=" << dataWeight << "\n"
+              << "with relaxation level=" << relLevel
               << "; and " << levels << " levels...\n";
+
+
 
     DigitalSet ds = loadImageAsDigitalSet(pgmInputImage);
     
 
     Initialization::Parameters prm = Initialization::API::initParameters(ds,levels);
     Utils::exportODRModel(prm,outputPath+"/odr-model.eps");
+
 
     Initialization::Grid grid = Initialization::API::createGrid(prm.odrModel.optRegion,
                                                                 prm);
@@ -92,7 +98,7 @@ int main(int argc, char* argv[])
     linearization.linearize(mergedTerm.ternaryMap);
 
     std::string lpOutputFilePath = resolveLPOutputFilePath(outputPath,pgmInputImage);
-    LPWriter::writeLP(lpOutputFilePath,prm,grid,mergedTerm.unaryMap,linearization);
+    LPWriter::writeLP(lpOutputFilePath,prm,grid,mergedTerm.unaryMap,linearization,relLevel);
 
     saveObjects(outputPath,ds,grid);
 

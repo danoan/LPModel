@@ -44,6 +44,11 @@ bool CTerm::Internal::isPixel(const DGtal::Z2i::Point& p)
     return p(0)%2==1 && p(1)%2==1;
 }
 
+bool CTerm::Internal::isLinel(const DGtal::Z2i::Point& p)
+{
+    return ( p(0)%2==1 && p(1)%2==0 || p(0)%2==0 && p(1)%2==1);
+}
+
 void CTerm::Internal::separate(DGtal::Z2i::Point& linel,
                                DGtal::Z2i::Point& pixel,
                                const LinelContribution::PointMultiIndex& pmi)
@@ -51,7 +56,8 @@ void CTerm::Internal::separate(DGtal::Z2i::Point& linel,
     for(auto it=pmi.begin();it!=pmi.end();++it)
     {
         if( isPixel(*it) ) pixel = *it;
-        else linel=*it;
+        else if( isLinel(*it) ) linel=*it;
+        else throw std::runtime_error("Expected Pixel or Linel, got Pointel");
     }
 }
 

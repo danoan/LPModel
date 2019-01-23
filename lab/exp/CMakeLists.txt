@@ -13,6 +13,7 @@ add_dependencies(exp-sum-sqc initialization)
 
 target_include_directories(exp-sum-sqc PRIVATE
         ${CMAKE_SOURCE_DIR}/modules/initialization/include
+        ${CMAKE_SOURCE_DIR}/ext
         ${DIPACUS_INCLUDE_DIRS}
         ${DGTAL_INCLUDE_DIRS})
 

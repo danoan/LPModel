@@ -1,24 +1,31 @@
-#include "geoc/estimator/standard/Curvature.h"
+#include <DGtal/helpers/StdDefs.h>
+#include "geoc/api/gridCurve/Curvature.hpp"
 #include "LPModel/initialization/Shapes.h"
 
 using namespace LPModel;
 
+
+typedef DGtal::Z2i::Curve Curve;
+typedef GEOC::API::GridCurve::Curvature::EstimationsVector EstimationVector;
 typedef DGtal::Z2i::DigitalSet DigitalSet;
+
+template<typename T>
+using ALG_CURV = GEOC::API::GridCurve::Curvature::EstimationAlgorithms::ALG_MDCA<T> ;
 
 double sumSqc(const DigitalSet& ds)
 {
-    typedef DGtal::Z2i::Curve Curve;
-    typedef GEOC::Estimator::Standard::IICurvature<Curve::ConstIterator> MyIICurvature;
-
     DIPaCUS::Representation::Image2D imgDS(ds.domain());
     DIPaCUS::Representation::digitalSetToImage(imgDS,ds);
 
     Curve curve;
     DIPaCUS::Misc::ComputeBoundaryCurve(imgDS,curve,1);
 
+    KSpace KImage;
+    KImage.init( ds.domain().lowerBound(),ds.domain().upperBound(),true);
+
     double sumSQC=0;
-    std::vector<double> estimations;
-    MyIICurvature(curve.begin(),curve.end(),estimations,1.0);
+    EstimationVector estimations;
+    GEOC::API::GridCurve::Curvature::identityClosed<ALG_CURV>(KImage,curve.begin(),curve.end(),estimations,1.0);
     for(auto it=estimations.begin();it!=estimations.end();++it) sumSQC+=pow(*it,2);
 
     return sumSQC;

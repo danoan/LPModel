@@ -1,3 +1,4 @@
+#include <DGtal/io/boards/Board2D.h>
 #include "LPModel/initialization/control/CLinel.h"
 
 namespace LPModel{ namespace Initialization{
@@ -19,10 +20,26 @@ using namespace LPModel::Initialization;
 CLinel::Internal::IncidentLinels CLinel::Internal::incidentLinels(const KPoint &pixel)
 {
     return
-    IncidentLinels ( { SignedKPoint( pixel+KPoint(1,0),true ),
-                       SignedKPoint( pixel+KPoint(0,1),false ),
-                       SignedKPoint( pixel+KPoint(-1,0),false ),
-                       SignedKPoint( pixel+KPoint(0,-1), true) } );
+    IncidentLinels ( { SignedKPoint( pixel+KPoint(1,0),false ),
+                       SignedKPoint( pixel+KPoint(0,1),true ),
+                       SignedKPoint( pixel+KPoint(-1,0),true ),
+                       SignedKPoint( pixel+KPoint(0,-1), false) } );
+}
+
+
+CLinel::Internal::IncidentPixels CLinel::Internal::incidentPixels(const _Linel &linel)
+{
+    if(linel.orientation==Linel::LinelOrientation::Up || linel.orientation==Linel::LinelOrientation::Down)
+    {
+        return
+                IncidentPixels ( { linel.linelCoord + KPoint(-1,0) ,
+                                   linel.linelCoord + KPoint(1,0) } );
+    } else
+    {
+        return
+                IncidentPixels ( { linel.linelCoord +KPoint(0,-1) ,
+                                   linel.linelCoord + KPoint(0,1) } );
+    }
 }
 
 CLinel::KPoint CLinel::Internal::findAuxiliarPixelCoord(const PixelMap& pixelMap,
@@ -35,14 +52,9 @@ CLinel::KPoint CLinel::Internal::findAuxiliarPixelCoord(const PixelMap& pixelMap
 }
 
 void CLinel::Internal::auxiliaryMap(AuxLinelMap& auxLinelMap,
-                                    const Domain& domain,
                                     const PixelMap& pixelMap)
 {
-    KSpace kspace;
-    kspace.init(domain.lowerBound(),domain.upperBound(),true);
-
     KPoint auxInvalidPixelCoord  = findAuxiliarPixelCoord(pixelMap,Pixel::CellType::AuxiliarInvalid);
-    DGtal::Z2i::SCell pixelModel = kspace.sCell( DGtal::Z2i::Point(1,1),true);
 
     std::set<KPoint> testSet;
     int j=0;
@@ -74,47 +86,36 @@ void CLinel::Internal::auxiliaryMap(AuxLinelMap& auxLinelMap,
 
 void CLinel::Internal::fixInvalidAuxPixels(AuxLinelMap& auxLinelMap,
                                            const PixelMap& pixelMap,
-                                           const Domain& domain,
+                                           const DigitalSet& optRegion,
                                            const DigitalSet& trustFrg)
 {
-    KSpace kspace;
-    kspace.init(domain.lowerBound(),domain.upperBound(),true);
-
     KPoint auxInvalidPixelCoord  = findAuxiliarPixelCoord(pixelMap,Pixel::CellType::AuxiliarInvalid);
     KPoint auxBkgPixelCoord  = findAuxiliarPixelCoord(pixelMap,Pixel::CellType::AuxiliarBkg);
     KPoint auxFrgPixelCoord  = findAuxiliarPixelCoord(pixelMap,Pixel::CellType::AuxiliarFrg);
 
     for(auto it=auxLinelMap.begin();it!=auxLinelMap.end();++it)
     {
-        KSpace::SCells pixels = kspace.sUpperIncident( kspace.sCell( it->second.linelCoord,true ) );
+        IncidentPixels pixels = incidentPixels( it->second );
         for(auto itp=pixels.begin();itp!=pixels.end();++itp)
         {
 
-            if(it->second.pCoord1==auxInvalidPixelCoord)
+            if( trustFrg.operator()( *itp ) )
             {
-                if( trustFrg.operator()( kspace.sKCoords( *itp ) ) )
+                if(it->second.pCoord1==auxInvalidPixelCoord)
                 {
                     it->second.pCoord1 = auxFrgPixelCoord;
                 }
-                else
-                {
-                    it->second.pCoord1 = auxBkgPixelCoord;
-                }
-            }
-
-
-            if(it->second.pCoord2==auxInvalidPixelCoord)
-            {
-                if( trustFrg.operator()( kspace.sKCoords( *itp ) ) )
+                if(it->second.pCoord2==auxInvalidPixelCoord)
                 {
                     it->second.pCoord2 = auxFrgPixelCoord;
                 }
-                else
-                {
-                    it->second.pCoord2 = auxBkgPixelCoord;
-                }
-            }
 
+            }
+            else if( !optRegion.operator()( *itp ) )
+            {
+                if(it->second.pCoord1==auxInvalidPixelCoord) it->second.pCoord1 = auxBkgPixelCoord;
+                if(it->second.pCoord2==auxInvalidPixelCoord) it->second.pCoord2 = auxBkgPixelCoord;
+            }
 
         }
 
@@ -153,14 +154,14 @@ int CLinel::edgeBaseIndex(const int firstLinelVar,
 
 void CLinel::createLinelSet(LinelMap &linelMap,
                             const DigitalSet& trustFrg,
-                            const Domain &domain,
+                            const DigitalSet& optRegion,
                             const PixelMap &pixelMap)
 {
 
     Internal::AuxLinelMap auxLinelMap;
-    Internal::auxiliaryMap(auxLinelMap,domain,pixelMap);
+    Internal::auxiliaryMap(auxLinelMap,pixelMap);
 
-    Internal::fixInvalidAuxPixels(auxLinelMap,pixelMap,domain,trustFrg);
+    Internal::fixInvalidAuxPixels(auxLinelMap,pixelMap,optRegion,trustFrg);
     assert( Internal::validAuxLinelMap(auxLinelMap,pixelMap) );
 
 

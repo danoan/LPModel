@@ -12,6 +12,9 @@ using namespace LPModel;
 using namespace SCaBOliC::Core;
 using namespace DGtal::Z2i;
 
+std::string projectDir = PROJECT_DIR;
+std::string outputFolder = projectDir + "/output/test/lp-creation";
+
 Initialization::Parameters initParameters()
 {
     Domain domain( Point(0,0), Point(20,20) );
@@ -26,13 +29,13 @@ Initialization::Parameters initParameters()
 
     DGtal::Board2D board;
     board << original;
-    board.saveEPS("output/input-set.eps");
+    board.saveEPS( (outputFolder + "/input-set.eps").c_str() );
 
 
-    ODRInterpixels odrInterpixels(ODRModel::AC_POINTEL,
+    ODRInterpixels odrInterpixels(ODRModel::AC_LINEL,
                                   ODRModel::CM_PIXEL,
                                   0,
-                                  ODRModel::EightNeighborhood,
+                                  ODRModel::FourNeighborhood,
                                   true);
 
     unsigned long radius = 5;
@@ -67,7 +70,8 @@ Initialization::Parameters initParameters()
 
 int main(int argc, char* argv[])
 {
-    std::string outputFolder = "output";
+    boost::filesystem::create_directories(outputFolder);
+
     Initialization::Parameters prm = initParameters();
     Utils::exportODRModel(prm,outputFolder+"/odr-model.eps");
 
@@ -84,7 +88,7 @@ int main(int argc, char* argv[])
     linearization.linearize(mergedTerm.ternaryMap);
 
     std::string lpOutputFilePath = outputFolder+"/lp-output.lp";
-    LPWriter::writeLP(lpOutputFilePath,prm,grid,mergedTerm.unaryMap,linearization);
+    LPWriter::writeLP(lpOutputFilePath,prm,grid,mergedTerm.unaryMap,linearization,LPWriter::RelaxationLevel::AUXILIAR_RELAXATION);
 
     return 0;
 }

@@ -13,14 +13,14 @@ namespace LPModel
             typedef std::map<int,Edge> EdgeMap;
             typedef std::pair<int,Edge> MapElement;
 
-            Edge(const Linel& l1,
+            Edge(const Linel l1,
                  const EdgeOrientation& orientation,
                  const unsigned long varIndex):l1(l1),
                                      orientation(orientation),
                                      varIndex(varIndex)
             {}
 
-            const Linel &l1;
+            const Linel l1;
             const EdgeOrientation orientation;
             const unsigned long varIndex;
 

@@ -4,7 +4,7 @@ using namespace LPModel::Initialization;
 
 Shapes::DigitalSet Shapes::square(double h)
 {
-    NGon2D square(0,0,10,4,3.1416/4.0);
+    NGon2D square(0,0,6,4,3.1416/4.0);
     DigitalSet ds = Internal::shapeDigitizer(square,h);
 
     return DIPaCUS::Transform::bottomLeftBoundingBoxAtOrigin(ds);

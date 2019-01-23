@@ -64,7 +64,8 @@ void LPWriter::writeLP(const std::string& outputFilePath,
                        const Initialization::Parameters& prm,
                        const Initialization::Grid& grid,
                        const Terms::Term::UnaryMap& um,
-                       const MyLinearization& linearization)
+                       const MyLinearization& linearization,
+                       const RelaxationLevel relLevel)
 {
     std::cerr << "Writing LP-Program at " << outputFilePath << "\n";
 
@@ -87,11 +88,28 @@ void LPWriter::writeLP(const std::string& outputFilePath,
     Constraints::ClosedAndConnected::closedConnectedContraints(lc,grid);
     LPWriter::writeConstraint(ofs,constraintNum,lc);
 
-    ofs << "\nBounds\n";
-    Objective::writeBounds(ofs,linearization.begin(),linearization.end());
+    if(relLevel==NO_RELAXATION)
+    {
+        ofs << "\nBinaries\n";
+        Objective::writeBounds(ofs,linearization.begin(),linearization.end());
+        Objective::writeBinaries(ofs,grid);
+    }else if(relLevel==AUXILIAR_RELAXATION)
+    {
+        ofs << "\nBounds\n";
+        Objective::writeBounds(ofs,linearization.begin(),linearization.end());
 
-    ofs << "\nBinaries\n";
-    Objective::writeBinaries(ofs,grid);
+        ofs << "\nBinaries\n";
+        Objective::writeBinaries(ofs,grid);
+    }else if(relLevel==ALL_RELAXATION)
+    {
+        ofs << "\nBounds\n";
+        Objective::writeBounds(ofs,linearization.begin(),linearization.end());
+        Objective::writeBounds(ofs,grid.pixelMap.begin(),grid.pixelMap.end());
+        Objective::writeBounds(ofs,grid.edgeMap.begin(),grid.edgeMap.end());
+    }
+
+
+
 
     ofs << "\nEnd";
 

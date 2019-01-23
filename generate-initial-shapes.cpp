@@ -1,3 +1,4 @@
+#include <boost/filesystem/operations.hpp>
 #include "DGtal/helpers/StdDefs.h"
 #include "DGtal/io/writers/GenericWriter.h"
 
@@ -18,6 +19,8 @@ int main(int argc, char* argv[])
 
     std::string outputPath = argv[1];
     double h = atof(argv[2]);
+
+    boost::filesystem::create_directories(outputPath);
 
     DigitalSet square = Initialization::Shapes::square(h);
     DigitalSet flower = Initialization::Shapes::flower(h);

@@ -26,9 +26,9 @@ void CPixel::createPixelMap(PixelMap& pxlMap,
     ub(0) = ub(0) + ub(0)%2;
     ub(1) = ub(1) + ub(1)%2;
 
-    Pixel::KPoint auxInvalidCoord(ub+Pixel::KPoint(1,1));
-    Pixel::KPoint auxBkgCoord(ub+Pixel::KPoint(3,3));
-    Pixel::KPoint auxFkgCoord(ub+Pixel::KPoint(5,5));
+    Pixel::KPoint auxBkgCoord(ub+Pixel::KPoint(1,1));
+    Pixel::KPoint auxFkgCoord(ub+Pixel::KPoint(3,3));
+    Pixel::KPoint auxInvalidCoord(ub+Pixel::KPoint(5,5));
 
     pxlMap.insert( MapElement( auxInvalidCoord,
                                Pixel(auxInvalidCoord(1),auxInvalidCoord(0),-1,Pixel::CellType::AuxiliarInvalid) ) );

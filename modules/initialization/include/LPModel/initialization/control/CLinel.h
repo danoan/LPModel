@@ -24,7 +24,7 @@ namespace LPModel
 
             void createLinelSet(LinelMap& linelMap,
                                 const DigitalSet& trustFrg,
-                                const Domain& domain,
+                                const DigitalSet& optRegion,
                                 const PixelMap& pixelMap);
 
             int edgeBaseIndex(const int firstLinelVar,
@@ -65,19 +65,22 @@ namespace LPModel
                 typedef std::map<DGtal::Z2i::Point,_Linel> AuxLinelMap;
                 typedef std::pair<DGtal::Z2i::Point,_Linel> AuxMapElement;
                 typedef std::vector<SignedKPoint> IncidentLinels;
+                typedef std::vector<KPoint> IncidentPixels;
 
                 void auxiliaryMap(AuxLinelMap& auxLinelMap,
-                                  const Domain& domain,
                                   const PixelMap& pixelMap);
 
                 IncidentLinels incidentLinels(const KPoint& pixel);
+                IncidentPixels incidentPixels(const _Linel &linel);
 
                 KPoint findAuxiliarPixelCoord(const PixelMap& pixelMap,
                                               Pixel::CellType ct);
+
                 void fixInvalidAuxPixels(AuxLinelMap& auxLinelMap,
                                          const PixelMap& pixelMap,
-                                         const Domain& domain,
+                                         const DigitalSet& optRegion,
                                          const DigitalSet& trustFrg);
+
                 bool validAuxLinelMap(const AuxLinelMap& auxLinelMap,
                                       const PixelMap& pixelMap);
 

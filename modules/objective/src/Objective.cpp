@@ -76,6 +76,29 @@ void Objective::writeBounds(std::ofstream &ofs,
     }
 }
 
+
+void Objective::writeBounds(std::ofstream &ofs,
+                            Grid::PixelMap::const_iterator begin,
+                            Grid::PixelMap::const_iterator end)
+{
+
+    for(auto it=begin;it!=end;++it)
+    {
+        ofs << "0 <= x" << it->second.varIndex << " <= 1\n";
+    }
+}
+
+void Objective::writeBounds(std::ofstream &ofs,
+                            Grid::EdgeMap::const_iterator begin,
+                            Grid::EdgeMap::const_iterator end)
+{
+
+    for(auto it=begin;it!=end;++it)
+    {
+        ofs << "0 <= x" << it->second.varIndex << " <= 1\n";
+    }
+}
+
 void Objective::writeBinaries(std::ofstream& ofs,
                               const Grid& grid)
 {

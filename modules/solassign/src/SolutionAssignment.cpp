@@ -12,6 +12,16 @@ void SolutionAssignment::reversePixelMap(ReversePixelMap &rpm,
     }
 }
 
+void SolutionAssignment::reverseEdgeMap(ReverseEdgeMap &rpm,
+                                         const Grid &grid)
+{
+    typedef std::pair<Index,Edge> Element;
+    for(auto it=grid.edgeMap.begin();it!=grid.edgeMap.end();++it)
+    {
+        rpm.insert( Element( it->second.varIndex,it->second ) );
+    }
+}
+
 double SolutionAssignment::skipCommentLines(std::ifstream& ifs,
                                             const Terms::SquaredCurvature::Constants& sqc)
 {
@@ -47,6 +57,9 @@ SolutionAssignment::DigitalSet SolutionAssignment::readSolution(const std::strin
     ReversePixelMap rpm;
     reversePixelMap(rpm,grid);
 
+    ReverseEdgeMap rem;
+    reverseEdgeMap(rem,grid);
+
     DigitalSet dsOutput(parameters.odrModel.domain);
     dsOutput.insert(parameters.odrModel.trustFRG.begin(),parameters.odrModel.trustFRG.end());
 
@@ -72,22 +85,21 @@ SolutionAssignment::DigitalSet SolutionAssignment::readSolution(const std::strin
         ifs >> value;
 
         spVector.push_back( SolutionPair(varIndex,value));
-        
 
-        if(rpm.find(varIndex)==rpm.end()) continue; //Not pixel variable;
 
-        if(value>=0.5)
+
+        if(rpm.find(varIndex)!=rpm.end()) //continue; //Not pixel variable;
         {
-            varValue.push_back(1);
-        }
-        else
-        {
-            varValue.push_back(0);
-        }
+            if (value >= 0.5) {
+                varValue.push_back(1);
+            } else {
+                varValue.push_back(0);
+            }
 
 
-        pixelCoords = Point(rpm.at(varIndex).col, rpm.at(varIndex).row);
-        assert( parameters.odrModel.trustFRG( pixelCoords )==false );
+            pixelCoords = Point(rpm.at(varIndex).col, rpm.at(varIndex).row);
+            assert(parameters.odrModel.trustFRG(pixelCoords) == false);
+        }
 
 
         pointToVar[pixelCoords]=varValue.size()-1;

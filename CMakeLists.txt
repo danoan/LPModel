@@ -85,6 +85,8 @@ add_dependencies(generate-initial-shapes initialization)
 target_link_libraries(generate-initial-shapes
         -linitialization
         -ldipacus-base
+        -lboost_system
+        -lboost_filesystem
         ${DGTAL_LIBRARIES})
 
 target_include_directories(generate-initial-shapes PRIVATE

@@ -46,6 +46,14 @@ namespace LPModel
                          VariableMapIterator begin,
                          VariableMapIterator end);
 
+        void writeBounds(std::ofstream &ofs,
+                         Grid::EdgeMap::const_iterator begin,
+                         Grid::EdgeMap::const_iterator end);
+
+        void writeBounds(std::ofstream &ofs,
+                         Grid::PixelMap::const_iterator begin,
+                         Grid::PixelMap::const_iterator end);
+
         void writeBinaries(std::ofstream& ofs,
                            const Grid& grid);
     }

@@ -47,7 +47,7 @@ namespace LPModel
                 CPixel::createPixelMap(_pixelMap,ds);
                 CLinel::createLinelSet(_linelMap,
                                        trustFrg,
-                                       ds.domain(),
+                                       ds,
                                        _pixelMap);
                 CEdge::createEdgeMap(_edgeMap,_pixelMap,_linelMap);
             }

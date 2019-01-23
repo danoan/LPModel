@@ -26,6 +26,8 @@ namespace LPModel
         typedef Constraints::ClosedAndConnected::PixelIncidence PixelIncidence;
         typedef Constraints::ClosedAndConnected::EdgeIncidence EdgeIncidence;
 
+        enum RelaxationLevel{NO_RELAXATION=0,AUXILIAR_RELAXATION=1,ALL_RELAXATION=2};
+
         typedef Linearization< Terms::Term::UIntMultiIndex,double > MyLinearization;
 
         struct StringConstraint
@@ -48,7 +50,8 @@ namespace LPModel
                      const Initialization::Parameters& prm,
                      const Initialization::Grid& grid,
                      const Terms::Term::UnaryMap& um,
-                     const MyLinearization& linearization);
+                     const MyLinearization& linearization,
+                     const RelaxationLevel relLevel);
     }
 }
 

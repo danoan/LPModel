@@ -4,11 +4,13 @@ project(lpmodel-lab-test)
 find_package(DGtal REQUIRED)
 
 link_directories(
-        ../modules/initialization/lib
+        ${CMAKE_SOURCE_DIR}/modules/initialization/lib
         ${CMAKE_PREFIX_PATH}
         ${DIPACUS_LIBS_DIR})
 
 add_executable(test-serialization test-serialization.cpp)
+target_compile_definitions(test-serialization PRIVATE -DPROJECT_DIR=\"${CMAKE_SOURCE_DIR}\")
+
 add_dependencies(test-serialization initialization)
 
 target_include_directories(test-serialization PRIVATE
@@ -27,6 +29,7 @@ target_link_libraries(test-serialization PRIVATE
 
 
 add_executable(test-levels test-levels.cpp)
+target_compile_definitions(test-levels PRIVATE -DPROJECT_DIR=\"${CMAKE_SOURCE_DIR}\")
 add_dependencies(test-levels initialization solassign terms)
 
 target_include_directories(test-levels PRIVATE
@@ -51,6 +54,7 @@ target_link_libraries(test-levels PRIVATE
 
 
 add_executable(test-lp-creation test-lp-creation.cpp)
+target_compile_definitions(test-lp-creation PRIVATE -DPROJECT_DIR=\"${CMAKE_SOURCE_DIR}\")
 add_dependencies(test-lp-creation initialization utils terms linearization lpwriter)
 
 target_include_directories(test-lp-creation PRIVATE

@@ -42,6 +42,7 @@ namespace LPModel
                     typedef LinelContribution::PointMultiIndex PointMultiIndex;
 
                     bool isPixel(const Point &p);
+                    bool isLinel(const DGtal::Z2i::Point& p);
 
 
                     void separate(Point &linel,
