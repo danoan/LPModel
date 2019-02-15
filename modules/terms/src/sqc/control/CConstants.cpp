@@ -28,10 +28,12 @@ Constants CConstants::setConstants(const Parameters &prm)
 
         double Ij = temp.size();
 
-        cc[*it] = pow(C, 2) + pow(Ij, 2) -2 * C * Ij; 
+        double k = Ij - C; //Add constant in order to have SPD matrix for quadratic term
+
+        cc[*it] = pow(k, 2);
         W += cc[*it];
 
-        uc[*it] = 1 - 2 * C + 2 * Ij;
+        uc[*it] = 2*k+1;
     }
 
     return Constants(W,C,F,R,cc,uc);

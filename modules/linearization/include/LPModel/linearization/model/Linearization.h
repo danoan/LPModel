@@ -2,6 +2,7 @@
 #define LPMODEL_LINEARLIZATION_H
 
 #include <map>
+#include <LPModel/terms/model/MultiIndex.h>
 
 namespace LPModel
 {
@@ -24,11 +25,15 @@ namespace LPModel
         typedef typename LinearizationMap::const_iterator LinearizationMapIterator;
         typedef typename UniqueIndexMap::const_iterator UniqueIndexMapIterator;
 
+    private:
+        typedef unsigned long Index;
+        typedef Utils::MultiIndex<Index> UIntMultiIndex;
 
     public:
         Linearization(LinearIndex nextIndex):nextIndex(nextIndex){}
 
         void linearize(const Input& input);
+        Input partialLinearization(const Input& input);
 
         LinearizationMapIterator begin() const{ return linearizationMap.begin(); }
         LinearizationMapIterator end() const{ return linearizationMap.end(); }

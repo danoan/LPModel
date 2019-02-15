@@ -1,10 +1,10 @@
 cmake_minimum_required(VERSION 3.8)
 project(lpmodel-lpwriter)
 
-add_library(lpwriter
+add_library(lpwriter SHARED
         src/LPWriter.cpp)
 
-add_dependencies(lpwriter initialization terms constraints objective linearization)
+add_dependencies(lpwriter initialization terms constraints linearization)
 
 target_include_directories(lpwriter PRIVATE
         include
@@ -18,8 +18,6 @@ target_include_directories(lpwriter PRIVATE
 
 target_link_libraries(lpwriter
         -lterms
-        -llinearization
-        -lobjective
         -lconstraints
         -linitialization
         -lscabolic-core)

@@ -25,8 +25,11 @@ namespace LPModel
 
         typedef unsigned long Index;
         typedef std::map<Index,Pixel> ReversePixelMap;
-
         typedef std::map<Index,Edge> ReverseEdgeMap;
+
+        typedef std::pair<Index,double> SolutionPair;
+        typedef std::vector<SolutionPair> SolutionPairVector;
+        typedef std::vector<int> SolutionVector;
 
         double skipCommentLines(std::ifstream& ifs,
                                 const Terms::SquaredCurvature::Constants& sqc);
@@ -36,6 +39,15 @@ namespace LPModel
 
         void reverseEdgeMap(ReverseEdgeMap &rpm,
                             const Grid &grid);
+
+        SolutionPairVector solutionPairVector(const std::string &solutionFile,
+                                              const Parameters &parameters,
+                                              const Grid& grid);
+
+        SolutionVector solutionVector(const SolutionPairVector& spv,
+                                       const Parameters& parameters,
+                                       const Grid& grid);
+
 
         DigitalSet readSolution(const std::string& solutionFile,
                           const Parameters& parameters,

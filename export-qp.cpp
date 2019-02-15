@@ -74,7 +74,7 @@ int main(int argc, char* argv[])
 
 
     DigitalSet ds = loadImageAsDigitalSet(pgmInputImage);
-    
+
 
     Initialization::Parameters prm = Initialization::API::initParameters(ds,levels);
     Utils::exportODRModel(prm,outputPath+"/odr-model.eps");
@@ -89,15 +89,14 @@ int main(int argc, char* argv[])
     Terms::Term mergedTerm = scTerm;//Terms::API::merge(dataTerm,scTerm);
 
 
-
     unsigned long nextIndex = grid.pixelMap.size()+grid.linelMap.size()+grid.edgeMap.size();
-
     LPWriter::MyLinearization linearization(nextIndex);
-    linearization.linearize(mergedTerm.binaryMap);
-    linearization.linearize(mergedTerm.ternaryMap);
+    Terms::Term::BinaryMap partialL = linearization.partialLinearization(mergedTerm.ternaryMap);
+
+    std::cout << mergedTerm.binaryMap.size() << std::endl;
 
     std::string lpOutputFilePath = resolveLPOutputFilePath(outputPath,pgmInputImage);
-    LPWriter::writeLP(lpOutputFilePath,prm,grid,mergedTerm.unaryMap,linearization,relLevel);
+    LPWriter::writeQP(lpOutputFilePath,prm,grid,mergedTerm.unaryMap,mergedTerm.binaryMap,partialL,linearization,relLevel);
 
     saveObjects(outputPath,ds,grid);
 

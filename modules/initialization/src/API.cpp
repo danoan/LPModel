@@ -24,19 +24,19 @@ API::DigitalSet API::Internal::extendedOptRegion(const ODRModel &odrModel)
 
     for(auto it=incidence.begin();it!=incidence.end();++it)
     {
-        if(it->second==4) extOptRegion.insert(it->first);
+        if(it->second>=2) extOptRegion.insert(it->first);
     }
 
     return extOptRegion;
 }
 
-API::DigitalSet API::Internal::extendedAppRegion(const ODRModel &odrModel)
+API::DigitalSet API::Internal::extendedAppRegion(const DigitalSet& appRegion, const DigitalSet& optRegion)
 {
     typedef DGtal::Z2i::Point Point;
     Point neighPointel[4] = {Point(1,0),Point(0,1),Point(-1,0),Point(0,-1) };
 
-    DigitalSet extAppRegion = odrModel.applicationRegion;
-    for(auto it=odrModel.optRegion.begin();it!=odrModel.optRegion.end();++it)
+    DigitalSet extAppRegion = appRegion;
+    for(auto it=optRegion.begin();it!=optRegion.end();++it)
     {
         for(int i=0;i<4;++i)
         {
@@ -107,18 +107,19 @@ Parameters API::initParameters(const DigitalSet &originalDS, int levels)
     ODRInterpixels odrInterpixels(ODRModel::AC_LINEL,
                                   ODRModel::CM_PIXEL,
                                   levels,
+                                  ODRModel::LevelDefinition::LD_CloserFromCenter,
                                   ODRModel::FourNeighborhood,
                                   true);
 
     ODRModel odrModel = odrInterpixels.createODR(ODRModel::OM_OriginalBoundary,
-                                                 ODRModel::AM_AroundBoundary,
+                                                 ODRModel::AM_ExternRange,
                                                  3,
                                                  originalDS);
 
 
 
     DigitalSet extendedOptRegion = Internal::extendedOptRegion(odrModel);
-    DigitalSet extendedAppRegion = Internal::extendedAppRegion(odrModel);
+    DigitalSet extendedAppRegion = Internal::extendedAppRegion(odrModel.applicationRegion,extendedOptRegion);
     DigitalSet reducedTrustFrg(odrModel.trustFRG.domain());
     DIPaCUS::SetOperations::setDifference(reducedTrustFrg,odrModel.trustFRG,extendedOptRegion);
 

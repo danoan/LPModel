@@ -8,7 +8,6 @@ link_directories(cmake-build-debug/modules/constraints
         cmake-build-debug/modules/initialization
         cmake-build-debug/modules/linearization
         cmake-build-debug/modules/lpwriter
-        cmake-build-debug/modules/objective
         cmake-build-debug/modules/solassign
         cmake-build-debug/modules/terms
         cmake-build-debug/modules/utils
@@ -19,21 +18,20 @@ add_subdirectory(modules/constraints)
 add_subdirectory(modules/initialization)
 add_subdirectory(modules/linearization)
 add_subdirectory(modules/lpwriter)
-add_subdirectory(modules/objective)
 add_subdirectory(modules/solassign)
 add_subdirectory(modules/terms)
 add_subdirectory(modules/utils)
+add_subdirectory(modules/nonlinopt)
 
 add_subdirectory(lab/test)
 add_subdirectory(lab/exp)
 
 
 add_executable(export-lp export-lp.cpp)
-add_dependencies(export-lp constraints initialization linearization lpwriter objective solassign terms utils)
+add_dependencies(export-lp constraints initialization linearization lpwriter solassign terms utils)
 
 target_link_libraries(export-lp
         -llpwriter
-        -lobjective
         -lconstraints
         -lterms
         -linitialization
@@ -53,10 +51,43 @@ target_include_directories(export-lp PRIVATE
         modules/initialization/include
         modules/linearization/include
         modules/lpwriter/include
-        modules/objective/include
         modules/terms/include
         modules/utils/include
         ${DGTAL_INCLUDE_DIRS})
+
+
+
+
+
+add_executable(export-qp export-qp.cpp)
+add_dependencies(export-qp constraints initialization linearization lpwriter solassign terms utils)
+
+target_link_libraries(export-qp
+        -llpwriter
+        -lconstraints
+        -lterms
+        -linitialization
+        -lscabolic-core
+        -ldipacus-derivates
+        -ldipacus-components
+        -ldipacus-base
+        -lutils
+        -lboost_system
+        -lboost_filesystem
+        ${DGTAL_LIBRARIES}
+        ${OpenCV_LIBS})
+
+target_include_directories(export-qp PRIVATE
+        ext/include
+        modules/constraints/include
+        modules/initialization/include
+        modules/linearization/include
+        modules/lpwriter/include
+        modules/terms/include
+        modules/utils/include
+        ${DGTAL_INCLUDE_DIRS})
+
+
 
 
 

@@ -13,9 +13,9 @@ SCRIPT_FOLDER=$ROOT_PROJECT_FOLDER/lp-solve-scripts
 
 if [ -z $7 ]
 then
-    OUTPUT_FOLDER_PREFIX=lp/$IMAGE_NAME/H$GRID_STEP-R$RELAXATION_LEVEL-L$LEVELS
+    OUTPUT_FOLDER_PREFIX=qp/$IMAGE_NAME/H$GRID_STEP-R$RELAXATION_LEVEL-L$LEVELS
 else
-    OUTPUT_FOLDER_PREFIX=lp/$7
+    OUTPUT_FOLDER_PREFIX=qp/$7
 fi
 
 
@@ -49,7 +49,7 @@ do
 
 
 
-    $BIN_FOLDER/export-lp   $BASE_FOLDER/it${IT}/${IMAGE_NAME}.pgm \
+    $BIN_FOLDER/export-qp   $BASE_FOLDER/it${IT}/${IMAGE_NAME}.pgm \
                             $LEVELS \
                             $SQ_WEIGHT \
                             $DATA_WEIGHT \
@@ -57,8 +57,7 @@ do
                             $EXPORT_LP_OUTPUT_FOLDER
 
 
-    gurobi_cl   Method=1 \
-                ResultFile=$GUROBI_OUTPUT_FOLDER/${IMAGE_NAME}.sol \
+    gurobi_cl   ResultFile=$GUROBI_OUTPUT_FOLDER/${IMAGE_NAME}.sol \
                 $EXPORT_LP_OUTPUT_FOLDER/${IMAGE_NAME}.lp
 
 

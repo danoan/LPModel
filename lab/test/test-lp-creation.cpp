@@ -35,20 +35,21 @@ Initialization::Parameters initParameters()
     ODRInterpixels odrInterpixels(ODRModel::AC_LINEL,
                                   ODRModel::CM_PIXEL,
                                   0,
+                                  ODRModel::LevelDefinition::LD_CloserFromCenter,
                                   ODRModel::FourNeighborhood,
                                   true);
 
     unsigned long radius = 5;
 
     ODRModel odrModel = odrInterpixels.createODR(ODRModel::OM_OriginalBoundary,
-                                                 ODRModel::AM_AroundBoundary,
+                                                 ODRModel::AM_ExternRange,
                                                  radius,
                                                  original);
 
 
 
     DigitalSet extendedOptRegion = odrModel.optRegion;
-    DigitalSet extendedAppRegion = Initialization::API::Internal::extendedAppRegion(odrModel);
+    DigitalSet extendedAppRegion = Initialization::API::Internal::extendedAppRegion(odrModel.applicationRegion,extendedOptRegion);
 
     DigitalSet reducedTrustFrg(odrModel.trustFRG.domain());
     DIPaCUS::SetOperations::setDifference(reducedTrustFrg,odrModel.trustFRG,extendedOptRegion);

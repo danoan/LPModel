@@ -52,7 +52,7 @@ namespace LPModel
                 int boundaryLinels(const DigitalSet& ds);
 
                 DigitalSet extendedOptRegion(const ODRModel& odrModel);
-                DigitalSet extendedAppRegion(const ODRModel& odrModel);
+                DigitalSet extendedAppRegion(const DigitalSet& appRegion, const DigitalSet& optRegion);
 
                 bool consistentGrid(const Parameters& prm,
                                     const Grid& grid);

@@ -61,7 +61,6 @@ target_include_directories(test-lp-creation PRIVATE
         ${CMAKE_SOURCE_DIR}/modules/initialization/include
         ${CMAKE_SOURCE_DIR}/modules/terms/include
         ${CMAKE_SOURCE_DIR}/modules/constraints/include
-        ${CMAKE_SOURCE_DIR}/modules/objective/include
         ${CMAKE_SOURCE_DIR}/modules/linearization/include
         ${CMAKE_SOURCE_DIR}/modules/lpwriter/include
         ${CMAKE_SOURCE_DIR}/modules/utils/include
@@ -72,7 +71,6 @@ target_link_libraries(test-lp-creation PRIVATE
         -lutils
         -llpwriter
         -lconstraints
-        -lobjective
         -lterms
         -linitialization
         -lscabolic-core

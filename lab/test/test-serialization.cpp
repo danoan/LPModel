@@ -17,18 +17,19 @@ namespace LPModel{ namespace Initialization{
         ODRInterpixels odrInterpixels(ODRModel::AC_POINTEL,
                                       ODRModel::CM_PIXEL,
                                       levels,
+                                      ODRModel::LevelDefinition::LD_CloserFromCenter,
                                       ODRModel::FourNeighborhood,
                                       evenIteration);
 
         ODRModel odrModel = odrInterpixels.createODR(ODRModel::OM_OriginalBoundary,
-                                                     ODRModel::AM_AroundBoundary,
+                                                     ODRModel::AM_ExternRange,
                                                      3,
                                                      originalDS);
 
 
 
         DigitalSet extendedOptRegion = Internal::extendedOptRegion(odrModel);
-        DigitalSet extendedAppRegion = Internal::extendedAppRegion(odrModel);
+        DigitalSet extendedAppRegion = Internal::extendedAppRegion(odrModel.applicationRegion,extendedOptRegion);
         DigitalSet reducedTrustFrg(odrModel.trustFRG.domain());
         DIPaCUS::SetOperations::setDifference(reducedTrustFrg,odrModel.trustFRG,extendedOptRegion);
 
