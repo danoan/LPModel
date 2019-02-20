@@ -12,6 +12,7 @@ link_directories(cmake-build-debug/modules/constraints
         cmake-build-debug/modules/terms
         cmake-build-debug/modules/utils
         ${CMAKE_PREFIX_PATH}
+        ${BOOST_LIBS_DIR}
         ${DIPACUS_LIBS_DIR})
 
 add_subdirectory(modules/constraints)
@@ -87,6 +88,36 @@ target_include_directories(export-qp PRIVATE
         modules/utils/include
         ${DGTAL_INCLUDE_DIRS})
 
+
+
+
+add_executable(export-penalty export-penalty.cpp)
+add_dependencies(export-penalty constraints initialization linearization lpwriter solassign terms utils)
+
+target_link_libraries(export-penalty
+        -llpwriter
+        -lconstraints
+        -lterms
+        -linitialization
+        -lscabolic-core
+        -ldipacus-derivates
+        -ldipacus-components
+        -ldipacus-base
+        -lutils
+        -lboost_system
+        -lboost_filesystem
+        ${DGTAL_LIBRARIES}
+        ${OpenCV_LIBS})
+
+target_include_directories(export-penalty PRIVATE
+        ext/include
+        modules/constraints/include
+        modules/initialization/include
+        modules/linearization/include
+        modules/lpwriter/include
+        modules/terms/include
+        modules/utils/include
+        ${DGTAL_INCLUDE_DIRS})
 
 
 

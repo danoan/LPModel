@@ -2,6 +2,7 @@ cmake_minimum_required(VERSION 3.8)
 project(lpmodel-terms)
 
 find_package(DGtal REQUIRED)
+find_package(OpenCV REQUIRED)
 
 add_library(terms SHARED
         src/sqc/adapters/linel/control/CLinelContribution.cpp

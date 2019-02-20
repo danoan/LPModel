@@ -45,8 +45,10 @@ namespace LPModel
         LinearIndex nextIndex;
 
         UniqueIndexMap uniqueIndexMap;
-        ReverseUniqueIndexMap reverseUniqueIndexMap;
         LinearizationMap linearizationMap;
+
+    public:
+        ReverseUniqueIndexMap reverseUniqueIndexMap;
     };
 }
 

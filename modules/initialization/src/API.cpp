@@ -112,7 +112,7 @@ Parameters API::initParameters(const DigitalSet &originalDS, int levels)
                                   true);
 
     ODRModel odrModel = odrInterpixels.createODR(ODRModel::OM_OriginalBoundary,
-                                                 ODRModel::AM_ExternRange,
+                                                 ODRModel::AM_AroundIntern,
                                                  3,
                                                  originalDS);
 
