@@ -44,10 +44,11 @@ namespace LPModel
     private:
         LinearIndex nextIndex;
 
-        UniqueIndexMap uniqueIndexMap;
+
         LinearizationMap linearizationMap;
 
     public:
+        UniqueIndexMap uniqueIndexMap;
         ReverseUniqueIndexMap reverseUniqueIndexMap;
     };
 }

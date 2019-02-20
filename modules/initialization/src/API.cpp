@@ -112,16 +112,19 @@ Parameters API::initParameters(const DigitalSet &originalDS, int levels)
                                   true);
 
     ODRModel odrModel = odrInterpixels.createODR(ODRModel::OM_OriginalBoundary,
-                                                 ODRModel::AM_AroundIntern,
+                                                 ODRModel::AM_ExternRange,
                                                  3,
                                                  originalDS);
 
-
-
     DigitalSet extendedOptRegion = Internal::extendedOptRegion(odrModel);
     DigitalSet extendedAppRegion = Internal::extendedAppRegion(odrModel.applicationRegion,extendedOptRegion);
+
+
     DigitalSet reducedTrustFrg(odrModel.trustFRG.domain());
     DIPaCUS::SetOperations::setDifference(reducedTrustFrg,odrModel.trustFRG,extendedOptRegion);
+
+    DigitalSet reducedTrustBkg(odrModel.trustBKG.domain());
+    DIPaCUS::SetOperations::setDifference(reducedTrustBkg,odrModel.trustBKG,extendedOptRegion);
 
 
     InterpixelSpaceHandle* ish = (InterpixelSpaceHandle*) odrInterpixels.handle();
@@ -130,7 +133,7 @@ Parameters API::initParameters(const DigitalSet &originalDS, int levels)
                                 odrModel.original,
                                 extendedOptRegion,
                                 reducedTrustFrg,//odrModel.trustFRG,
-                                odrModel.trustBKG,
+                                reducedTrustBkg,
                                 extendedAppRegion,
                                 odrModel.toImageCoordinates),
                        *ish );

@@ -93,8 +93,6 @@ int main(int argc, char* argv[])
     LPWriter::MyLinearization linearization(nextIndex);
     Terms::Term::BinaryMap partialL = linearization.partialLinearization(mergedTerm.ternaryMap);
 
-    std::cout << mergedTerm.binaryMap.size() << std::endl;
-
     std::string lpOutputFilePath = resolveLPOutputFilePath(outputPath,pgmInputImage);
     LPWriter::writeQP(lpOutputFilePath,prm,grid,mergedTerm.unaryMap,mergedTerm.binaryMap,partialL,linearization,relLevel);
 

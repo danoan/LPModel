@@ -53,3 +53,4 @@ typename Linearization<TIndex,TValue>::Input Linearization<TIndex,TValue>::parti
     }
     return bm;
 }
+

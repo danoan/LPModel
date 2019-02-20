@@ -138,6 +138,72 @@ void writeMatrix(std::ofstream& ofs,
     ofs << " ] \n\n";
 }
 
+void writeSparseMatrix(std::ofstream& ofs,
+                 const std::string nameVar,
+                 const SquareMatrix& m)
+{
+    if(m.size()==0) return;
+
+    bool first=true;
+    unsigned  long int notZero=0;
+    ofs << nameVar << "_values" << " = ( ";
+    for(int i = 0;i<m.size();++i)
+    {
+        for(int j=0;j<m[i].size();++j)
+        {
+            if(m[i][j]!=0)
+            {
+                if(!first)
+                    ofs << ", ";
+
+                ++notZero;
+                ofs << m[i][j];
+                first = false;
+            }
+        }
+    }
+    ofs << " ) \n\n";
+
+
+    first=true;
+    ofs << nameVar << "_row" << " = ( ";
+    for(int i = 0;i<m.size();++i)
+    {
+        for(int j=0;j<m[i].size();++j)
+        {
+            if(m[i][j]!=0)
+            {
+                if(!first)
+                    ofs << ", ";
+
+                ofs << i;
+                first = false;
+            }
+        }
+    }
+    ofs << " ) \n\n";
+
+    first=true;
+    ofs << nameVar << "_col" << " = ( ";
+    for(int i = 0;i<m.size();++i)
+    {
+        for(int j=0;j<m[i].size();++j)
+        {
+            if(m[i][j]!=0)
+            {
+                if(!first)
+                    ofs << ", ";
+
+                ofs << j;
+                first = false;
+            }
+        }
+    }
+    ofs << " ) \n\n";
+
+    ofs << "## Sparsity Coefficient: " << notZero/( m.size()*m.size() ) << "\n\n";
+}
+
 void exportPython(std::ofstream& ofs,
                   const std::vector<double>& U,
                   const SquareMatrix& P1,
@@ -156,45 +222,44 @@ void exportPython(std::ofstream& ofs,
     writeVector(ofs,"_c",c);
 }
 
-int main(int argc, char* argv[])
+void exportPython(std::ofstream& ofs,
+                  const std::vector<double>& U,
+                  const std::vector<double>& V,
+                  const SquareMatrix& P,
+                  const ConstraintMatrix& Z,
+                  const std::vector<double>& z,
+                  const ConstraintMatrix& C,
+                  const std::vector<double>& c)
 {
-    if(argc<6)
-    {
-        std::cerr <<"Expected pgm-input-image levels sq-weight data-weight output-path\n";
-        exit(1);
-    }
+    writeVector(ofs,"_U",U);
+    writeVector(ofs,"_V",V);
+    writeSparseMatrix(ofs,"_P",P);
+    writeSparseMatrix(ofs,"_Z",Z);
+    writeVector(ofs,"_z",z);
+    writeSparseMatrix(ofs,"_C",C);
+    writeVector(ofs,"_c",c);
+}
 
-    std::string pgmInputImage = argv[1];
-    int levels = std::atoi(argv[2]);
-    double sqWeight = std::atof( argv[3] );
-    double dataWeight = std::atof( argv[4] );
-    LPWriter::RelaxationLevel relLevel = (LPWriter::RelaxationLevel) std::atoi( argv[5] );
-    std::string outputPath = argv[6];
+void exportPython(std::ofstream& ofs,
+                  const std::vector<double>& U,
+                  const std::vector<double>& V,
+                  const ConstraintMatrix& Z,
+                  const std::vector<double>& z,
+                  const ConstraintMatrix& C,
+                  const std::vector<double>& c)
+{
+    writeVector(ofs,"_U",U);
+    writeVector(ofs,"_V",V);
+    writeSparseMatrix(ofs,"_Z",Z);
+    writeVector(ofs,"_z",z);
+    writeSparseMatrix(ofs,"_C",C);
+    writeVector(ofs,"_c",c);
+}
 
-    boost::filesystem::create_directories(outputPath);
-    std::cerr << "Preparing LP for image: " << pgmInputImage << "\n"
-              << "with sq-weight=" << sqWeight << "; data-weight=" << dataWeight << "\n"
-              << "with relaxation level=" << relLevel
-              << "; and " << levels << " levels...\n";
-
-
-
-    DigitalSet ds = loadImageAsDigitalSet(pgmInputImage);
-
-
-    Initialization::Parameters prm = Initialization::API::initParameters(ds,levels);
-    Utils::exportODRModel(prm,outputPath+"/odr-model.eps");
-
-
-    Initialization::Grid grid = Initialization::API::createGrid(prm.odrModel.optRegion,
-                                                                prm);
-
-    Terms::Term scTerm = SquaredCurvature::API::prepare(prm,grid,sqWeight);
-    //Terms::Term dataTerm = DataFidelity::API::prepare(prm,grid,dataWeight);
-
-    Terms::Term mergedTerm = scTerm;//Terms::API::merge(dataTerm,scTerm);
-
-
+void exportPixelPairLinearization(const std::string& outputPath,
+                                  const Initialization::Grid& grid,
+                                  const Terms::Term& mergedTerm)
+{
     unsigned long nextIndex = grid.pixelMap.size()+grid.linelMap.size()+grid.edgeMap.size();
     LPWriter::MyLinearization linearization(nextIndex);
     Terms::Term::BinaryMap partialL = linearization.partialLinearization(mergedTerm.ternaryMap);
@@ -320,15 +385,7 @@ int main(int argc, char* argv[])
         }
     }
 
-
-
-    std::string lpOutputFilePath = resolveLPOutputFilePath(outputPath,pgmInputImage);
-    LPWriter::writeQP(lpOutputFilePath,prm,grid,mergedTerm.unaryMap,mergedTerm.binaryMap,partialL,linearization,relLevel);
-
-    saveObjects(outputPath,ds,grid);
-
-
-    std::string pythonFilePath = outputPath + "/model.py";
+    std::string pythonFilePath = outputPath + "/model_pixelpair.py";
     std::ofstream ofs(pythonFilePath);
 
     ofs << "numPixels = " << grid.pixelMap.size() - 3 << "\n";
@@ -340,6 +397,342 @@ int main(int argc, char* argv[])
     exportPython(ofs,U,P1,P2,Z,z,C,c);
 
     ofs.close();
+}
+
+
+void exportPixelLinelPairLinearization(const std::string& outputPath,
+                                       const Initialization::Grid& grid,
+                                       const Terms::Term& mergedTerm)
+{
+    unsigned long nextIndex = grid.pixelMap.size()+grid.linelMap.size()+grid.edgeMap.size();
+    LPWriter::MyLinearization linearization(nextIndex);
+    linearization.linearize(mergedTerm.binaryMap);
+
+    unsigned long int numPixelLinelPairs = 0;
+    for(auto it=linearization.ubegin();it!=linearization.uend();++it) ++numPixelLinelPairs;
+
+    unsigned long int numSlack = numPixelLinelPairs*3;
+    unsigned long int numVars = grid.pixelMap.size() -3 + grid.edgeMap.size() + numPixelLinelPairs + numSlack;
+
+    unsigned long int slackStart = nextIndex+numPixelLinelPairs;
+
+    std::vector<double> U(numVars);
+    {
+        for(auto it=U.begin();it!=U.end();++it) *it=0;
+        const Term::UnaryMap& um = mergedTerm.unaryMap;
+        for(auto it=um.begin();it!=um.end();++it)
+        {
+            Term::UIntMultiIndex mIndex = it->first;
+            auto mit = mIndex.begin();
+            unsigned long int pixel = *mit;
+
+            U[pixel] = mergedTerm.unaryMap.at(mIndex);
+        }
+    }
+
+    std::vector<double> V(numVars);
+    {
+        for(auto it=linearization.begin();it!=linearization.end();++it)
+        {
+            V[it->first] = it->second;
+        }
+    }
+
+
+    SquareMatrix P;
+    {
+        initSquareMatrix(P,numVars);
+        const Term::TernaryMap& tm = mergedTerm.ternaryMap;
+        for(auto it=tm.begin();it!=tm.end();++it)
+        {
+            const Term::UIntMultiIndex& mIndex = it->first;
+            auto mit = mIndex.begin();
+
+            unsigned long int pixel1 = *mit;++mit;
+            unsigned long int pixel2 = *mit;++mit;
+            unsigned long int edge = *mit;
+
+            Term::UIntMultiIndex lpIndex;
+            lpIndex << pixel1 << edge;
+
+            unsigned long int linelPairIndex = linearization.uniqueIndexMap[lpIndex];
+
+
+            P[edge][linelPairIndex] = it->second;
+        }
+    }
+
+    //RHS constants missing
+    ConstraintMatrix Z;
+    std::vector<double> z;
+    {
+        unsigned long int slackBaseIndex = slackStart;
+        unsigned long int baseIndex = 0;
+        initConstraintMatrix(Z,numSlack,numVars);
+        z.resize(numSlack);
+        for(auto it=linearization.ubegin();it!=linearization.uend();++it)
+        {
+            const Term::UIntMultiIndex& mIndex = it->first;
+            auto mit = mIndex.begin();
+            unsigned long int pixel1 = *mit; ++mit;
+            unsigned long int edge = *mit;
+            unsigned long int auxVarIndex = it->second;
+
+            Z[baseIndex*3][pixel1]=-1;
+            Z[baseIndex*3][auxVarIndex]=1;
+            Z[baseIndex*3][slackBaseIndex+baseIndex*3]=1;
+            z[slackBaseIndex+baseIndex*3]=0;
+
+            Z[baseIndex*3+1][edge]=-1;
+            Z[baseIndex*3+1][auxVarIndex]=1;
+            Z[baseIndex*3+1][slackBaseIndex+baseIndex*3+1]=1;
+            z[slackBaseIndex+baseIndex*3+1]=0;
+
+            Z[baseIndex*3+2][pixel1]=-1;
+            Z[baseIndex*3+2][edge]=-1;
+            Z[baseIndex*3+2][auxVarIndex]=1;
+            Z[baseIndex*3+2][slackBaseIndex+baseIndex*3+2]=-1;
+            z[slackBaseIndex+baseIndex*3+2]=-1;
+
+            if(baseIndex*3+2>=numSlack) throw std::runtime_error("");
+            if(slackBaseIndex+baseIndex*3+2>=numVars) throw std::runtime_error("");
+            if(auxVarIndex>=numVars) throw std::runtime_error("");
+            if(pixel1>=numVars) throw std::runtime_error("");
+            if(edge>=numVars) throw std::runtime_error("");
+        }
+    }
+
+    ConstraintMatrix C;
+    std::vector<double> c;
+    {
+        initConstraintMatrix(C,grid.edgeMap.size()/2,numVars);
+        c.resize(grid.edgeMap.size()/2);
+
+        Constraints::ClosedAndConnected::LinelConstraints lc;
+        Constraints::ClosedAndConnected::closedConnectedContraints(lc,grid);
+
+        typedef Constraints::ClosedAndConnected::Linel Linel;
+        typedef Constraints::ClosedAndConnected::LinelIncidence LinelIncidence;
+        typedef Constraints::ClosedAndConnected::PixelIncidence PixelIncidence;
+        typedef Constraints::ClosedAndConnected::EdgeIncidence EdgeIncidence;
+
+        int nc=0;
+        for(auto it=lc.begin();it!=lc.end();++it,++nc)
+        {
+            const Linel& linel = it->first;
+            const LinelIncidence li = it->second;
+
+            consistentPixel(li.pixel1,nc,C,c);
+            consistentPixel(li.pixel2,nc,C,c);
+            consistentEdge(li.edge1,nc,C,c);
+            consistentEdge(li.edge2,nc,C,c);
+
+        }
+    }
+
+    std::string pythonFilePath = outputPath + "/model_pixellinel.py";
+    std::ofstream ofs(pythonFilePath);
+
+    ofs << "numPixels = " << grid.pixelMap.size() - 3 << "\n";
+    ofs << "numEdges = " << grid.edgeMap.size() << "\n";
+    ofs << "numPixelLinelPairs = " << numPixelLinelPairs << "\n";
+    ofs << "numSlackVars = " << numSlack << "\n";
+    ofs << "numVars = " << numVars  << "\n";
+
+    exportPython(ofs,U,V,P,Z,z,C,c);
+
+    ofs.close();
+}
+
+void exportLinearizeAll(const std::string& outputPath,
+                        const Initialization::Grid& grid,
+                        const Terms::Term& mergedTerm)
+{
+    unsigned long nextIndex = grid.pixelMap.size()+grid.linelMap.size()+grid.edgeMap.size();
+    LPWriter::MyLinearization linearization(nextIndex);
+    linearization.linearize(mergedTerm.binaryMap);
+
+    unsigned long int numPixelPairs = 0;
+    for(auto it=linearization.ubegin();it!=linearization.uend();++it) ++numPixelPairs ;
+
+    Terms::Term::BinaryMap secondLinearization;
+    for(auto it=mergedTerm.ternaryMap.begin();it!=mergedTerm.ternaryMap.end();++it)
+    {
+        Term::UIntMultiIndex mIndex = it->first;
+        auto mit = mIndex.begin();
+
+        unsigned long int pixel1 = *mit;++mit;
+        unsigned long int pixel2 = *mit;++mit;
+        unsigned long int edge = *mit;
+
+        Term::UIntMultiIndex lpIndex;
+        lpIndex << pixel1 << edge;
+
+        Term::UIntMultiIndex sndOrderIndex;
+        sndOrderIndex << linearization.uniqueIndexMap[lpIndex] << pixel2;
+
+        secondLinearization.insert( LPWriter::MyLinearization::UniqueElement( sndOrderIndex, it->second) );
+    }
+    linearization.linearize(secondLinearization);
+
+
+    unsigned long int numSndOrderPairs = 0;
+    for(auto it=linearization.ubegin();it!=linearization.uend();++it) ++numSndOrderPairs ;
+
+    unsigned long int numSlack = numSndOrderPairs*3;
+    unsigned long int numVars = grid.pixelMap.size() -3 + grid.edgeMap.size() + numSndOrderPairs + numSlack;
+
+    unsigned long int slackStart = nextIndex+numSndOrderPairs;
+
+    std::vector<double> U(numVars);
+    {
+        for(auto it=U.begin();it!=U.end();++it) *it=0;
+        const Term::UnaryMap& um = mergedTerm.unaryMap;
+        for(auto it=um.begin();it!=um.end();++it)
+        {
+            Term::UIntMultiIndex mIndex = it->first;
+            auto mit = mIndex.begin();
+            unsigned long int pixel = *mit;
+
+            U[pixel] = mergedTerm.unaryMap.at(mIndex);
+        }
+    }
+
+    std::vector<double> V(numVars);
+    {
+        for(auto it=linearization.begin();it!=linearization.end();++it)
+        {
+            V[it->first] = it->second;
+        }
+    }
+
+
+    //RHS constants missing
+    ConstraintMatrix Z;
+    std::vector<double> z;
+    {
+        unsigned long int slackBaseIndex = slackStart;
+        unsigned long int baseIndex = 0;
+        initConstraintMatrix(Z,numSlack,numVars);
+        z.resize(numSlack);
+        for(auto it=linearization.ubegin();it!=linearization.uend();++it)
+        {
+            const Term::UIntMultiIndex& mIndex = it->first;
+            auto mit = mIndex.begin();
+            unsigned long int pixel1 = *mit; ++mit;
+            unsigned long int edge = *mit;
+            unsigned long int auxVarIndex = it->second;
+
+            Z[baseIndex*3][pixel1]=-1;
+            Z[baseIndex*3][auxVarIndex]=1;
+            Z[baseIndex*3][slackBaseIndex+baseIndex*3]=1;
+            z[slackBaseIndex+baseIndex*3]=0;
+
+            Z[baseIndex*3+1][edge]=-1;
+            Z[baseIndex*3+1][auxVarIndex]=1;
+            Z[baseIndex*3+1][slackBaseIndex+baseIndex*3+1]=1;
+            z[slackBaseIndex+baseIndex*3+1]=0;
+
+            Z[baseIndex*3+2][pixel1]=-1;
+            Z[baseIndex*3+2][edge]=-1;
+            Z[baseIndex*3+2][auxVarIndex]=1;
+            Z[baseIndex*3+2][slackBaseIndex+baseIndex*3+2]=-1;
+            z[slackBaseIndex+baseIndex*3+2]=-1;
+
+            if(baseIndex*3+2>=numSlack) throw std::runtime_error("");
+            if(slackBaseIndex+baseIndex*3+2>=numVars) throw std::runtime_error("");
+            if(auxVarIndex>=numVars) throw std::runtime_error("");
+            if(pixel1>=numVars) throw std::runtime_error("");
+            if(edge>=numVars) throw std::runtime_error("");
+        }
+    }
+
+    ConstraintMatrix C;
+    std::vector<double> c;
+    {
+        initConstraintMatrix(C,grid.edgeMap.size()/2,numVars);
+        c.resize(grid.edgeMap.size()/2);
+
+        Constraints::ClosedAndConnected::LinelConstraints lc;
+        Constraints::ClosedAndConnected::closedConnectedContraints(lc,grid);
+
+        typedef Constraints::ClosedAndConnected::Linel Linel;
+        typedef Constraints::ClosedAndConnected::LinelIncidence LinelIncidence;
+        typedef Constraints::ClosedAndConnected::PixelIncidence PixelIncidence;
+        typedef Constraints::ClosedAndConnected::EdgeIncidence EdgeIncidence;
+
+        int nc=0;
+        for(auto it=lc.begin();it!=lc.end();++it,++nc)
+        {
+            const Linel& linel = it->first;
+            const LinelIncidence li = it->second;
+
+            consistentPixel(li.pixel1,nc,C,c);
+            consistentPixel(li.pixel2,nc,C,c);
+            consistentEdge(li.edge1,nc,C,c);
+            consistentEdge(li.edge2,nc,C,c);
+
+        }
+    }
+
+    std::string pythonFilePath = outputPath + "/model_all.py";
+    std::ofstream ofs(pythonFilePath);
+
+    ofs << "numPixels = " << grid.pixelMap.size() - 3 << "\n";
+    ofs << "numEdges = " << grid.edgeMap.size() << "\n";
+    ofs << "numPixelPairs = " << numPixelPairs << "\n";
+    ofs << "numSndOrderPairs = " << numSndOrderPairs << "\n";
+    ofs << "numSlackVars = " << numSlack << "\n";
+    ofs << "numVars = " << numVars  << "\n";
+
+    exportPython(ofs,U,V,Z,z,C,c);
+
+    ofs.close();
+}
+
+int main(int argc, char* argv[])
+{
+    if(argc<6)
+    {
+        std::cerr <<"Expected pgm-input-image levels sq-weight data-weight output-path\n";
+        exit(1);
+    }
+
+    std::string pgmInputImage = argv[1];
+    int levels = std::atoi(argv[2]);
+    double sqWeight = std::atof( argv[3] );
+    double dataWeight = std::atof( argv[4] );
+    LPWriter::RelaxationLevel relLevel = (LPWriter::RelaxationLevel) std::atoi( argv[5] );
+    std::string outputPath = argv[6];
+
+    boost::filesystem::create_directories(outputPath);
+    std::cerr << "Preparing LP for image: " << pgmInputImage << "\n"
+              << "with sq-weight=" << sqWeight << "; data-weight=" << dataWeight << "\n"
+              << "with relaxation level=" << relLevel
+              << "; and " << levels << " levels...\n";
+
+
+
+    DigitalSet ds = loadImageAsDigitalSet(pgmInputImage);
+
+
+    Initialization::Parameters prm = Initialization::API::initParameters(ds,levels);
+    Utils::exportODRModel(prm,outputPath+"/odr-model.eps");
+
+
+    Initialization::Grid grid = Initialization::API::createGrid(prm.odrModel.optRegion,
+                                                                prm);
+
+    Terms::Term scTerm = SquaredCurvature::API::prepare(prm,grid,sqWeight);
+    //Terms::Term dataTerm = DataFidelity::API::prepare(prm,grid,dataWeight);
+
+    Terms::Term mergedTerm = scTerm;//Terms::API::merge(dataTerm,scTerm);
+
+    saveObjects(outputPath,ds,grid);
+
+//    exportLinearizeAll(outputPath,grid,mergedTerm);
+//    exportPixelPairLinearization(outputPath,grid,mergedTerm);
+    exportPixelLinelPairLinearization(outputPath,grid,mergedTerm);
 
     return 0;
 }
