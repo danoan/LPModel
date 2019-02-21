@@ -31,7 +31,7 @@ void MinimizerAR::buildConstraintsMatrix()
     Constraints::ClosedAndConnected::LinelConstraints lc;
     Constraints::ClosedAndConnected::closedConnectedContraints(lc,grid);
 
-    CM.resize(lc.size()+numVars,numVars);
+    CM.resize(lc.size()+2*numVars,numVars);
 
     Size currRow = 0;
     for(auto it=lc.begin();it!=lc.end();++it,++currRow)
@@ -52,30 +52,45 @@ void MinimizerAR::buildConstraintsMatrix()
     fic = currRow;
     eqKernel = CM.block(0,0,fic,numVars).fullPivLu().kernel();
 
-    activeFilter.resize(numVars);
+    activeFilter.resize(2*numVars);
+    //Greater than Zero and smaller than One
     for(auto it=grid.pixelMap.begin();it!=grid.pixelMap.end();++it)
     {
         if(it->second.ct==Pixel::CellType::Variable)
         {
+            //Greater than Zero
             CM.coeffRef(currRow,it->second.varIndex) = -1;
             activeFilter.coeffRef(currRow-fic) = 0;
+            //Smaller than One
+            CM.coeffRef(numVars+currRow,it->second.varIndex) = 1;
+            activeFilter.coeffRef(numVars+(currRow-fic)) = 1;
             ++currRow;
         }
     }
 
     for(auto it=grid.edgeMap.begin();it!=grid.edgeMap.end();++it,++currRow)
     {
+        //Greater than Zero
         CM.coeffRef(currRow,it->second.varIndex-edgeOffset) = -1;
         activeFilter.coeffRef(currRow-fic) = 0;
+        //Smaller than One
+        CM.coeffRef(numVars+currRow,it->second.varIndex-edgeOffset) = 1;
+        activeFilter.coeffRef(numVars + (currRow-fic) ) = 1;
     }
 
-    inequalities = CM.block(fic,0,currRow-fic,numVars);
+    lbFilter = activeFilter + Vector::Constant(activeFilter.rows(),activeFilter.cols(),-1e-20);
+    ubFilter = activeFilter + Vector::Constant(activeFilter.rows(),activeFilter.cols(),1e-20);
+
+
+    inequalities = CM.block(fic,0,2*numVars,numVars);
 
 }
 
 MinimizerAR::Matrix MinimizerAR::activeSet(Vector& x)
 {
-    FilterMatrix v = ( (inequalities*x).array()==activeFilter.array() ).matrix();
+    FilterMatrix vLb = ( (inequalities*x).array()>=lbFilter.array() ).matrix();
+    FilterMatrix vUb = ( (inequalities*x).array()<=ubFilter.array() ).matrix();
+    FilterMatrix v = vLb && vUb;
 
     Size activeConstraints =0;
     for(int i=0;i<v.size();++i)
@@ -101,22 +116,26 @@ MinimizerAR::Matrix MinimizerAR::activeSet(Vector& x)
 double MinimizerAR::maxDeplacementOnDk(const Vector& x, const Vector& dk)
 {
     FilterMatrix minFilter = (inequalities*dk).array()>Vector::Zero(inequalities.rows()).array();
-    const Matrix& num = -inequalities*x;
+    const Matrix& num = activeFilter-inequalities*x;
     const Matrix& den = inequalities*dk;
 
-    int first=0;while(!minFilter(first))++first;
-    double m = num(first)/den(first);
-    double pot=0;
-
-    for(int i=first;i<minFilter.rows();++i)
+    double m=1;
+    if(minFilter.any())
     {
-        if(minFilter(i))
+        int first = 0;
+        while (!minFilter(first))++first;
+        m = num(first)/den(first);
+
+        double pot=0;
+        for(int i=first;i<minFilter.rows();++i)
         {
-            pot = num(i)/den(i);
-            if(pot < m) m = pot;
+            if(minFilter(i))
+            {
+                pot = num(i)/den(i);
+                if(pot < m) m = pot;
+            }
         }
     }
-
 
     return m;
 }

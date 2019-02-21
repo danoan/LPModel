@@ -31,6 +31,7 @@ DigitalSet loadImageAsDigitalSet(const std::string& imageFilePath)
     return ds;
 }
 
+
 int main(int argc, char* argv[])
 {
     if(argc<5)
@@ -64,8 +65,8 @@ int main(int argc, char* argv[])
                                                                                          grid);
     NonLinOpt::MinimizerAR minimizer(grid,mergedTerm);
     NonLinOpt::MinimizerAR::Vector feasVector = minimizer.feasibleSolution(spv);
-    double optValue = minimizer.minimize(feasVector,5);
 
+    double optValue = minimizer.minimize(feasVector,10);
     std::cout << "Optvalue: " << optValue << std::endl;
 
 //    free(varVector);

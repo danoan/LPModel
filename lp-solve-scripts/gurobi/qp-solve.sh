@@ -57,7 +57,7 @@ do
                             $EXPORT_LP_OUTPUT_FOLDER
 
 
-    gurobi_cl   ResultFile=$GUROBI_OUTPUT_FOLDER/${IMAGE_NAME}.sol \
+    gurobi_cl   ResultFile=$GUROBI_OUTPUT_OLDER/${IMAGE_NAME}.sol \
                 $EXPORT_LP_OUTPUT_FOLDER/${IMAGE_NAME}.lp
 
 

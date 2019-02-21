@@ -151,7 +151,7 @@ namespace LPModel
             Vector feasibleSolution(const SolutionPairVector& spv);
 
             template<class TNUM, class TNUMARRAY>
-            TNUM objective( const TNUMARRAY x)
+            TNUM objective( const TNUMARRAY x) const
             {
                 TNUM res = 0;
                 Size index1,index2,index3;
@@ -205,7 +205,7 @@ namespace LPModel
 
             Matrix CM;
             Matrix inequalities;
-            Vector activeFilter;
+            Vector activeFilter,lbFilter,ubFilter;
 
             Matrix eqKernel;
 

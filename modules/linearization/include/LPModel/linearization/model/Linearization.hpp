@@ -15,7 +15,6 @@ void Linearization<TIndex,TValue>::linearize(const Input &input)
 }
 
 
-
 template<typename TIndex, typename TValue>
 typename Linearization<TIndex,TValue>::Input Linearization<TIndex,TValue>::partialLinearization(const Input &input)
 {

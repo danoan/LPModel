@@ -140,10 +140,11 @@ void LPWriter::writeBinaries(std::ofstream& ofs,
     }
 
 
-    for(auto it=grid.edgeMap.begin();it!=grid.edgeMap.end();++it)
-    {
-        ofs << "x" << it->second.varIndex << " ";
-    }
+    //It is enough to impose binray values for pixels.
+//    for(auto it=grid.edgeMap.begin();it!=grid.edgeMap.end();++it)
+//    {
+//        ofs << "x" << it->second.varIndex << " ";
+//    }
 
     ofs << "\n";
 }

@@ -94,7 +94,32 @@ int main(int argc, char* argv[])
 
     LPWriter::MyLinearization linearization(nextIndex);
     linearization.linearize(mergedTerm.binaryMap);
-    linearization.linearize(mergedTerm.ternaryMap);
+    //linearization.linearize(mergedTerm.ternaryMap); //Independent Linearization of third order terms
+
+
+    {
+        //Coupled linearization of third order terms.
+        Terms::Term::BinaryMap sndOrderLinearization;
+        for(auto it=mergedTerm.ternaryMap.begin();it!=mergedTerm.ternaryMap.end();++it)
+        {
+            const Utils::MultiIndex<unsigned long> &mIndex = it->first;
+            auto mit = mIndex.begin();
+            unsigned long pixel1 = *mit;++mit;
+            unsigned long pixel2 = *mit;++mit;
+            unsigned long edge = *mit;
+
+            Utils::MultiIndex<unsigned long> pixelLinelMIndex;
+            pixelLinelMIndex << pixel1 << edge;
+            unsigned long auxIndex = linearization.uniqueIndexMap[pixelLinelMIndex];
+
+            Utils::MultiIndex<unsigned long> sndOrderMIndex;
+            sndOrderMIndex << auxIndex << pixel2;
+
+            sndOrderLinearization.insert( LPWriter::MyLinearization::UniqueElement( sndOrderMIndex, it->second) );
+        }
+
+        linearization.linearize(sndOrderLinearization);
+    }
 
     std::string lpOutputFilePath = resolveLPOutputFilePath(outputPath,pgmInputImage);
     LPWriter::writeLP(lpOutputFilePath,prm,grid,mergedTerm.unaryMap,linearization,relLevel);
