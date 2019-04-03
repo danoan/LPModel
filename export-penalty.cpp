@@ -204,6 +204,67 @@ void writeSparseMatrix(std::ofstream& ofs,
     ofs << "## Sparsity Coefficient: " << notZero/( m.size()*m.size() ) << "\n\n";
 }
 
+void exportDigitalSetAsMatrix(std::ofstream& ofs,
+                              const DigitalSet& ds)
+{
+    typedef DGtal::Z2i::Domain Domain;
+    typedef DGtal::Z2i::Point Point;
+
+    const Domain& domain = ds.domain();
+    Point lb = domain.lowerBound();
+    Point ub = domain.upperBound();
+
+    int startR = ub[1];
+    int endR = lb[1];
+    int startC = lb[0];
+    int endC = ub[0];
+
+    ofs << "digitalModel=[";
+    for(int r=startR;r>=endR;--r)
+    {
+        ofs << "[";
+        for(int c=startC;c<=endC;++c)
+        {
+            if(ds(Point(c,r))) ofs << "255";
+            else ofs << "0";
+
+            if(c!=endC) ofs << ",";
+        }
+        ofs << "]";
+        if(r!=endR) ofs << ",";
+    }
+    ofs << "]\n\n";
+
+}
+
+
+void exportPixelMap(std::ofstream& ofs,
+                    const Initialization::Grid::PixelMap& pixelMap)
+{
+    auto it=pixelMap.begin();
+    ofs << "pixelMap={";
+
+    const Initialization::Pixel& pixel = it->second;
+    if( pixel.ct == Initialization::Pixel::CellType::Variable )
+    {
+        ofs << pixel.varIndex << ":{'row':" << (pixel.row+1)/2 << ",'col':" << (pixel.col+1)/2 << "}";
+    }
+    ++it;
+    while(it!=pixelMap.end())
+    {
+        const Initialization::Pixel& pixel = it->second;
+        if( pixel.ct == Initialization::Pixel::CellType::Variable )
+        {
+            if(it!=pixelMap.end()) ofs << ",";
+            ofs << pixel.varIndex << ":{'row':" << (pixel.row+1)/2 << ",'col':" << (pixel.col+1)/2 << "}";
+        }
+        ++it;
+    }
+
+    ofs << "}\n\n";
+
+}
+
 void exportPython(std::ofstream& ofs,
                   const std::vector<double>& U,
                   const SquareMatrix& P1,
@@ -216,9 +277,9 @@ void exportPython(std::ofstream& ofs,
     writeVector(ofs,"_U",U);
     writeMatrix(ofs,"_P1",P1);
     writeMatrix(ofs,"_P2",P2);
-    writeMatrix(ofs,"_Z",Z);
+    writeSparseMatrix(ofs,"_Z",Z);
     writeVector(ofs,"_z",z);
-    writeMatrix(ofs,"_C",C);
+    writeSparseMatrix(ofs,"_C",C);
     writeVector(ofs,"_c",c);
 }
 
@@ -257,6 +318,7 @@ void exportPython(std::ofstream& ofs,
 }
 
 void exportPixelPairLinearization(const std::string& outputPath,
+                                  const DigitalSet& ds,
                                   const Initialization::Grid& grid,
                                   const Terms::Term& mergedTerm)
 {
@@ -385,7 +447,7 @@ void exportPixelPairLinearization(const std::string& outputPath,
         }
     }
 
-    std::string pythonFilePath = outputPath + "/model_pixelpair.py";
+    std::string pythonFilePath = outputPath + "/DLinearizedPixelPixel.py";
     std::ofstream ofs(pythonFilePath);
 
     ofs << "numPixels = " << grid.pixelMap.size() - 3 << "\n";
@@ -396,11 +458,15 @@ void exportPixelPairLinearization(const std::string& outputPath,
 
     exportPython(ofs,U,P1,P2,Z,z,C,c);
 
+    exportDigitalSetAsMatrix(ofs,ds);
+    exportPixelMap(ofs,grid.pixelMap);
+
     ofs.close();
 }
 
 
 void exportPixelLinelPairLinearization(const std::string& outputPath,
+                                       const DigitalSet& ds,
                                        const Initialization::Grid& grid,
                                        const Terms::Term& mergedTerm)
 {
@@ -530,7 +596,7 @@ void exportPixelLinelPairLinearization(const std::string& outputPath,
         }
     }
 
-    std::string pythonFilePath = outputPath + "/model_pixellinel.py";
+    std::string pythonFilePath = outputPath + "/DLinearizedPixelLinel.py";
     std::ofstream ofs(pythonFilePath);
 
     ofs << "numPixels = " << grid.pixelMap.size() - 3 << "\n";
@@ -541,10 +607,14 @@ void exportPixelLinelPairLinearization(const std::string& outputPath,
 
     exportPython(ofs,U,V,P,Z,z,C,c);
 
+    exportDigitalSetAsMatrix(ofs,ds);
+    exportPixelMap(ofs,grid.pixelMap);
+
     ofs.close();
 }
 
 void exportLinearizeAll(const std::string& outputPath,
+                        const DigitalSet& ds,
                         const Initialization::Grid& grid,
                         const Terms::Term& mergedTerm)
 {
@@ -675,7 +745,7 @@ void exportLinearizeAll(const std::string& outputPath,
         }
     }
 
-    std::string pythonFilePath = outputPath + "/model_all.py";
+    std::string pythonFilePath = outputPath + "/DLinearizedAll.py";
     std::ofstream ofs(pythonFilePath);
 
     ofs << "numPixels = " << grid.pixelMap.size() - 3 << "\n";
@@ -686,6 +756,9 @@ void exportLinearizeAll(const std::string& outputPath,
     ofs << "numVars = " << numVars  << "\n";
 
     exportPython(ofs,U,V,Z,z,C,c);
+
+    exportDigitalSetAsMatrix(ofs,ds);
+    exportPixelMap(ofs,grid.pixelMap);
 
     ofs.close();
 }
@@ -730,9 +803,9 @@ int main(int argc, char* argv[])
 
     saveObjects(outputPath,ds,grid);
 
-//    exportLinearizeAll(outputPath,grid,mergedTerm);
-//    exportPixelPairLinearization(outputPath,grid,mergedTerm);
-    exportPixelLinelPairLinearization(outputPath,grid,mergedTerm);
+    exportLinearizeAll(outputPath,ds,grid,mergedTerm);
+    exportPixelPairLinearization(outputPath,ds,grid,mergedTerm);
+    exportPixelLinelPairLinearization(outputPath,ds,grid,mergedTerm);
 
     return 0;
 }
