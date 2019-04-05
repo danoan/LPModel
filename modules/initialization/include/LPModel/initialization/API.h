@@ -32,15 +32,15 @@ namespace LPModel
             typedef SCaBOliC::Core::ODRModel ODRModel;
 
             //For test only
-            Parameters initParameters(const DigitalSet &originalDS, int levels, bool fixedEvenIteration);
-            Parameters readParametersFromFile(const std::string& inputFile, int levels, bool fixedEvenIteration);
+            Parameters initParameters(const DigitalSet &originalDS, int optRegionWidth, bool fixedEvenIteration);
+            Parameters readParametersFromFile(const std::string& inputFile, int optRegionWidth, bool fixedEvenIteration);
 
 
-            Parameters initParameters(const DigitalSet &originalDS, int levels);
+            Parameters initParameters(const DigitalSet &originalDS, int optRegionWidth);
             Grid createGrid(const DigitalSet& ds,
                             const Parameters& prm);
 
-            Parameters readParametersFromFile(const std::string& inputFile, int levels);
+            Parameters readParametersFromFile(const std::string& inputFile, int optRegionWidth);
             void save(const DigitalSet& dsOriginal, const std::string& outputFile);
             
             Grid* readGridFromFile(const std::string& inputFile);

@@ -15,25 +15,47 @@ void Linearization<TIndex,TValue>::linearize(const Input &input)
 }
 
 
+/*
+ * Given a ternary map, create RELAXATION_AUXILIAR variables for a second order pair.
+ * Ex1: (Pixel,Pixel) -> Aux Z
+ * Ex2: (Pixel,Linel) -> Aux Z
+ */
 template<typename TIndex, typename TValue>
-typename Linearization<TIndex,TValue>::Input Linearization<TIndex,TValue>::partialLinearization(const Input &input)
+typename Linearization<TIndex,TValue>::Input Linearization<TIndex,TValue>::partialLinearization(const Input &input,
+                                                                                                const Grid& grid,
+                                                                                                const PartialLinearizationPair& plp)
 {
     //I am expecting a TernaryMap
     assert(input.begin()->first.size()==3);
 
+    int variableCount;
+
     Input bm;
     for(auto it=input.begin();it!=input.end();++it)
     {
-        const UIntMultiIndex& currMI = it->first;
+        variableCount=0;
 
-        auto itMI = currMI.begin();
+        LinearIndex otherIndex;
         UIntMultiIndex newMI;
-        for(int i=0;i<2;++i,++itMI)
+        const UIntMultiIndex& currMI = it->first;
+        auto itMI = currMI.begin();
+        do
         {
-            newMI << *itMI;
-        }
-        LinearIndex edgeIndex = *itMI;  //Among pixels and edges, edges has the highest index
-        ++itMI;
+            if( grid.variableMap.at(*itMI)->vt==plp.variableTypes[variableCount] )
+            {
+                newMI << *itMI;
+                ++variableCount;
+            }
+            else
+            {
+                otherIndex = *itMI;
+            }
+
+            ++itMI;
+
+        }while(variableCount<2 && itMI!=currMI.end());
+
+        if(variableCount!=2) throw std::runtime_error("Variable pair not found!");
 
         if(uniqueIndexMap.find(newMI)==uniqueIndexMap.end())
         {
@@ -45,7 +67,7 @@ typename Linearization<TIndex,TValue>::Input Linearization<TIndex,TValue>::parti
         }
 
         UIntMultiIndex bmIndex;
-        bmIndex << uniqueIndexMap[newMI] << edgeIndex;
+        bmIndex << uniqueIndexMap[newMI] << otherIndex;
 
         if(bm.find(bmIndex)==bm.end()) bm[bmIndex] = it->second;
         else throw std::runtime_error("Not expected state!");
@@ -53,3 +75,31 @@ typename Linearization<TIndex,TValue>::Input Linearization<TIndex,TValue>::parti
     return bm;
 }
 
+
+template<typename TIndex, typename TValue>
+void Linearization<TIndex,TValue>::coupledLinearization(const Input &input)
+{
+    //I am expecting a TernaryMap
+    assert(input.begin()->first.size()==3);
+
+    Input sndOrderLinearization;
+    for(auto it=input.begin();it!=input.end();++it)
+    {
+        const Utils::MultiIndex<unsigned long> &mIndex = it->first;
+        auto mit = mIndex.begin();
+        unsigned long pixel1 = *mit;++mit;
+        unsigned long pixel2 = *mit;++mit;
+        unsigned long edge = *mit;
+
+        TIndex pixelLinelMIndex;
+        pixelLinelMIndex << pixel1 << edge;
+        unsigned long auxIndex = this->uniqueIndexMap[pixelLinelMIndex];
+
+        TIndex sndOrderMIndex;
+        sndOrderMIndex << auxIndex << pixel2;
+
+        sndOrderLinearization.insert( UniqueElement( sndOrderMIndex, it->second) );
+    }
+
+    this->linearize(sndOrderLinearization);
+};

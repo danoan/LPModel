@@ -1,0 +1,36 @@
+This package contains three different formulations for the global optimization model of curvature regularization.
+
+We use the cvxopt package to try to solve the problems. In order to use convex optimization, the energy should
+respect some properties. In the case of quadratic energies, the coefficient matrix correponding to the second order
+term must be semi-definite positive.
+
+All models here are continuous, i.e., variables are allowed to assume any value between 0 and 1.
+For each model we derive a constrained and a penalty version.
+
+****MLinearizedPixelLinel
+
+    The original third order energy is converted in a quadratic energy by means of linearization of second order terms
+    of type Pixel*Linel.
+
+    An additional variable z is created for the pair.
+    For each variable z, three constraints are included:
+        z <= p
+        z <= l
+        z >= p+l-1
+
+
+****MLinearizedPixelPixel
+
+    Same as above, but the linearized second order term is of the form: Pixel*Pixel
+
+****MLinearizedAll
+
+    All terms are linearized and we finish with a linear programming model.
+
+
+
+For the quadratic formulations, both constrained and penalty formulations have a non semi-definite positive matrix.
+
+For the all linearized formulation, we actually have a linear programming. An optimal solution is find for the
+penalty version. For the square shape, it consists on labeling pixel variables to 1 and all others (RELAXATION_AUXILIAR, slack)
+to 0.5.

@@ -4,13 +4,13 @@ project(LPModel)
 find_package(DGtal REQUIRED)
 find_package(OpenCV REQUIRED)
 
-link_directories(cmake-build-debug/modules/constraints
-        cmake-build-debug/modules/initialization
-        cmake-build-debug/modules/linearization
-        cmake-build-debug/modules/lpwriter
-        cmake-build-debug/modules/solassign
-        cmake-build-debug/modules/terms
-        cmake-build-debug/modules/utils
+link_directories(${LPMODEL_LIBS_DIR}/constraints
+        ${LPMODEL_LIBS_DIR}/initialization
+        ${LPMODEL_LIBS_DIR}/linearization
+        ${LPMODEL_LIBS_DIR}/lpwriter
+        ${LPMODEL_LIBS_DIR}/terms
+        ${LPMODEL_LIBS_DIR}/utils
+        ${LPMODEL_LIBS_DIR}/solassign
         ${CMAKE_PREFIX_PATH}
         ${BOOST_LIBS_DIR}
         ${DIPACUS_LIBS_DIR})
@@ -22,137 +22,14 @@ add_subdirectory(modules/lpwriter)
 add_subdirectory(modules/solassign)
 add_subdirectory(modules/terms)
 add_subdirectory(modules/utils)
-add_subdirectory(modules/nonlinopt)
 
 add_subdirectory(lab/test)
 add_subdirectory(lab/exp)
 
 
-add_executable(export-lp export-lp.cpp)
-add_dependencies(export-lp constraints initialization linearization lpwriter solassign terms utils)
-
-target_link_libraries(export-lp
-        -llpwriter
-        -lconstraints
-        -lterms
-        -linitialization
-        -lscabolic-core
-        -ldipacus-derivates
-        -ldipacus-components
-        -ldipacus-base
-        -lutils
-        -lboost_system
-        -lboost_filesystem
-        ${DGTAL_LIBRARIES}
-        ${OpenCV_LIBS})
-
-target_include_directories(export-lp PRIVATE
-        ext/include
-        modules/constraints/include
-        modules/initialization/include
-        modules/linearization/include
-        modules/lpwriter/include
-        modules/terms/include
-        modules/utils/include
-        ${DGTAL_INCLUDE_DIRS})
-
-
-
-
-
-add_executable(export-qp export-qp.cpp)
-add_dependencies(export-qp constraints initialization linearization lpwriter solassign terms utils)
-
-target_link_libraries(export-qp
-        -llpwriter
-        -lconstraints
-        -lterms
-        -linitialization
-        -lscabolic-core
-        -ldipacus-derivates
-        -ldipacus-components
-        -ldipacus-base
-        -lutils
-        -lboost_system
-        -lboost_filesystem
-        ${DGTAL_LIBRARIES}
-        ${OpenCV_LIBS})
-
-target_include_directories(export-qp PRIVATE
-        ext/include
-        modules/constraints/include
-        modules/initialization/include
-        modules/linearization/include
-        modules/lpwriter/include
-        modules/terms/include
-        modules/utils/include
-        ${DGTAL_INCLUDE_DIRS})
-
-
-
-
-add_executable(export-penalty export-penalty.cpp)
-add_dependencies(export-penalty constraints initialization linearization lpwriter solassign terms utils)
-
-target_link_libraries(export-penalty
-        -llpwriter
-        -lconstraints
-        -lterms
-        -linitialization
-        -lscabolic-core
-        -ldipacus-derivates
-        -ldipacus-components
-        -ldipacus-base
-        -lutils
-        -lboost_system
-        -lboost_filesystem
-        ${DGTAL_LIBRARIES}
-        ${OpenCV_LIBS})
-
-target_include_directories(export-penalty PRIVATE
-        ext/include
-        modules/constraints/include
-        modules/initialization/include
-        modules/linearization/include
-        modules/lpwriter/include
-        modules/terms/include
-        modules/utils/include
-        ${DGTAL_INCLUDE_DIRS})
-
-
-
-
-add_executable(generate-solution generate-solution.cpp)
-add_dependencies(generate-solution initialization solassign utils)
-
-target_link_libraries(generate-solution
-        -lterms
-        -lsolassign
-        -linitialization
-        -ldipacus-base
-        ${DGTAL_LIBRARIES})
-
-target_include_directories(generate-solution PRIVATE
-        ext/include
-        modules/solassign/include
-        modules/initialization/include
-        modules/utils/include
-        modules/terms/include
-        ${DGTAL_INCLUDE_DIRS})
-
-
-add_executable(generate-initial-shapes generate-initial-shapes.cpp )
-add_dependencies(generate-initial-shapes initialization)
-
-target_link_libraries(generate-initial-shapes
-        -linitialization
-        -ldipacus-base
-        -lboost_system
-        -lboost_filesystem
-        ${DGTAL_LIBRARIES})
-
-target_include_directories(generate-initial-shapes PRIVATE
-        ext/include
-        modules/initialization/include
-        ${DIPACUS_INCLUDE_DIRS}
-        ${DGTAL_INCLUDE_DIRS})
+add_subdirectory(CApplications/export-cplex-lp)
+add_subdirectory(CApplications/export-cplex-qp)
+add_subdirectory(CApplications/export-cvxopt)
+add_subdirectory(CApplications/generate-shapes)
+add_subdirectory(CApplications/generate-solution)
+add_subdirectory(CApplications/nonlinopt)

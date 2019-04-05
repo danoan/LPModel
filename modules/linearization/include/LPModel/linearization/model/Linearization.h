@@ -3,6 +3,8 @@
 
 #include <map>
 #include <LPModel/terms/model/MultiIndex.h>
+#include <LPModel/initialization/model/IVariable.h>
+#include <LPModel/initialization/model/Grid.h>
 
 namespace LPModel
 {
@@ -25,6 +27,21 @@ namespace LPModel
         typedef typename LinearizationMap::const_iterator LinearizationMapIterator;
         typedef typename UniqueIndexMap::const_iterator UniqueIndexMapIterator;
 
+        typedef Initialization::Grid Grid;
+
+        struct PartialLinearizationPair
+        {
+            typedef Initialization::IVariable::VariableType VariableType;
+
+            PartialLinearizationPair(VariableType tp1, VariableType tp2)
+            {
+                variableTypes[0] = tp1;
+                variableTypes[1] = tp2;
+            }
+
+            VariableType variableTypes[2];
+        };
+
     private:
         typedef unsigned long Index;
         typedef Utils::MultiIndex<Index> UIntMultiIndex;
@@ -33,7 +50,10 @@ namespace LPModel
         Linearization(LinearIndex nextIndex):nextIndex(nextIndex){}
 
         void linearize(const Input& input);
-        Input partialLinearization(const Input& input);
+        void coupledLinearization(const Input& input);
+        Input partialLinearization(const Input& input,
+                                   const Grid& grid,
+                                   const PartialLinearizationPair& plp);
 
         LinearizationMapIterator begin() const{ return linearizationMap.begin(); }
         LinearizationMapIterator end() const{ return linearizationMap.end(); }

@@ -34,8 +34,6 @@ namespace LPModel
         typedef Constraints::ClosedAndConnected::PixelIncidence PixelIncidence;
         typedef Constraints::ClosedAndConnected::EdgeIncidence EdgeIncidence;
 
-        enum RelaxationLevel{NO_RELAXATION=0,AUXILIAR_RELAXATION=1,ALL_RELAXATION=2};
-
         typedef Linearization< Terms::Term::UIntMultiIndex,double > MyLinearization;
 
         struct StringConstraint
@@ -95,12 +93,16 @@ namespace LPModel
         void writeBinaries(std::ofstream& ofs,
                            const Grid& grid);
 
+        void writeBinaries(std::ofstream& ofs,
+                           VariableMapIterator begin,
+                           VariableMapIterator end);
+
         void writeLP(const std::string& outputFilePath,
                      const Initialization::Parameters& prm,
                      const Initialization::Grid& grid,
                      const Terms::Term::UnaryMap& um,
                      const MyLinearization& linearization,
-                     const RelaxationLevel relLevel);
+                     const int relLevel);
 
 
         void writeQP(const std::string& outputFilePath,
@@ -110,7 +112,7 @@ namespace LPModel
                      const Terms::Term::BinaryMap& bm,
                      const Terms::Term::BinaryMap& partialL,
                      const MyLinearization& linearization,
-                     const RelaxationLevel relLevel);
+                     const int relLevel);
     }
 }
 

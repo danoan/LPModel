@@ -141,10 +141,22 @@ void LPWriter::writeBinaries(std::ofstream& ofs,
 
 
     //It is enough to impose binray values for pixels.
-//    for(auto it=grid.edgeMap.begin();it!=grid.edgeMap.end();++it)
-//    {
-//        ofs << "x" << it->second.varIndex << " ";
-//    }
+    for(auto it=grid.edgeMap.begin();it!=grid.edgeMap.end();++it)
+    {
+        ofs << "x" << it->second.varIndex << " ";
+    }
+
+    ofs << "\n";
+}
+
+void LPWriter::writeBinaries(std::ofstream& ofs,
+                             VariableMapIterator begin,
+                             VariableMapIterator end)
+{
+    for(auto it=begin;it!=end;++it)
+    {
+        ofs << "x" << it->first << " ";
+    }
 
     ofs << "\n";
 }
@@ -154,7 +166,7 @@ void LPWriter::writePixelPenalty(StringConstraint& sc,
 {
     std::ostringstream oss;
     char s=pi.posIncidence?'+':'-';
-    if(pi.pixel.ct==Pixel::CellType::AuxiliarFrg)
+    if(pi.pixel.ct==Pixel::CellType::RELAXATION_AUXILIARFrg)
     {
         double v = sc.rhs.top();sc.rhs.pop();
 
@@ -184,7 +196,7 @@ void LPWriter::writePixel(StringConstraint& sc,
 {
     std::ostringstream oss;
     char s=pi.posIncidence?'+':'-';
-    if(pi.pixel.ct==Pixel::CellType::AuxiliarFrg)
+    if(pi.pixel.ct==Pixel::CellType::RELAXATION_AUXILIARFrg)
     {
         double v = sc.rhs.top();sc.rhs.pop();
 
@@ -242,7 +254,7 @@ void LPWriter::writeLP(const std::string& outputFilePath,
                        const Initialization::Grid& grid,
                        const Terms::Term::UnaryMap& um,
                        const MyLinearization& linearization,
-                       const RelaxationLevel relLevel)
+                       const int relLevel)
 {
     std::cerr << "Writing LP-Program at " << outputFilePath << "\n";
 
@@ -265,19 +277,27 @@ void LPWriter::writeLP(const std::string& outputFilePath,
     Constraints::ClosedAndConnected::closedConnectedContraints(lc,grid);
     LPWriter::writeConstraint(ofs,constraintNum,lc);
 
-    if(relLevel==NO_RELAXATION)
+    if(relLevel==0)
     {
         ofs << "\nBinaries\n";
         writeBounds(ofs,linearization.begin(),linearization.end());
         writeBinaries(ofs,grid);
-    }else if(relLevel==AUXILIAR_RELAXATION)
+    }else if(relLevel==1)
+    {
+        ofs << "\nBounds\n";
+        writeBounds(ofs,grid.pixelMap.begin(),grid.pixelMap.end());
+        writeBounds(ofs,grid.edgeMap.begin(),grid.edgeMap.end());
+
+        ofs << "\nBinaries\n";
+        writeBinaries(ofs,linearization.begin(),linearization.end());
+    }else if(relLevel==2)
     {
         ofs << "\nBounds\n";
         writeBounds(ofs,linearization.begin(),linearization.end());
 
         ofs << "\nBinaries\n";
         writeBinaries(ofs,grid);
-    }else if(relLevel==ALL_RELAXATION)
+    }else if(relLevel==3)
     {
         ofs << "\nBounds\n";
         writeBounds(ofs,linearization.begin(),linearization.end());
@@ -302,7 +322,7 @@ void LPWriter::writeQP(const std::string& outputFilePath,
                        const Terms::Term::BinaryMap& bm,
                        const Terms::Term::BinaryMap& partialL,
                        const MyLinearization& linearization,
-                       const RelaxationLevel relLevel)
+                       const int relLevel)
 {
     std::cerr << "Writing QP-Program at " << outputFilePath << "\n";
 
@@ -327,19 +347,19 @@ void LPWriter::writeQP(const std::string& outputFilePath,
     LPWriter::writeConstraint(ofs,constraintNum,lc);
 
 
-    if(relLevel==NO_RELAXATION)
+    if(relLevel==0)
     {
         ofs << "\nBinaries\n";
         writeBounds(ofs,linearization.begin(),linearization.end());
         writeBinaries(ofs,grid);
-    }else if(relLevel==AUXILIAR_RELAXATION)
+    }else if(relLevel==2)
     {
         ofs << "\nBounds\n";
         writeBounds(ofs,linearization.begin(),linearization.end());
 
         ofs << "\nBinaries\n";
         writeBinaries(ofs,grid);
-    }else if(relLevel==ALL_RELAXATION)
+    }else if(relLevel==3)
     {
         ofs << "\nBounds\n";
         writeBounds(ofs,linearization.begin(),linearization.end());

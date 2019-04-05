@@ -2,12 +2,13 @@
 #define LPMODEL_INITIALIZATION_EDGE_H
 
 #include "Linel.h"
+#include "IVariable.h"
 
 namespace LPModel
 {
     namespace Initialization
     {
-        struct Edge
+        struct Edge:public IVariable
         {
             enum EdgeOrientation{Left,Down,Right,Up};
             typedef std::map<int,Edge> EdgeMap;
@@ -15,14 +16,14 @@ namespace LPModel
 
             Edge(const Linel l1,
                  const EdgeOrientation& orientation,
-                 const unsigned long varIndex):l1(l1),
-                                     orientation(orientation),
-                                     varIndex(varIndex)
+                 const unsigned long varIndex):IVariable(IVariable::Edge,varIndex),
+                                               l1(l1),
+                                               orientation(orientation)
+
             {}
 
             const Linel l1;
             const EdgeOrientation orientation;
-            const unsigned long varIndex;
 
             friend std::ostream& operator<<(std::ostream& os, const Edge& edge);
         };

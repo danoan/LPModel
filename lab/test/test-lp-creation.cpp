@@ -89,7 +89,7 @@ int main(int argc, char* argv[])
     linearization.linearize(mergedTerm.ternaryMap);
 
     std::string lpOutputFilePath = outputFolder+"/lp-output.lp";
-    LPWriter::writeLP(lpOutputFilePath,prm,grid,mergedTerm.unaryMap,linearization,LPWriter::RelaxationLevel::AUXILIAR_RELAXATION);
+    LPWriter::writeLP(lpOutputFilePath,prm,grid,mergedTerm.unaryMap,linearization,2);
 
     return 0;
 }

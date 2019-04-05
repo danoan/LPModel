@@ -29,6 +29,8 @@ namespace LPModel
             typedef std::pair<Point,Linel> LinelMapElement;
             typedef std::pair<int,Edge> EdgeMapElement;
 
+            typedef std::map<unsigned long, const IVariable*> VariableMap;
+
             Grid(const PixelMap& pixelMap,
                  const EdgeMap& edgeMap,
                  const LinelMap& linelMap):_pixelMap(pixelMap),
@@ -36,13 +38,18 @@ namespace LPModel
                                            _linelMap(linelMap),
                                            pixelMap(_pixelMap),
                                            edgeMap(_edgeMap),
-                                           linelMap(_linelMap)
-            {}
+                                           linelMap(_linelMap),
+                                           variableMap(_variableMap)
+            {
+                addInVariableMap(pixelMap);
+                addInVariableMap(edgeMap);
+            }
 
             Grid(const DigitalSet& ds,
                  const DigitalSet& trustFrg):pixelMap(_pixelMap),
                                              edgeMap(_edgeMap),
-                                             linelMap(_linelMap)
+                                             linelMap(_linelMap),
+                                             variableMap(_variableMap)
             {
                 CPixel::createPixelMap(_pixelMap,ds);
                 CLinel::createLinelSet(_linelMap,
@@ -50,6 +57,19 @@ namespace LPModel
                                        ds,
                                        _pixelMap);
                 CEdge::createEdgeMap(_edgeMap,_pixelMap,_linelMap);
+
+                addInVariableMap(pixelMap);
+                addInVariableMap(edgeMap);
+            }
+
+            template<class TIVariableMap>
+            void addInVariableMap(const TIVariableMap& IVarMap)
+            {
+                for(auto it=IVarMap.begin();it!=IVarMap.end();++it)
+                {
+                    const IVariable* ivar = &(it->second);
+                    _variableMap[ivar->varIndex] = ivar;
+                }
             }
 
             friend std::ifstream& operator>>(std::ifstream& is, Grid** grid);
@@ -59,10 +79,14 @@ namespace LPModel
             const EdgeMap& edgeMap;
             const LinelMap& linelMap;
 
+            const VariableMap& variableMap;
+
         private:
             PixelMap _pixelMap;
             EdgeMap _edgeMap;
             LinelMap _linelMap;
+
+            VariableMap _variableMap;
         };
 
     }

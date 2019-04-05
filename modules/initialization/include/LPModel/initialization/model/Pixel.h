@@ -2,15 +2,16 @@
 #define LPMODEL_INITIALIZATION_PIXEL_H
 
 #include "DGtal/helpers/StdDefs.h"
+#include "IVariable.h"
 
 namespace LPModel
 {
     namespace Initialization
     {
-        struct Pixel
+        struct Pixel:public IVariable
         {
             enum CellOrientation{Clockwise,Counterclockwise};
-            enum CellType{Variable,AuxiliarBkg,AuxiliarFrg,AuxiliarInvalid};
+            enum CellType{Variable,RELAXATION_AUXILIARBkg,RELAXATION_AUXILIARFrg,RELAXATION_AUXILIARInvalid};
 
             typedef DGtal::Z2i::Point KPoint;
 
@@ -20,16 +21,16 @@ namespace LPModel
             Pixel(int row,
                   int col,
                   unsigned long varIndex,
-                  CellType ct):row(row),
+                  CellType ct):IVariable(IVariable::Pixel,
+                                         varIndex),
+                               row(row),
                                col(col),
-                               varIndex(varIndex),
                                orientation(CellOrientation::Counterclockwise),
                                ct(ct)
             {}
 
             const int row,col;
             const CellOrientation orientation;
-            const unsigned long varIndex;
             const CellType ct;
 
             friend std::ostream& operator<<(std::ostream& os, const Pixel& pixel);

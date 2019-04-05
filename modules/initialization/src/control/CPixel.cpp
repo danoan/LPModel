@@ -31,13 +31,13 @@ void CPixel::createPixelMap(PixelMap& pxlMap,
     Pixel::KPoint auxInvalidCoord(ub+Pixel::KPoint(5,5));
 
     pxlMap.insert( MapElement( auxInvalidCoord,
-                               Pixel(auxInvalidCoord(1),auxInvalidCoord(0),-1,Pixel::CellType::AuxiliarInvalid) ) );
+                               Pixel(auxInvalidCoord(1),auxInvalidCoord(0),-1,Pixel::CellType::RELAXATION_AUXILIARInvalid) ) );
 
     pxlMap.insert( MapElement( auxBkgCoord,
-                               Pixel(auxBkgCoord(1),auxBkgCoord(0),-2,Pixel::CellType::AuxiliarBkg) ) );
+                               Pixel(auxBkgCoord(1),auxBkgCoord(0),-2,Pixel::CellType::RELAXATION_AUXILIARBkg) ) );
 
     pxlMap.insert( MapElement( auxFkgCoord,
-                               Pixel(auxFkgCoord(1),auxFkgCoord(0),-3,Pixel::CellType::AuxiliarFrg) ) );
+                               Pixel(auxFkgCoord(1),auxFkgCoord(0),-3,Pixel::CellType::RELAXATION_AUXILIARFrg) ) );
     for(auto it=ds.begin();it!=ds.end();++it)
     {
         pxlMap.insert( MapElement(*it,Pixel( (*it)(1),(*it)(0), varIndex, Pixel::CellType::Variable) ) );

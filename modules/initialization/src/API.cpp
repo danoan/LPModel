@@ -98,7 +98,7 @@ bool API::Internal::consistentGrid(const Parameters& prm,
     return isConnected(gridSet);
 };
 
-Parameters API::initParameters(const DigitalSet &originalDS, int levels)
+Parameters API::initParameters(const DigitalSet &originalDS,int optRegionWidth)
 {
     const Domain &domain = originalDS.domain();
     DigitalSet boundary(domain);
@@ -106,13 +106,13 @@ Parameters API::initParameters(const DigitalSet &originalDS, int levels)
 
     ODRInterpixels odrInterpixels(ODRModel::AC_LINEL,
                                   ODRModel::CM_PIXEL,
-                                  levels,
+                                  optRegionWidth,
                                   ODRModel::LevelDefinition::LD_CloserFromCenter,
                                   ODRModel::FourNeighborhood,
                                   true);
 
     ODRModel odrModel = odrInterpixels.createODR(ODRModel::OM_OriginalBoundary,
-                                                 ODRModel::AM_ExternRange,
+                                                 ODRModel::AM_AroundBoundary,
                                                  3,
                                                  originalDS);
 
@@ -196,14 +196,14 @@ void API::save(const DigitalSet& dsOriginal, const std::string& outputFile)
     DGtal::GenericWriter<Image2D>::exportFile(outputFile,imgPRM);
 }
 
-Parameters API::readParametersFromFile(const std::string &inputFile, int levels)
+Parameters API::readParametersFromFile(const std::string &inputFile, int optRegionWidth)
 {
     typedef DIPaCUS::Representation::Image2D Image2D;
     Image2D imgIn = DGtal::GenericReader<Image2D>::import(inputFile);
     DigitalSet ds(imgIn.domain());
     DIPaCUS::Representation::imageAsDigitalSet(ds,imgIn);
 
-    return initParameters(ds,levels);
+    return initParameters(ds,optRegionWidth);
 }
 
 void API::save(const Grid &grid, const std::string &outputFile)

@@ -42,7 +42,7 @@ CLinel::Internal::IncidentPixels CLinel::Internal::incidentPixels(const _Linel &
     }
 }
 
-CLinel::KPoint CLinel::Internal::findAuxiliarPixelCoord(const PixelMap& pixelMap,
+CLinel::KPoint CLinel::Internal::findRELAXATION_AUXILIARPixelCoord(const PixelMap& pixelMap,
                                                         Pixel::CellType ct)
 {
     for(auto it=pixelMap.begin();it!=pixelMap.end();++it)
@@ -51,10 +51,10 @@ CLinel::KPoint CLinel::Internal::findAuxiliarPixelCoord(const PixelMap& pixelMap
     }
 }
 
-void CLinel::Internal::auxiliaryMap(AuxLinelMap& auxLinelMap,
+void CLinel::Internal::RELAXATION_AUXILIARyMap(AuxLinelMap& auxLinelMap,
                                     const PixelMap& pixelMap)
 {
-    KPoint auxInvalidPixelCoord  = findAuxiliarPixelCoord(pixelMap,Pixel::CellType::AuxiliarInvalid);
+    KPoint auxInvalidPixelCoord  = findRELAXATION_AUXILIARPixelCoord(pixelMap,Pixel::CellType::RELAXATION_AUXILIARInvalid);
 
     std::set<KPoint> testSet;
     int j=0;
@@ -89,9 +89,9 @@ void CLinel::Internal::fixInvalidAuxPixels(AuxLinelMap& auxLinelMap,
                                            const DigitalSet& optRegion,
                                            const DigitalSet& trustFrg)
 {
-    KPoint auxInvalidPixelCoord  = findAuxiliarPixelCoord(pixelMap,Pixel::CellType::AuxiliarInvalid);
-    KPoint auxBkgPixelCoord  = findAuxiliarPixelCoord(pixelMap,Pixel::CellType::AuxiliarBkg);
-    KPoint auxFrgPixelCoord  = findAuxiliarPixelCoord(pixelMap,Pixel::CellType::AuxiliarFrg);
+    KPoint auxInvalidPixelCoord  = findRELAXATION_AUXILIARPixelCoord(pixelMap,Pixel::CellType::RELAXATION_AUXILIARInvalid);
+    KPoint auxBkgPixelCoord  = findRELAXATION_AUXILIARPixelCoord(pixelMap,Pixel::CellType::RELAXATION_AUXILIARBkg);
+    KPoint auxFrgPixelCoord  = findRELAXATION_AUXILIARPixelCoord(pixelMap,Pixel::CellType::RELAXATION_AUXILIARFrg);
 
     for(auto it=auxLinelMap.begin();it!=auxLinelMap.end();++it)
     {
@@ -127,7 +127,7 @@ void CLinel::Internal::fixInvalidAuxPixels(AuxLinelMap& auxLinelMap,
 bool CLinel::Internal::validAuxLinelMap(const AuxLinelMap &auxLinelMap,
                                         const PixelMap& pixelMap)
 {
-    KPoint auxInvalidPixelCoord  = findAuxiliarPixelCoord(pixelMap,Pixel::CellType::AuxiliarInvalid);
+    KPoint auxInvalidPixelCoord  = findRELAXATION_AUXILIARPixelCoord(pixelMap,Pixel::CellType::RELAXATION_AUXILIARInvalid);
     for(auto it=auxLinelMap.begin();it!=auxLinelMap.end();++it)
     {
         if( it->second.pCoord1 == auxInvalidPixelCoord )
@@ -159,7 +159,7 @@ void CLinel::createLinelSet(LinelMap &linelMap,
 {
 
     Internal::AuxLinelMap auxLinelMap;
-    Internal::auxiliaryMap(auxLinelMap,pixelMap);
+    Internal::RELAXATION_AUXILIARyMap(auxLinelMap,pixelMap);
 
     Internal::fixInvalidAuxPixels(auxLinelMap,pixelMap,optRegion,trustFrg);
     assert( Internal::validAuxLinelMap(auxLinelMap,pixelMap) );
