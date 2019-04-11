@@ -13,6 +13,7 @@ target_include_directories(lpwriter PRIVATE
         ${CMAKE_SOURCE_DIR}/modules/objective/include
         ${CMAKE_SOURCE_DIR}/modules/linearization/include
         ${CMAKE_SOURCE_DIR}/modules/terms/include
+        ${CMAKE_SOURCE_DIR}/modules/types/include
         ${DIPACUS_INCLUDE_DIRS}
         ${DGTAL_INCLUDE_DIRS})
 

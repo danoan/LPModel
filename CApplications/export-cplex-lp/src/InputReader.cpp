@@ -27,21 +27,21 @@ InputData readInput(int argc, char* argv[])
             case 'l':
             {
                 std::cout << optarg << std::endl;
-                if(strcmp(optarg,"none")==0) in.linearizationLevel = InputData::LinearizationLevel::LINEARIZATION_NONE;
-                else if(strcmp(optarg,"pixel-pair")==0) in.linearizationLevel = InputData::LINEARIZATION_PIXEL_PAIR;
-                else if(strcmp(optarg,"pixel-linel")==0) in.linearizationLevel = InputData::LINEARIZATION_PIXEL_LINEL;
-                else if(strcmp(optarg,"all-coupled")==0) in.linearizationLevel = InputData::LINEARIZATION_ALL_COUPLED;
-                else if(strcmp(optarg,"all-uncoupled")==0) in.linearizationLevel = InputData::LINEARIZATION_ALL_UNCOUPLED;
+                if(strcmp(optarg,"none")==0) in.linearizationLevel = LPModel::LinearizationLevel::LINEARIZATION_NONE;
+                else if(strcmp(optarg,"pixel-pair")==0) in.linearizationLevel = LPModel::LINEARIZATION_PIXEL_PAIR;
+                else if(strcmp(optarg,"pixel-linel")==0) in.linearizationLevel = LPModel::LINEARIZATION_PIXEL_LINEL;
+                else if(strcmp(optarg,"all-coupled")==0) in.linearizationLevel = LPModel::LINEARIZATION_ALL_COUPLED;
+                else if(strcmp(optarg,"all-uncoupled")==0) in.linearizationLevel = LPModel::LINEARIZATION_ALL_UNCOUPLED;
                 else throw std::runtime_error("Linearization option not recognized!");
 
                 break;
             }
             case 'r':
             {
-                if(strcmp(optarg,"none")==0) in.relaxationLevel = InputData::RelaxationLevel::RELAXATION_NONE;
-                else if(strcmp(optarg,"original")==0) in.relaxationLevel = InputData::RELAXATION_ORIGINAL;
-                else if(strcmp(optarg,"auxiliar")==0) in.relaxationLevel = InputData::RELAXATION_AUXILIAR;
-                else if(strcmp(optarg,"all")==0) in.relaxationLevel = InputData::RELAXATION_ALL;
+                if(strcmp(optarg,"none")==0) in.relaxationLevel = LPModel::RelaxationLevel::RELAXATION_NONE;
+                else if(strcmp(optarg,"original")==0) in.relaxationLevel = LPModel::RELAXATION_ORIGINAL;
+                else if(strcmp(optarg,"auxiliar")==0) in.relaxationLevel = LPModel::RELAXATION_AUXILIAR;
+                else if(strcmp(optarg,"all")==0) in.relaxationLevel = LPModel::RELAXATION_ALL;
                 else throw std::runtime_error("Relaxation option not recognized!");
 
                 break;
@@ -65,21 +65,21 @@ InputData readInput(int argc, char* argv[])
     return in;
 }
 
-std::string resolveLinearizationLevelName(InputData::LinearizationLevel L)
+std::string resolveLinearizationLevelName(LPModel::LinearizationLevel L)
 {
-    if(L==InputData::LinearizationLevel::LINEARIZATION_NONE) return "None";
-    else if(L==InputData::LINEARIZATION_PIXEL_PAIR) return "Pixel-Pair";
-    else if(L==InputData::LINEARIZATION_PIXEL_LINEL) return "Pixel-Linel";
-    else if(L==InputData::LINEARIZATION_ALL_COUPLED) return "All-Coupled";
-    else if(L==InputData::LINEARIZATION_ALL_UNCOUPLED) return "All-Uncoupled";
+    if(L==LPModel::LinearizationLevel::LINEARIZATION_NONE) return "None";
+    else if(L==LPModel::LINEARIZATION_PIXEL_PAIR) return "Pixel-Pair";
+    else if(L==LPModel::LINEARIZATION_PIXEL_LINEL) return "Pixel-Linel";
+    else if(L==LPModel::LINEARIZATION_ALL_COUPLED) return "All-Coupled";
+    else if(L==LPModel::LINEARIZATION_ALL_UNCOUPLED) return "All-Uncoupled";
     else return "Not recognized";
 }
 
-std::string resolveRelaxationLevelName(InputData::RelaxationLevel R)
+std::string resolveRelaxationLevelName(LPModel::RelaxationLevel R)
 {
-    if(R==InputData::RelaxationLevel::RELAXATION_NONE) return "None";
-    else if(R==InputData::RELAXATION_ORIGINAL) return "Original";
-    else if(R==InputData::RELAXATION_AUXILIAR) return "Auxiliar";
-    else if(R==InputData::RELAXATION_ALL) return "All";
+    if(R==LPModel::RelaxationLevel::RELAXATION_NONE) return "None";
+    else if(R==LPModel::RELAXATION_ORIGINAL) return "Original";
+    else if(R==LPModel::RELAXATION_AUXILIAR) return "Auxiliar";
+    else if(R==LPModel::RELAXATION_ALL) return "All";
     else return "Not recognized";
 }

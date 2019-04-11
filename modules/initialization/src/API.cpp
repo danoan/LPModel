@@ -24,7 +24,7 @@ API::DigitalSet API::Internal::extendedOptRegion(const ODRModel &odrModel)
 
     for(auto it=incidence.begin();it!=incidence.end();++it)
     {
-        if(it->second>=2) extOptRegion.insert(it->first);
+        if(it->second>=2 && !odrModel.trustFRG(it->first)) extOptRegion.insert(it->first);
     }
 
     return extOptRegion;
@@ -95,6 +95,7 @@ bool API::Internal::consistentGrid(const Parameters& prm,
 
     gridSet.insert(prm.odrModel.applicationRegion.begin(),prm.odrModel.applicationRegion.end());
 
+
     return isConnected(gridSet);
 };
 
@@ -114,7 +115,8 @@ Parameters API::initParameters(const DigitalSet &originalDS,int optRegionWidth)
     ODRModel odrModel = odrInterpixels.createODR(ODRModel::OM_OriginalBoundary,
                                                  ODRModel::AM_AroundBoundary,
                                                  3,
-                                                 originalDS);
+                                                 originalDS,
+                                                 true);
 
     DigitalSet extendedOptRegion = Internal::extendedOptRegion(odrModel);
     DigitalSet extendedAppRegion = Internal::extendedAppRegion(odrModel.applicationRegion,extendedOptRegion);

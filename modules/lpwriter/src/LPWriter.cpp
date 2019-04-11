@@ -277,12 +277,12 @@ void LPWriter::writeLP(const std::string& outputFilePath,
     Constraints::ClosedAndConnected::closedConnectedContraints(lc,grid);
     LPWriter::writeConstraint(ofs,constraintNum,lc);
 
-    if(relLevel==0)
+    if(relLevel==LPModel::RELAXATION_NONE)
     {
         ofs << "\nBinaries\n";
-        writeBounds(ofs,linearization.begin(),linearization.end());
+        writeBinaries(ofs,linearization.begin(),linearization.end());
         writeBinaries(ofs,grid);
-    }else if(relLevel==1)
+    }else if(relLevel==LPModel::RELAXATION_ORIGINAL)
     {
         ofs << "\nBounds\n";
         writeBounds(ofs,grid.pixelMap.begin(),grid.pixelMap.end());
@@ -290,14 +290,14 @@ void LPWriter::writeLP(const std::string& outputFilePath,
 
         ofs << "\nBinaries\n";
         writeBinaries(ofs,linearization.begin(),linearization.end());
-    }else if(relLevel==2)
+    }else if(relLevel==LPModel::RELAXATION_AUXILIAR)
     {
         ofs << "\nBounds\n";
         writeBounds(ofs,linearization.begin(),linearization.end());
 
         ofs << "\nBinaries\n";
         writeBinaries(ofs,grid);
-    }else if(relLevel==3)
+    }else if(relLevel==LPModel::RELAXATION_ALL)
     {
         ofs << "\nBounds\n";
         writeBounds(ofs,linearization.begin(),linearization.end());
@@ -347,19 +347,27 @@ void LPWriter::writeQP(const std::string& outputFilePath,
     LPWriter::writeConstraint(ofs,constraintNum,lc);
 
 
-    if(relLevel==0)
+    if(relLevel==LPModel::RELAXATION_NONE)
     {
         ofs << "\nBinaries\n";
-        writeBounds(ofs,linearization.begin(),linearization.end());
+        writeBinaries(ofs,linearization.begin(),linearization.end());
         writeBinaries(ofs,grid);
-    }else if(relLevel==2)
+    }else if(relLevel==LPModel::RELAXATION_ORIGINAL)
+    {
+        ofs << "\nBounds\n";
+        writeBounds(ofs,grid.pixelMap.begin(),grid.pixelMap.end());
+        writeBounds(ofs,grid.edgeMap.begin(),grid.edgeMap.end());
+
+        ofs << "\nBinaries\n";
+        writeBinaries(ofs,linearization.begin(),linearization.end());
+    }else if(relLevel==LPModel::RELAXATION_AUXILIAR)
     {
         ofs << "\nBounds\n";
         writeBounds(ofs,linearization.begin(),linearization.end());
 
         ofs << "\nBinaries\n";
         writeBinaries(ofs,grid);
-    }else if(relLevel==3)
+    }else if(relLevel==LPModel::RELAXATION_ALL)
     {
         ofs << "\nBounds\n";
         writeBounds(ofs,linearization.begin(),linearization.end());

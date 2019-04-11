@@ -12,6 +12,7 @@ target_include_directories(export-cvxopt PRIVATE
         ${LPMODEL_INCLUDE_DIR}/lpwriter/include
         ${LPMODEL_INCLUDE_DIR}/terms/include
         ${LPMODEL_INCLUDE_DIR}/utils/include
+        ${LPMODEL_INCLUDE_DIR}/types/include
         ${DIPACUS_INCLUDE_DIRS}
         ${SCABOLIC_INCLUDE_DIRS}
         ${DGTAL_INCLUDE_DIRS})

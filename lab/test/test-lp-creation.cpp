@@ -42,7 +42,7 @@ Initialization::Parameters initParameters()
     unsigned long radius = 5;
 
     ODRModel odrModel = odrInterpixels.createODR(ODRModel::OM_OriginalBoundary,
-                                                 ODRModel::AM_ExternRange,
+                                                 ODRModel::AM_AroundBoundary,
                                                  radius,
                                                  original);
 

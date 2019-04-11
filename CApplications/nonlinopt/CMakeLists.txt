@@ -17,6 +17,7 @@ target_include_directories(nonlinopt PRIVATE
         ${LPMODEL_INCLUDE_DIR}/lpwriter/include
         ${LPMODEL_INCLUDE_DIR}/linearization/include
         ${LPMODEL_INCLUDE_DIR}/solassign/include
+        ${LPMODEL_INCLUDE_DIR}/types/include
         ${SCABOLIC_INCLUDE_DIRS}
         ${DIPACUS_INCLUDE_DIRS}
         ${DGTAL_INCLUDE_DIRS}

@@ -27,6 +27,9 @@ add_subdirectory(lab/test)
 add_subdirectory(lab/exp)
 
 
+add_subdirectory(CApplications/export-grid)
+add_subdirectory(CApplications/create-ODR-image)
+
 add_subdirectory(CApplications/export-cplex-lp)
 add_subdirectory(CApplications/export-cplex-qp)
 add_subdirectory(CApplications/export-cvxopt)

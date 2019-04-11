@@ -3,6 +3,15 @@
 import subprocess,sys,os
 from utils import *
 
+PROJECT_FOLDER="/home-local/dantu1/GIT/PhD/LPModel"
+BIN_FOLDER="%s/%s" % (PROJECT_FOLDER,"cmake-build-debug/CApplications")
+if 'GUROBI_HOME' in os.environ.keys():
+    GUROBI_HOME=os.environ['GUROBI_HOME']
+else:
+    print("GUROBI_HOME is not defined.")
+    exit()
+
+
 R_NONE="none"                     #No relaxation
 R_ORIGINAL="original"             #Relaxe original variables
 R_AUXILIAR="auxiliar"            #Relaxe auxiliar variables
@@ -20,7 +29,7 @@ OPTWIDTH_CONFIGURATIONS=[0,1]
 SQWEIGTH_CONFIGURATIONS=[1.0]
 DATAWEIGTH_CONFIGURATIONS=[0.0]
 RELAXATION_CONFIGURATIONS=[R_NONE, R_ORIGINAL, R_AUXILIAR, R_ALL]
-LINEARIZATION_CONFIGURATIONS=[L_ALL_COUPLED]
+LINEARIZATION_CONFIGURATIONS=[L_PIXEL_PAIR,L_PIXEL_LINEL]
 MAX_ITERATIONS=3
 
 
@@ -35,7 +44,7 @@ CONFIG_LIST=[ (SHAPE_CONFIGURATIONS,"shape"),
 
 def main():
     argc = len(sys.argv)
-    baseFolder = "%s/%s" % (PROJECT_FOLDER,"CApplications/scripts/output/experiment-lp")
+    baseFolder = "%s/%s" % (PROJECT_FOLDER,"CApplications/scripts/output/experiment-qp")
 
     shape_gs_1_output = "%s/%s" % (baseFolder,"shapes/grid-1.0")
     shape_gs_05_output = "%s/%s" % (baseFolder,"shapes/grid-0.5")
@@ -57,13 +66,14 @@ def main():
             iterationFolder = "%s/it%d" % (outputFolder,it)
 
             gridObjectFile = exportGrid(shapePath,iterationFolder,optWidth)
-            lpCplexFile = exportLP(shapeName,shapePath,iterationFolder,optWidth,sqWeight,dataWeight,rel,lin)
-            lpSolutionFile = solveLP(lpCplexFile,iterationFolder)
+            qpCplexFile = exportQP(shapeName,shapePath,iterationFolder,optWidth,sqWeight,dataWeight,rel,lin)
+            qpSolutionFile = solveQP(qpCplexFile,iterationFolder)
 
-            shapeSolutionFile = generateSolution(shapePath, optWidth, gridObjectFile, lpSolutionFile,iterationFolder)
+            shapeSolutionFile = generateSolution(shapePath, optWidth, gridObjectFile, qpSolutionFile,iterationFolder)
             shapePath = shapeSolutionFile
 
             it+=1
+            exit()
 
 
 

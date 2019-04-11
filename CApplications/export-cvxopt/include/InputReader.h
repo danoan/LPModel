@@ -9,7 +9,6 @@
 #include "InputData.h"
 
 InputData readInput(int argc, char* argv[]);
-std::string resolveRelaxationLevelName(InputData::RelaxationLevel R);
-std::string resolveLinearizationLevelName(InputData::LinearizationLevel L);
+std::string resolveLinearizationLevelName(LPModel::LinearizationLevel L);
 
 #endif //EXPORT_CVXOPT_INPUTREADER_H

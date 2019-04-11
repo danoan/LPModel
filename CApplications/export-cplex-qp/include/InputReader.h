@@ -7,9 +7,10 @@
 #include <stdexcept>
 
 #include "InputData.h"
+#include "LPModel/types/types.h"
 
 InputData readInput(int argc, char* argv[]);
-std::string resolveRelaxationLevelName(InputData::RelaxationLevel R);
-std::string resolveLinearizationLevelName(InputData::LinearizationLevel L);
+std::string resolveRelaxationLevelName(LPModel::RelaxationLevel R);
+std::string resolveLinearizationLevelName(LPModel::LinearizationLevel L);
 
 #endif //EXPORT_CPLEX_LP_INPUTREADER_H

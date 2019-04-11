@@ -15,25 +15,25 @@ int main(int argc, char* argv[])
 {
     if(argc<6)
     {
-        std::cerr << "Usage: parameter-file levels lp-solution-output-file output-file\n";
+        std::cerr << "Usage: pgmShapeImage optWidth gridObjectFile lpCplexFile outputFilePath\n";
         exit(1);
     }
 
-    std::string parameterFile = argv[1];
-    int levels = std::atoi(argv[2]);
-    std::string gridFile = argv[3];
-    std::string lpOutputFilePath = argv[4];
+    std::string pgmShapeImage = argv[1];
+    int optWidth = std::atoi(argv[2]);
+    std::string gridObjectFile = argv[3];
+    std::string lpCplexFile = argv[4];
     std::string outputFilePath = argv[5];
 
     std::cerr << "Reading Parameters Object\n";
-    Initialization::Parameters prm( Initialization::API::readParametersFromFile(parameterFile,levels) );
+    Initialization::Parameters prm( Initialization::API::readParametersFromFile(pgmShapeImage,optWidth) );
 
     std::cerr << "Generating Grid Object\n";
-    Initialization::Grid* grid = Initialization::API::readGridFromFile(gridFile);
+    Initialization::Grid* grid = Initialization::API::readGridFromFile(gridObjectFile);
 
 
     std::cerr << "Generating Image solution\n";
-    DGtal::Z2i::DigitalSet dsOutput = SolutionAssignment::readSolution(lpOutputFilePath,prm,*grid);
+    DGtal::Z2i::DigitalSet dsOutput = SolutionAssignment::readSolution(lpCplexFile,prm,*grid);
 
 
     Image2D imgOutput(dsOutput.domain());

@@ -53,7 +53,7 @@ typename Linearization<TIndex,TValue>::Input Linearization<TIndex,TValue>::parti
 
             ++itMI;
 
-        }while(variableCount<2 && itMI!=currMI.end());
+        }while(variableCount<2 || itMI!=currMI.end());
 
         if(variableCount!=2) throw std::runtime_error("Variable pair not found!");
 

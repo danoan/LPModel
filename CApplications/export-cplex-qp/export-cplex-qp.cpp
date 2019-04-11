@@ -38,29 +38,12 @@ DigitalSet loadImageAsDigitalSet(const std::string& imageFilePath)
     return ds;
 }
 
-void saveObjects(const std::string& outputPath,
-                 const DigitalSet& dsOriginal,
-                 const Initialization::Grid& grid)
-{
-    std::cerr << "Saving Objects\n";
-
-    Initialization::API::save(dsOriginal,outputPath+"/prm.pgm");
-    Initialization::API::save(grid,outputPath+"/grid.obj");
-}
-
-std::string resolveLPOutputFilePath(const std::string& outputFolder,
-                                    const std::string& imageFilePath)
-{
-    boost::filesystem::path p(imageFilePath);
-    return outputFolder + "/" + p.stem().string() + ".lp";
-}
 
 int main(int argc, char* argv[])
 {
     InputData in;
     in = readInput(argc,argv);
 
-    boost::filesystem::create_directories(in.outputPath);
     std::cerr << "Preparing QP for image: " << in.pgmInputImage << "\n"
               << "with sq-weight=" << in.sqWeight << "; data-weight=" << in.dataWeight << "\n"
               << "with relaxation level=" << resolveRelaxationLevelName(in.relaxationLevel) << "\n"
@@ -73,9 +56,6 @@ int main(int argc, char* argv[])
 
 
     Initialization::Parameters prm = Initialization::API::initParameters(ds,in.optRegionWidth);
-    Utils::exportODRModel(prm,in.outputPath+"/odr-model.eps");
-
-
     Initialization::Grid grid = Initialization::API::createGrid(prm.odrModel.optRegion,
                                                                 prm);
 
@@ -92,15 +72,17 @@ int main(int argc, char* argv[])
 
     switch(in.linearizationLevel)
     {
-        case InputData::LINEARIZATION_PIXEL_LINEL:
+        case LPModel::LINEARIZATION_PIXEL_LINEL:
         {
             linearization.linearize(mergedTerm.binaryMap);
             linearization.coupledLinearization(mergedTerm.ternaryMap);
+            break;
         }
-        case InputData::LINEARIZATION_PIXEL_PAIR:
+        case LPModel::LINEARIZATION_PIXEL_PAIR:
         {
             MyLinearization::PartialLinearizationPair plp(Initialization::IVariable::Pixel,Initialization::IVariable::Pixel);
             partialLinearizationBM = linearization.partialLinearization(mergedTerm.ternaryMap,grid,plp);
+            break;
         }
         default:
         {
@@ -109,11 +91,7 @@ int main(int argc, char* argv[])
         }
     }
 
-    std::string lpOutputFilePath = resolveLPOutputFilePath(in.outputPath,in.pgmInputImage);
-    LPWriter::writeQP(lpOutputFilePath,prm,grid,mergedTerm.unaryMap,mergedTerm.binaryMap,partialLinearizationBM,linearization,in.relaxationLevel);
-
-    saveObjects(in.outputPath,ds,grid);
-
+    LPWriter::writeQP(in.outputPath,prm,grid,mergedTerm.unaryMap,mergedTerm.binaryMap,partialLinearizationBM,linearization,in.relaxationLevel);
 
 
 

@@ -1,6 +1,6 @@
 import numpy as np
 from cvxopt import matrix, spmatrix, sparse, spdiag
-from models.data import DLinearizedPixelLinel as D
+from models.data import DPixelLinel as D
 from models.dataCheck import memoryCheck, dataStats
 from models.utils import extendSparse, extendMatrix
 

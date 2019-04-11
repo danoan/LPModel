@@ -2,7 +2,6 @@
 
 from cvxopt import solvers, matrix
 
-from models import MLinearizedAll as PO
 from models import MLinearizedPixelLinel as PL
 from models import MLinearizedPixelPixel as PP
 
@@ -40,14 +39,6 @@ def constrainedConvex():
         print("Error: ",v)
         print("Probably non-semidefinite positive matrix!")
 
-    print("****Model:Linearize All")
-    try:
-        quadratic_solver(PO.constrainedQuadraticModel())
-    except ValueError as v:
-        print("Error: ",v)
-        print("Probably non-semidefinite positive matrix!")
-
-
 
 def penaltyConvex():
     print("------------------- Penalty Quadratic Models ---------------------------")
@@ -62,14 +53,6 @@ def penaltyConvex():
     print("****Model:Linearize PixelLinel")
     try:
         quadratic_solver(PL.penaltyQuadraticModel())
-    except ValueError as v:
-        print("Error: ",v)
-        print("Probably non-semidefinite positive matrix!")
-
-    print("****Model:Linearize All")
-    try:
-        x = quadratic_solver(PO.penaltyQuadraticModel())
-        PO.build_solution(x)
     except ValueError as v:
         print("Error: ",v)
         print("Probably non-semidefinite positive matrix!")

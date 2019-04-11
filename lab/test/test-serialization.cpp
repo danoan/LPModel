@@ -1,4 +1,7 @@
+#include "boost/filesystem.hpp"
 #include <LPModel/initialization/API.h>
+
+#include "SCaBOliC/Core/display.h"
 
 using namespace LPModel;
 
@@ -14,7 +17,7 @@ namespace LPModel{ namespace Initialization{
         DigitalSet boundary(domain);
         DigitalSet optRegion(domain);
 
-        ODRInterpixels odrInterpixels(ODRModel::AC_POINTEL,
+        ODRInterpixels odrInterpixels(ODRModel::AC_LINEL,
                                       ODRModel::CM_PIXEL,
                                       levels,
                                       ODRModel::LevelDefinition::LD_CloserFromCenter,
@@ -22,11 +25,10 @@ namespace LPModel{ namespace Initialization{
                                       evenIteration);
 
         ODRModel odrModel = odrInterpixels.createODR(ODRModel::OM_OriginalBoundary,
-                                                     ODRModel::AM_ExternRange,
+                                                     ODRModel::AM_AroundBoundary,
                                                      3,
-                                                     originalDS);
-
-
+                                                     originalDS,
+                                                     true);
 
         DigitalSet extendedOptRegion = Internal::extendedOptRegion(odrModel);
         DigitalSet extendedAppRegion = Internal::extendedAppRegion(odrModel.applicationRegion,extendedOptRegion);
@@ -69,14 +71,15 @@ DigitalSet loadImageAsDigitalSet(const std::string& imageFilePath)
     return ds;
 }
 
-void saveObjects(const std::string& outputPath,
+void saveObjects(const std::string& outputFolder,
                  const DigitalSet& dsOriginal,
                  const Initialization::Grid& grid)
 {
+    boost::filesystem::create_directories(outputFolder);
     std::cerr << "Saving Objects\n";
 
-    Initialization::API::save(dsOriginal,outputPath+"/prm.pgm");
-    Initialization::API::save(grid,outputPath+"/grid.obj");
+    Initialization::API::save(dsOriginal,outputFolder+"/prm.pgm");
+    Initialization::API::save(grid,outputFolder+"/grid.obj");
 }
 
 bool compareParameters(const Initialization::Parameters& prm1, const Initialization::Parameters& prm2)
@@ -106,7 +109,7 @@ bool compareGrid(const Initialization::Grid& g1, const Initialization::Grid& g2)
 
     return r;
 }
-
+#include "LPModel/utils/dispUtils.h"
 int main(int argc, char* argv[])
 {
     if(argc<4)
@@ -123,8 +126,12 @@ int main(int argc, char* argv[])
 
 
     Initialization::Parameters prm = Initialization::API::initParameters(ds,levels,true);
+    Utils::exportODRModel(prm,"odr-model.eps");
+
     Initialization::Grid grid = Initialization::API::createGrid(prm.odrModel.optRegion,
                                                                 prm);
+
+
 
     saveObjects(outputPath,ds,grid);
 

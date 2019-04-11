@@ -42,23 +42,6 @@ DigitalSet loadImageAsDigitalSet(const std::string& imageFilePath)
     return ds;
 }
 
-void saveObjects(const std::string& outputPath,
-                 const DigitalSet& dsOriginal,
-                 const Initialization::Grid& grid)
-{
-    std::cerr << "Saving Objects\n";
-
-    Initialization::API::save(dsOriginal,outputPath+"/prm.pgm");
-    Initialization::API::save(grid,outputPath+"/grid.obj");
-}
-
-std::string resolveLPOutputFilePath(const std::string& outputFolder,
-                                    const std::string& imageFilePath)
-{
-    boost::filesystem::path p(imageFilePath);
-    return outputFolder + "/" + p.stem().string() + ".lp";
-}
-
 void consistentPixel(const Constraints::ClosedAndConnected::PixelIncidence& pi,
                      unsigned long int cNum,
                      ConstraintMatrix& C,
@@ -222,8 +205,7 @@ void exportPixelPairLinearization(const std::string& outputPath,
         }
     }
 
-    std::string pythonFilePath = outputPath + "/DLinearizedPixelPixel.py";
-    std::ofstream ofs(pythonFilePath);
+    std::ofstream ofs(outputPath);
 
     ofs << "numPixels = " << grid.pixelMap.size() - 3 << "\n";
     ofs << "numEdges = " << grid.edgeMap.size() << "\n";
@@ -371,8 +353,7 @@ void exportPixelLinelPairLinearization(const std::string& outputPath,
         }
     }
 
-    std::string pythonFilePath = outputPath + "/DLinearizedPixelLinel.py";
-    std::ofstream ofs(pythonFilePath);
+    std::ofstream ofs(outputPath);
 
     ofs << "numPixels = " << grid.pixelMap.size() - 3 << "\n";
     ofs << "numEdges = " << grid.edgeMap.size() << "\n";
@@ -388,149 +369,16 @@ void exportPixelLinelPairLinearization(const std::string& outputPath,
     ofs.close();
 }
 
-void exportLinearizeAll(const std::string& outputPath,
-                        const DigitalSet& ds,
-                        const Initialization::Grid& grid,
-                        const Terms::Term& mergedTerm)
-{
-    unsigned long nextIndex = grid.pixelMap.size()+grid.linelMap.size()+grid.edgeMap.size();
-    LPWriter::MyLinearization linearization(nextIndex);
-    linearization.linearize(mergedTerm.binaryMap);
-    linearization.coupledLinearization(mergedTerm.ternaryMap);
-
-    unsigned long int numPixelPairs = 0;
-    for(auto it=linearization.ubegin();it!=linearization.uend();++it) ++numPixelPairs ;
-
-
-    unsigned long int numSndOrderPairs = 0;
-    for(auto it=linearization.ubegin();it!=linearization.uend();++it) ++numSndOrderPairs ;
-
-
-    unsigned long int numSlack = numSndOrderPairs*3;
-    unsigned long int numVars = grid.pixelMap.size() -3 + grid.edgeMap.size() + numSndOrderPairs + numSlack;
-
-    unsigned long int slackStart = nextIndex+numSndOrderPairs;
-
-    std::vector<double> U(numVars);
-    {
-        for(auto it=U.begin();it!=U.end();++it) *it=0;
-        const Term::UnaryMap& um = mergedTerm.unaryMap;
-        for(auto it=um.begin();it!=um.end();++it)
-        {
-            Term::UIntMultiIndex mIndex = it->first;
-            auto mit = mIndex.begin();
-            unsigned long int pixel = *mit;
-
-            U[pixel] = mergedTerm.unaryMap.at(mIndex);
-        }
-    }
-
-    std::vector<double> V(numVars);
-    {
-        for(auto it=linearization.begin();it!=linearization.end();++it)
-        {
-            V[it->first] = it->second;
-        }
-    }
-
-
-    //RHS constants missing
-    ConstraintMatrix Z;
-    std::vector<double> z;
-    {
-        unsigned long int slackBaseIndex = slackStart;
-        unsigned long int baseIndex = 0;
-        initConstraintMatrix(Z,numSlack,numVars);
-        z.resize(numSlack);
-        for(auto it=linearization.ubegin();it!=linearization.uend();++it)
-        {
-            const Term::UIntMultiIndex& mIndex = it->first;
-            auto mit = mIndex.begin();
-            unsigned long int pixel1 = *mit; ++mit;
-            unsigned long int edge = *mit;
-            unsigned long int auxVarIndex = it->second;
-
-            Z[baseIndex*3][pixel1]=-1;
-            Z[baseIndex*3][auxVarIndex]=1;
-            Z[baseIndex*3][slackBaseIndex+baseIndex*3]=1;
-            z[slackBaseIndex+baseIndex*3]=0;
-
-            Z[baseIndex*3+1][edge]=-1;
-            Z[baseIndex*3+1][auxVarIndex]=1;
-            Z[baseIndex*3+1][slackBaseIndex+baseIndex*3+1]=1;
-            z[slackBaseIndex+baseIndex*3+1]=0;
-
-            Z[baseIndex*3+2][pixel1]=-1;
-            Z[baseIndex*3+2][edge]=-1;
-            Z[baseIndex*3+2][auxVarIndex]=1;
-            Z[baseIndex*3+2][slackBaseIndex+baseIndex*3+2]=-1;
-            z[slackBaseIndex+baseIndex*3+2]=-1;
-
-            if(baseIndex*3+2>=numSlack) throw std::runtime_error("");
-            if(slackBaseIndex+baseIndex*3+2>=numVars) throw std::runtime_error("");
-            if(auxVarIndex>=numVars) throw std::runtime_error("");
-            if(pixel1>=numVars) throw std::runtime_error("");
-            if(edge>=numVars) throw std::runtime_error("");
-        }
-    }
-
-    ConstraintMatrix C;
-    std::vector<double> c;
-    {
-        initConstraintMatrix(C,grid.edgeMap.size()/2,numVars);
-        c.resize(grid.edgeMap.size()/2);
-
-        Constraints::ClosedAndConnected::LinelConstraints lc;
-        Constraints::ClosedAndConnected::closedConnectedContraints(lc,grid);
-
-        typedef Constraints::ClosedAndConnected::Linel Linel;
-        typedef Constraints::ClosedAndConnected::LinelIncidence LinelIncidence;
-        typedef Constraints::ClosedAndConnected::PixelIncidence PixelIncidence;
-        typedef Constraints::ClosedAndConnected::EdgeIncidence EdgeIncidence;
-
-        int nc=0;
-        for(auto it=lc.begin();it!=lc.end();++it,++nc)
-        {
-            const Linel& linel = it->first;
-            const LinelIncidence li = it->second;
-
-            consistentPixel(li.pixel1,nc,C,c);
-            consistentPixel(li.pixel2,nc,C,c);
-            consistentEdge(li.edge1,nc,C,c);
-            consistentEdge(li.edge2,nc,C,c);
-
-        }
-    }
-
-    std::string pythonFilePath = outputPath + "/DLinearizedAll.py";
-    std::ofstream ofs(pythonFilePath);
-
-    ofs << "numPixels = " << grid.pixelMap.size() - 3 << "\n";
-    ofs << "numEdges = " << grid.edgeMap.size() << "\n";
-    ofs << "numPixelPairs = " << numPixelPairs << "\n";
-    ofs << "numSndOrderPairs = " << numSndOrderPairs << "\n";
-    ofs << "numSlackVars = " << numSlack << "\n";
-    ofs << "numVars = " << numVars  << "\n";
-
-    exportPython(ofs,U,V,Z,z,C,c);
-
-    exportDigitalSetAsMatrix(ofs,ds);
-    exportPixelMap(ofs,grid.pixelMap);
-
-    ofs.close();
-}
 
 int main(int argc, char* argv[])
 {
     InputData in;
     in = readInput(argc,argv);
 
-    boost::filesystem::create_directories(in.outputPath);
-    std::cerr << "Preparing LP for image: " << in.pgmInputImage << "\n"
+    std::cerr << "Preparing python model for convex optimization for image: " << in.pgmInputImage << "\n"
               << "with sq-weight=" << in.sqWeight << "; data-weight=" << in.dataWeight << "\n"
-              << "with relaxation level=" << resolveRelaxationLevelName( in.relaxationLevel ) << "\n"
               << "with linearization level=" << resolveLinearizationLevelName( in.linearizationLevel ) << "\n"
-              << "; and optimization region width of " << in.optRegionWidth << " pixels...\n";
+              << "and optimization region width of " << in.optRegionWidth << " pixels...\n";
 
 
 
@@ -538,9 +386,6 @@ int main(int argc, char* argv[])
 
 
     Initialization::Parameters prm = Initialization::API::initParameters(ds,in.optRegionWidth);
-    Utils::exportODRModel(prm,in.outputPath+"/odr-model.eps");
-
-
     Initialization::Grid grid = Initialization::API::createGrid(prm.odrModel.optRegion,
                                                                 prm);
 
@@ -549,11 +394,26 @@ int main(int argc, char* argv[])
 
     Terms::Term mergedTerm = scTerm;//Terms::API::merge(dataTerm,scTerm);
 
-    saveObjects(in.outputPath,ds,grid);
+    switch(in.linearizationLevel)
+    {
+        case LPModel::LINEARIZATION_PIXEL_PAIR:
+        {
+            exportPixelPairLinearization(in.outputPath,ds,grid,mergedTerm);
+            break;
+        }
+        case LPModel::LINEARIZATION_PIXEL_LINEL:
+        {
+            exportPixelLinelPairLinearization(in.outputPath,ds,grid,mergedTerm);
+            break;
+        }
+        default:
+        {
+            std::cerr << "Invalid relaxation. Such relaxation leads to a linear or third order formulation.\n";
+            exit(1);
+        }
 
-    exportLinearizeAll(in.outputPath,ds,grid,mergedTerm);
-    exportPixelPairLinearization(in.outputPath,ds,grid,mergedTerm);
-    exportPixelLinelPairLinearization(in.outputPath,ds,grid,mergedTerm);
+    }
+
 
     return 0;
 }

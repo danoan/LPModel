@@ -10,6 +10,7 @@
 #include "LPModel/linearization/model/Linearization.h"
 #include "LPModel/constraints/ClosedAndConnected.h"
 #include "LPModel/terms/model/Term.h"
+#include "LPModel/types/types.h"
 
 namespace LPModel
 {

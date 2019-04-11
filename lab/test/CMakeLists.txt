@@ -15,41 +15,20 @@ add_dependencies(test-serialization initialization)
 
 target_include_directories(test-serialization PRIVATE
         ${CMAKE_SOURCE_DIR}/modules/initialization/include
+        ${CMAKE_SOURCE_DIR}/modules/utils/include
         ${DIPACUS_INCLUDE_DIRS}
         ${DGTAL_INCLUDE_DIRS})
 
 target_link_libraries(test-serialization PRIVATE
         -linitialization
+        -lutils
         -lscabolic-core
         -ldipacus-components
         -ldipacus-base
+        -lboost_system
+        -lboost_filesystem
         ${DIPACUS_LIBS_DIR}
         ${DGTAL_LIBRARIES})
-
-
-
-add_executable(test-levels test-levels.cpp)
-target_compile_definitions(test-levels PRIVATE -DPROJECT_DIR=\"${CMAKE_SOURCE_DIR}\")
-add_dependencies(test-levels initialization solassign terms)
-
-target_include_directories(test-levels PRIVATE
-        ${CMAKE_SOURCE_DIR}/modules/initialization/include
-        ${CMAKE_SOURCE_DIR}/modules/solassign/include
-        ${CMAKE_SOURCE_DIR}/modules/terms/include
-        ${DIPACUS_INCLUDE_DIRS}
-        ${DGTAL_INCLUDE_DIRS})
-
-target_link_libraries(test-levels PRIVATE
-        -lterms
-        -lsolassign
-        -linitialization
-        -lscabolic-core
-        -ldipacus-components
-        -ldipacus-base
-        ${DIPACUS_LIBS_DIR}
-        ${DGTAL_LIBRARIES})
-
-
 
 
 
@@ -64,6 +43,7 @@ target_include_directories(test-lp-creation PRIVATE
         ${CMAKE_SOURCE_DIR}/modules/linearization/include
         ${CMAKE_SOURCE_DIR}/modules/lpwriter/include
         ${CMAKE_SOURCE_DIR}/modules/utils/include
+        ${CMAKE_SOURCE_DIR}/modules/types/include
         ${DIPACUS_INCLUDE_DIRS}
         ${DGTAL_INCLUDE_DIRS})
 
