@@ -68,7 +68,7 @@ namespace PythonExporter
         std::string rowsName = nameVar + "_row";
         writeVector(ofs,rowsName,m.rows);
 
-        std::string colsName = nameVar + "_col";
+        std::string colsName = nameVar + "_cols";
         writeVector(ofs,colsName,m.cols);
 
     }

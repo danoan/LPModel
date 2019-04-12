@@ -369,6 +369,9 @@ int main(int argc, char* argv[])
     InputData in;
     in = readInput(argc,argv);
 
+    boost::filesystem::path p (in.outputPath);
+    boost::filesystem::create_directories(p.remove_filename());
+
     std::cerr << "Preparing python model for convex optimization for image: " << in.pgmInputImage << "\n"
               << "with sq-weight=" << in.sqWeight << "; data-weight=" << in.dataWeight << "\n"
               << "with linearization level=" << resolveLinearizationLevelName( in.linearizationLevel ) << "\n"
