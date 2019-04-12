@@ -33,6 +33,8 @@ add_subdirectory(CApplications/create-ODR-image)
 add_subdirectory(CApplications/export-cplex-lp)
 add_subdirectory(CApplications/export-cplex-qp)
 add_subdirectory(CApplications/export-cvxopt)
+add_subdirectory(CApplications/export-third-order)
+
 add_subdirectory(CApplications/generate-shapes)
 add_subdirectory(CApplications/generate-solution)
 add_subdirectory(CApplications/nonlinopt)
