@@ -18,6 +18,20 @@ namespace PythonExporter
     typedef std::vector< std::vector<double> > SquareMatrix;
     typedef std::vector< std::vector<double> > ConstraintMatrix;
 
+    struct SparseMatrix
+    {
+        void insert(double row,double col,double value)
+        {
+            rows.push_back(row);
+            cols.push_back(col);
+            values.push_back(value);
+        }
+
+        std::vector<double> values;
+        std::vector<double> rows;
+        std::vector<double> cols;
+    };
+
     void initSquareMatrix(SquareMatrix& m, unsigned long int size);
 
     void initConstraintMatrix(ConstraintMatrix& m, unsigned long int numRows, unsigned long int numCols);
@@ -32,7 +46,7 @@ namespace PythonExporter
 
     void writeSparseMatrix(std::ofstream& ofs,
                            const std::string nameVar,
-                           const SquareMatrix& m);
+                           const SparseMatrix& m);
 
     void exportDigitalSetAsMatrix(std::ofstream& ofs,
                                   const DigitalSet& ds);
@@ -43,28 +57,28 @@ namespace PythonExporter
 
     void exportPython(std::ofstream& ofs,
                       const std::vector<double>& U,
-                      const SquareMatrix& P1,
-                      const SquareMatrix& P2,
-                      const ConstraintMatrix& Z,
+                      const SparseMatrix& P1,
+                      const SparseMatrix& P2,
+                      const SparseMatrix& Z,
                       const std::vector<double>& z,
-                      const ConstraintMatrix& C,
+                      const SparseMatrix& C,
                       const std::vector<double>& c);
 
     void exportPython(std::ofstream& ofs,
                       const std::vector<double>& U,
                       const std::vector<double>& V,
-                      const SquareMatrix& P,
-                      const ConstraintMatrix& Z,
+                      const SparseMatrix& P,
+                      const SparseMatrix& Z,
                       const std::vector<double>& z,
-                      const ConstraintMatrix& C,
+                      const SparseMatrix& C,
                       const std::vector<double>& c);
 
     void exportPython(std::ofstream& ofs,
                       const std::vector<double>& U,
                       const std::vector<double>& V,
-                      const ConstraintMatrix& Z,
+                      const SparseMatrix& Z,
                       const std::vector<double>& z,
-                      const ConstraintMatrix& C,
+                      const SparseMatrix& C,
                       const std::vector<double>& c);
 }
 

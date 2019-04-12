@@ -135,12 +135,12 @@ def exportQP(shapeName,shapePath,outputFolder,optWidth=1,sqWeight=1,dataWeight=0
     return outputPath
 
 
-def solveLP(lpCplexFile,outputFolder,method=-1):
+def solveLP(lpCplexFile,outputFolder,method=1):
     """
     USAGE: lpCplexFormulationFile Method=[-1,0,1,2]
     Method: -1=automatic,
             0=primal simplex,
-            1=dual simplex,
+            1=dual simplex, //Use this if memory is a problem
             2=barrier,
             3=concurrent,
             4=deterministic concurrent,
@@ -162,12 +162,12 @@ def solveLP(lpCplexFile,outputFolder,method=-1):
     return outputPath
 
 
-def solveQP(lpCplexFile,outputFolder,method=-1):
+def solveQP(lpCplexFile,outputFolder,method=1):
     """
     USAGE: lpCplexFormulationFile Method=[-1,0,1,2,3,4,5]
     Method: -1=automatic,
             0=primal simplex,
-            1=dual simplex,
+            1=dual simplex,//Use this if memory is a problem
             2=barrier,
             3=concurrent (x),
             4=deterministic concurrent (x),

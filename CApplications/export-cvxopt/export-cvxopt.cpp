@@ -44,7 +44,7 @@ DigitalSet loadImageAsDigitalSet(const std::string& imageFilePath)
 
 void consistentPixel(const Constraints::ClosedAndConnected::PixelIncidence& pi,
                      unsigned long int cNum,
-                     ConstraintMatrix& C,
+                     SparseMatrix& C,
                      std::vector<double>& c)
 {
     typedef Constraints::ClosedAndConnected::Pixel Pixel;
@@ -56,18 +56,18 @@ void consistentPixel(const Constraints::ClosedAndConnected::PixelIncidence& pi,
     }
     else if(pi.pixel.ct==Pixel::CellType::Variable)
     {
-        if(pi.posIncidence) C[cNum][pi.pixel.varIndex] = 1;
-        else C[cNum][pi.pixel.varIndex] = -1;
+        if(pi.posIncidence) C.insert(cNum,pi.pixel.varIndex,1);
+        else C.insert(cNum,pi.pixel.varIndex,-1);
     }
 }
 
 void consistentEdge(const Constraints::ClosedAndConnected::EdgeIncidence& ei,
                     unsigned long int numC,
-                    ConstraintMatrix& C,
+                    SparseMatrix& C,
                     std::vector<double>& c)
 {
-    if(ei.posIncidence) C[numC][ei.edge.varIndex] = 1;
-    else C[numC][ei.edge.varIndex] = -1;
+    if(ei.posIncidence) C.insert(numC,ei.edge.varIndex,1);
+    else C.insert(numC,ei.edge.varIndex,-1);
 }
 
 
@@ -106,9 +106,8 @@ void exportPixelPairLinearization(const std::string& outputPath,
         }
     }
 
-    SquareMatrix P1;
+    SparseMatrix P1;
     {
-        initSquareMatrix(P1,numVars);
         const Term::BinaryMap& bm = mergedTerm.binaryMap;
         for(auto it=bm.begin();it!=bm.end();++it)
         {
@@ -117,14 +116,13 @@ void exportPixelPairLinearization(const std::string& outputPath,
             unsigned long int pixel = *mit;++mit;
             unsigned long int edge = *mit;
 
-            P1[pixel][edge] = it->second;
+            if(it->second!=0) P1.insert(pixel,edge,it->second);
         }
     }
 
 
-    SquareMatrix P2;
+    SparseMatrix P2;
     {
-        initSquareMatrix(P2,numVars);
         const Term::BinaryMap& bm = partialL;
         for(auto it=bm.begin();it!=bm.end();++it)
         {
@@ -133,17 +131,16 @@ void exportPixelPairLinearization(const std::string& outputPath,
             unsigned long int edge = *mit;++mit;
             unsigned long int pixelPair = *mit;
 
-            P2[pixelPair][edge] = it->second;
+            if(it->second!=0) P2.insert(pixelPair,edge,it->second);
         }
     }
 
     //RHS constants missing
-    ConstraintMatrix Z;
+    SparseMatrix Z;
     std::vector<double> z;
     {
         unsigned long int slackBaseIndex = slackStart;
         unsigned long int baseIndex = 0;
-        initConstraintMatrix(Z,numSlack,numVars);
         z.resize(numSlack);
         for(auto it=linearization.ubegin();it!=linearization.uend();++it)
         {
@@ -153,20 +150,20 @@ void exportPixelPairLinearization(const std::string& outputPath,
             unsigned long int pixel2 = *mit;
             unsigned long int auxVarIndex = it->second;
 
-            Z[baseIndex*3][pixel1]=-1;
-            Z[baseIndex*3][auxVarIndex]=1;
-            Z[baseIndex*3][slackBaseIndex+baseIndex*3]=1;
+            Z.insert(baseIndex*3,pixel1,-1);
+            Z.insert(baseIndex*3,auxVarIndex,1);
+            Z.insert(baseIndex*3,slackBaseIndex+baseIndex*3,1);
             z[slackBaseIndex+baseIndex*3]=0;
 
-            Z[baseIndex*3+1][pixel2]=-1;
-            Z[baseIndex*3+1][auxVarIndex]=1;
-            Z[baseIndex*3+1][slackBaseIndex+baseIndex*3+1]=1;
+            Z.insert(baseIndex*3+1,pixel2,-1);
+            Z.insert(baseIndex*3+1,auxVarIndex,1);
+            Z.insert(baseIndex*3+1,slackBaseIndex+baseIndex*3+1,1);
             z[slackBaseIndex+baseIndex*3+1]=0;
 
-            Z[baseIndex*3+2][pixel1]=-1;
-            Z[baseIndex*3+2][pixel2]=-1;
-            Z[baseIndex*3+2][auxVarIndex]=1;
-            Z[baseIndex*3+2][slackBaseIndex+baseIndex*3+2]=-1;
+            Z.insert(baseIndex*3+2,pixel1,-1);
+            Z.insert(baseIndex*3+2,pixel2,-1);
+            Z.insert(baseIndex*3+2,auxVarIndex,1);
+            Z.insert(baseIndex*3+2,slackBaseIndex+baseIndex*3+2,-1);
             z[slackBaseIndex+baseIndex*3+2]=-1;
 
             if(baseIndex*3+2>=numSlack) throw std::runtime_error("");
@@ -177,10 +174,9 @@ void exportPixelPairLinearization(const std::string& outputPath,
         }
     }
 
-    ConstraintMatrix C;
+    SparseMatrix C;
     std::vector<double> c;
     {
-        initConstraintMatrix(C,grid.edgeMap.size()/2,numVars);
         c.resize(grid.edgeMap.size()/2);
 
         Constraints::ClosedAndConnected::LinelConstraints lc;
@@ -262,9 +258,8 @@ void exportPixelLinelPairLinearization(const std::string& outputPath,
     }
 
 
-    SquareMatrix P;
+    SparseMatrix P;
     {
-        initSquareMatrix(P,numVars);
         const Term::TernaryMap& tm = mergedTerm.ternaryMap;
         for(auto it=tm.begin();it!=tm.end();++it)
         {
@@ -280,18 +275,18 @@ void exportPixelLinelPairLinearization(const std::string& outputPath,
 
             unsigned long int linelPairIndex = linearization.uniqueIndexMap[lpIndex];
 
+            if(it->second!=0) P.insert(pixel2,linelPairIndex,it->second);
 
-            P[pixel2][linelPairIndex] = it->second;
         }
     }
 
+
     //RHS constants missing
-    ConstraintMatrix Z;
+    SparseMatrix Z;
     std::vector<double> z;
     {
         unsigned long int slackBaseIndex = slackStart;
         unsigned long int baseIndex = 0;
-        initConstraintMatrix(Z,numSlack,numVars);
         z.resize(numSlack);
         for(auto it=linearization.ubegin();it!=linearization.uend();++it)
         {
@@ -301,20 +296,20 @@ void exportPixelLinelPairLinearization(const std::string& outputPath,
             unsigned long int edge = *mit;
             unsigned long int auxVarIndex = it->second;
 
-            Z[baseIndex*3][pixel1]=-1;
-            Z[baseIndex*3][auxVarIndex]=1;
-            Z[baseIndex*3][slackBaseIndex+baseIndex*3]=1;
+            Z.insert(baseIndex*3,pixel1,-1);
+            Z.insert(baseIndex*3,auxVarIndex,1);
+            Z.insert(baseIndex*3,slackBaseIndex+baseIndex*3,1);
             z[slackBaseIndex+baseIndex*3]=0;
 
-            Z[baseIndex*3+1][edge]=-1;
-            Z[baseIndex*3+1][auxVarIndex]=1;
-            Z[baseIndex*3+1][slackBaseIndex+baseIndex*3+1]=1;
+            Z.insert(baseIndex*3+1,edge,-1);
+            Z.insert(baseIndex*3+1,auxVarIndex,1);
+            Z.insert(baseIndex*3+1,slackBaseIndex+baseIndex*3+1,1);
             z[slackBaseIndex+baseIndex*3+1]=0;
 
-            Z[baseIndex*3+2][pixel1]=-1;
-            Z[baseIndex*3+2][edge]=-1;
-            Z[baseIndex*3+2][auxVarIndex]=1;
-            Z[baseIndex*3+2][slackBaseIndex+baseIndex*3+2]=-1;
+            Z.insert(baseIndex*3+2,pixel1,-1);
+            Z.insert(baseIndex*3+2,edge,-1);
+            Z.insert(baseIndex*3+2,auxVarIndex,1);
+            Z.insert(baseIndex*3+2,slackBaseIndex+baseIndex*3+2,-1);
             z[slackBaseIndex+baseIndex*3+2]=-1;
 
             if(baseIndex*3+2>=numSlack) throw std::runtime_error("");
@@ -325,10 +320,9 @@ void exportPixelLinelPairLinearization(const std::string& outputPath,
         }
     }
 
-    ConstraintMatrix C;
+    SparseMatrix C;
     std::vector<double> c;
     {
-        initConstraintMatrix(C,grid.edgeMap.size()/2,numVars);
         c.resize(grid.edgeMap.size()/2);
 
         Constraints::ClosedAndConnected::LinelConstraints lc;

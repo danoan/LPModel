@@ -60,68 +60,17 @@ namespace PythonExporter
 
     void writeSparseMatrix(std::ofstream& ofs,
                            const std::string nameVar,
-                           const SquareMatrix& m)
+                           const SparseMatrix& m)
     {
-        if(m.size()==0) return;
+        std::string valuesName = nameVar + "_values";
+        writeVector(ofs,valuesName,m.values);
 
-        bool first=true;
-        unsigned  long int notZero=0;
-        ofs << nameVar << "_values" << " = ( ";
-        for(int i = 0;i<m.size();++i)
-        {
-            for(int j=0;j<m[i].size();++j)
-            {
-                if(m[i][j]!=0)
-                {
-                    if(!first)
-                        ofs << ", ";
+        std::string rowsName = nameVar + "_row";
+        writeVector(ofs,rowsName,m.rows);
 
-                    ++notZero;
-                    ofs << m[i][j];
-                    first = false;
-                }
-            }
-        }
-        ofs << " ) \n\n";
+        std::string colsName = nameVar + "_col";
+        writeVector(ofs,colsName,m.cols);
 
-
-        first=true;
-        ofs << nameVar << "_row" << " = ( ";
-        for(int i = 0;i<m.size();++i)
-        {
-            for(int j=0;j<m[i].size();++j)
-            {
-                if(m[i][j]!=0)
-                {
-                    if(!first)
-                        ofs << ", ";
-
-                    ofs << i;
-                    first = false;
-                }
-            }
-        }
-        ofs << " ) \n\n";
-
-        first=true;
-        ofs << nameVar << "_col" << " = ( ";
-        for(int i = 0;i<m.size();++i)
-        {
-            for(int j=0;j<m[i].size();++j)
-            {
-                if(m[i][j]!=0)
-                {
-                    if(!first)
-                        ofs << ", ";
-
-                    ofs << j;
-                    first = false;
-                }
-            }
-        }
-        ofs << " ) \n\n";
-
-        ofs << "## Sparsity Coefficient: " << notZero/( m.size()*m.size() ) << "\n\n";
     }
 
     void exportDigitalSetAsMatrix(std::ofstream& ofs,
@@ -187,16 +136,16 @@ namespace PythonExporter
 
     void exportPython(std::ofstream& ofs,
                       const std::vector<double>& U,
-                      const SquareMatrix& P1,
-                      const SquareMatrix& P2,
-                      const ConstraintMatrix& Z,
+                      const SparseMatrix& P1,
+                      const SparseMatrix& P2,
+                      const SparseMatrix& Z,
                       const std::vector<double>& z,
-                      const ConstraintMatrix& C,
+                      const SparseMatrix& C,
                       const std::vector<double>& c)
     {
         writeVector(ofs,"_U",U);
-        writeMatrix(ofs,"_P1",P1);
-        writeMatrix(ofs,"_P2",P2);
+        writeSparseMatrix(ofs,"_P1",P1);
+        writeSparseMatrix(ofs,"_P2",P2);
         writeSparseMatrix(ofs,"_Z",Z);
         writeVector(ofs,"_z",z);
         writeSparseMatrix(ofs,"_C",C);
@@ -206,10 +155,10 @@ namespace PythonExporter
     void exportPython(std::ofstream& ofs,
                       const std::vector<double>& U,
                       const std::vector<double>& V,
-                      const SquareMatrix& P,
-                      const ConstraintMatrix& Z,
+                      const SparseMatrix& P,
+                      const SparseMatrix& Z,
                       const std::vector<double>& z,
-                      const ConstraintMatrix& C,
+                      const SparseMatrix& C,
                       const std::vector<double>& c)
     {
         writeVector(ofs,"_U",U);
@@ -224,9 +173,9 @@ namespace PythonExporter
     void exportPython(std::ofstream& ofs,
                       const std::vector<double>& U,
                       const std::vector<double>& V,
-                      const ConstraintMatrix& Z,
+                      const SparseMatrix& Z,
                       const std::vector<double>& z,
-                      const ConstraintMatrix& C,
+                      const SparseMatrix& C,
                       const std::vector<double>& c)
     {
         writeVector(ofs,"_U",U);

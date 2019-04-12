@@ -5,8 +5,8 @@ from models.dataCheck import memoryCheck, dataStats
 from models.utils import extendSparse, extendMatrix
 
 U = matrix( D._U, (D.numVars,1),'d' )
-P1 = matrix( D._P1, (D.numVars,D.numVars),'d' )
-P2 = matrix( D._P2, (D.numVars,D.numVars),'d' )
+P1 = spmatrix( D._P1_values, D._P1_row, D._P1_col, (D.numVars,D.numVars),'d' )
+P2 = spmatrix( D._P2_values, D._P2_row, D._P2_col, (D.numVars,D.numVars),'d' )
 P = P1+P2
 Z = spmatrix( D._Z_values, D._Z_row,D._Z_col, (D.numSlackVars,D.numVars),'d' )
 z = matrix( D._z, (D.numSlackVars,1),'d' )
