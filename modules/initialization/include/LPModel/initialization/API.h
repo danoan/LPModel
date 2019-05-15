@@ -27,7 +27,7 @@ namespace LPModel
             typedef DigitalSet::Point Point;
             typedef Point KPoint;
 
-            typedef DIPaCUS::Misc::DigitalBoundary<DIPaCUS::Neighborhood::FourNeighborhoodPredicate> FourDigitalBoundary;
+            typedef DIPaCUS::Neighborhood::FourNeighborhoodPredicate FourNeighborhood;
             typedef SCaBOliC::Core::ODRInterpixels ODRInterpixels;
             typedef SCaBOliC::Core::ODRModel ODRModel;
 

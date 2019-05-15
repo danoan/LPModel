@@ -144,6 +144,6 @@ SolutionAssignment::DigitalSet SolutionAssignment::readSolution(const std::strin
 
     DigitalSet backTransformed(parameters.odrModel.domain);
 
-    parameters.handle.solutionSet(backTransformed,dsOutput,parameters.odrModel,solVector.data(),pointToVar);
+    parameters.handle.solutionSet(backTransformed,dsOutput,parameters.odrModel,Parameters::ODRModel::OM_CorrectConvexities, solVector.data(),pointToVar);
     return DIPaCUS::Transform::bottomLeftBoundingBoxAtOrigin(backTransformed);
 }

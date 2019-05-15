@@ -13,7 +13,7 @@ using namespace SCaBOliC::Core;
 using namespace DGtal::Z2i;
 
 std::string projectDir = PROJECT_DIR;
-std::string outputFolder = projectDir + "/output/test/lp-creation";
+std::string outputFolder = projectDir + "/lab/test/lp-creation/output/test/lp-creation";
 
 Initialization::Parameters initParameters()
 {
@@ -31,19 +31,22 @@ Initialization::Parameters initParameters()
     board << original;
     board.saveEPS( (outputFolder + "/input-set.eps").c_str() );
 
+    double radius = 5;
+    int levels = 0;
+    double gridStep = 1.0;
 
     ODRInterpixels odrInterpixels(ODRModel::AC_LINEL,
                                   ODRModel::CM_PIXEL,
-                                  0,
+                                  radius,
+                                  gridStep,
+                                  levels,
                                   ODRModel::LevelDefinition::LD_CloserFromCenter,
                                   ODRModel::FourNeighborhood,
+                                  ODRModel::StructuringElementType::RECT,
                                   true);
 
-    unsigned long radius = 5;
-
-    ODRModel odrModel = odrInterpixels.createODR(ODRModel::OM_OriginalBoundary,
+    ODRModel odrModel = odrInterpixels.createODR(ODRModel::OM_CorrectConvexities,
                                                  ODRModel::AM_AroundBoundary,
-                                                 radius,
                                                  original);
 
 

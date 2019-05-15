@@ -32,6 +32,9 @@ int main(int argc, char* argv[])
     DigitalSet ds = loadImageAsDigitalSet(in.pgmInputImage);
     Initialization::Parameters prm = Initialization::API::initParameters(ds,in.optRegionWidth);
 
+    boost::filesystem::path p(in.outputPath);
+    boost::filesystem::create_directories(p.remove_filename());
+
     SCaBOliC::Core::Display::DisplayODR(prm.odrModel,in.outputPath);
     return 0;
 }

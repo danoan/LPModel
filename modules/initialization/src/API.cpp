@@ -105,16 +105,21 @@ Parameters API::initParameters(const DigitalSet &originalDS,int optRegionWidth)
     DigitalSet boundary(domain);
     DigitalSet optRegion(domain);
 
+    double radius = 3;
+    double gridStep = 1.0;
+
     ODRInterpixels odrInterpixels(ODRModel::AC_LINEL,
                                   ODRModel::CM_PIXEL,
+                                  radius,
+                                  gridStep,
                                   optRegionWidth,
                                   ODRModel::LevelDefinition::LD_CloserFromCenter,
                                   ODRModel::FourNeighborhood,
+                                  ODRModel::StructuringElementType::RECT,
                                   true);
 
-    ODRModel odrModel = odrInterpixels.createODR(ODRModel::OM_OriginalBoundary,
+    ODRModel odrModel = odrInterpixels.createODR(ODRModel::OM_CorrectConvexities,
                                                  ODRModel::AM_AroundBoundary,
-                                                 3,
                                                  originalDS,
                                                  true);
 
@@ -163,7 +168,7 @@ int API::Internal::boundaryLinels(const DigitalSet &ds)
     std::for_each(ds.begin(),ds.end(),[&setOnPixelSpace](KPoint p)mutable{ setOnPixelSpace.insert( (p-Point(1,1))/2 );});
 
     DigitalSet digitalBoundary(ds.domain());
-    FourDigitalBoundary(digitalBoundary,setOnPixelSpace);
+    DIPaCUS::Misc::digitalBoundary<FourNeighborhood>(digitalBoundary,setOnPixelSpace);
 
     std::set<DGtal::Z2i::Point> linelCoordSet;
     DGtal::Z2i::KSpace kspace;

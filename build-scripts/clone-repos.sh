@@ -25,10 +25,3 @@ SCABOLIC_DIR=$EXT_PROJECT_DIR/SCaBOliC
 mkdir $SCABOLIC_DIR -p
 git clone --single-branch --branch dev https://github.com/danoan/SCaBOliC $SCABOLIC_DIR
 
-
-
-#--------------BinOCS----------------
-
-BINOCS_DIR=$EXT_PROJECT_DIR/BinOCS
-mkdir $BINOCS_DIR -p
-git clone --single-branch --branch dev https://github.com/danoan/BinOCS $BINOCS_DIR

@@ -34,7 +34,7 @@ DigitalSet loadImageAsDigitalSet(const std::string& imageFilePath)
 
 int main(int argc, char* argv[])
 {
-    if(argc<5)
+    if(argc<6)
     {
         std::cerr <<"Expected pgm-input-image levels sq-weight data-weight output-path\n";
         exit(1);
@@ -44,6 +44,11 @@ int main(int argc, char* argv[])
     int levels = std::atoi(argv[2]);
     double sqWeight = std::atof( argv[3] );
     double dataWeight = std::atof( argv[4] );
+    std::string outputPath = argv[5];
+
+    boost::filesystem::path p(outputPath);
+    std::string outputFolder = p.remove_filename().string();
+    boost::filesystem::create_directories(outputFolder);
 
     DigitalSet ds = loadImageAsDigitalSet(pgmInputImage);
 
@@ -58,9 +63,9 @@ int main(int argc, char* argv[])
 
     //Find a feasible solution
     LPWriter::MyLinearization linearization(0);
-    LPWriter::writeLP("/home-local/dantu1/GIT/PhD/LPModel/temp.lp",prm,grid,mergedTerm.unaryMap,linearization,2);
+    LPWriter::writeLP(outputFolder + "/temp.lp",prm,grid,mergedTerm.unaryMap,linearization,2);
 
-    SolutionAssignment::SolutionPairVector spv  = SolutionAssignment::solutionPairVector("/home-local/dantu1/GIT/PhD/LPModel/temp.sol",
+    SolutionAssignment::SolutionPairVector spv  = SolutionAssignment::solutionPairVector(outputFolder + "/temp.sol",
                                                                                          prm,
                                                                                          grid);
     NonLinOpt::MinimizerAR minimizer(grid,mergedTerm);

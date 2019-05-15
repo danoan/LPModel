@@ -1,7 +1,9 @@
-#include "boost/filesystem.hpp"
-#include <LPModel/initialization/API.h>
+#include <boost/filesystem.hpp>
 
-#include "SCaBOliC/Core/display.h"
+#include <SCaBOliC/Core/display.h>
+
+#include "LPModel/initialization/API.h"
+#include "LPModel/utils/dispUtils.h"
 
 using namespace LPModel;
 
@@ -17,16 +19,22 @@ namespace LPModel{ namespace Initialization{
         DigitalSet boundary(domain);
         DigitalSet optRegion(domain);
 
+
+        double radius = 3;
+        double gridStep = 1.0;
+
         ODRInterpixels odrInterpixels(ODRModel::AC_LINEL,
                                       ODRModel::CM_PIXEL,
+                                      radius,
+                                      gridStep,
                                       levels,
                                       ODRModel::LevelDefinition::LD_CloserFromCenter,
                                       ODRModel::FourNeighborhood,
+                                      ODRModel::StructuringElementType::RECT,
                                       evenIteration);
 
-        ODRModel odrModel = odrInterpixels.createODR(ODRModel::OM_OriginalBoundary,
+        ODRModel odrModel = odrInterpixels.createODR(ODRModel::OM_CorrectConvexities,
                                                      ODRModel::AM_AroundBoundary,
-                                                     3,
                                                      originalDS,
                                                      true);
 
@@ -109,7 +117,7 @@ bool compareGrid(const Initialization::Grid& g1, const Initialization::Grid& g2)
 
     return r;
 }
-#include "LPModel/utils/dispUtils.h"
+
 int main(int argc, char* argv[])
 {
     if(argc<4)

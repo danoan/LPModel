@@ -24,17 +24,16 @@ add_subdirectory(modules/terms)
 add_subdirectory(modules/utils)
 
 add_subdirectory(lab/test)
-add_subdirectory(lab/exp)
 
 
-add_subdirectory(CApplications/export-grid)
-add_subdirectory(CApplications/create-ODR-image)
+add_subdirectory(app/CApplications/export-grid)
+add_subdirectory(app/CApplications/create-ODR-image)
 
-add_subdirectory(CApplications/export-cplex-lp)
-add_subdirectory(CApplications/export-cplex-qp)
-add_subdirectory(CApplications/export-cvxopt)
-add_subdirectory(CApplications/export-third-order)
+add_subdirectory(app/CApplications/export-cplex-lp)
+add_subdirectory(app/CApplications/export-cplex-qp)
+add_subdirectory(app/CApplications/export-cvxopt)
+#add_subdirectory(app/CApplications/export-third-order)
 
-add_subdirectory(CApplications/generate-shapes)
-add_subdirectory(CApplications/generate-solution)
-add_subdirectory(CApplications/nonlinopt)
+add_subdirectory(app/CApplications/generate-shapes)
+add_subdirectory(app/CApplications/generate-solution)
+add_subdirectory(app/CApplications/nonlinopt)

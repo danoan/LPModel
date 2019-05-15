@@ -5,7 +5,7 @@ using namespace LPModel::Terms::SquaredCurvature;
 Constants CConstants::setConstants(const Parameters &prm)
 {
     DigitalSet tempBall( Domain( 2*Point(-prm.radius,-prm.radius), 2*Point(prm.radius,prm.radius) ) );
-    DIPaCUS::Misc::DigitalBallIntersection::digitalBall(tempBall,Point(0,0),prm.radius);
+    tempBall = DIPaCUS::Shapes::ball(1.0,0,0,prm.radius);
 
 
 
@@ -14,8 +14,7 @@ Constants CConstants::setConstants(const Parameters &prm)
     double F = 9.0 / pow(prm.radius, 6.0);
     double R = prm.radius;
 
-    DIPaCUS::Misc::DigitalBallIntersection DBI = prm.handle.intersectionComputer(prm.radius,
-                                                                                 prm.odrModel.trustFRG);
+    DIPaCUS::Misc::DigitalBallIntersection DBI = prm.handle.intersectionComputer(prm.odrModel.trustFRG);
 
     Constants::UnaryContribution uc;
     Constants::ConstantContribution cc;

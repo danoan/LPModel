@@ -18,7 +18,7 @@ double sumSqc(const DigitalSet& ds)
     DIPaCUS::Representation::digitalSetToImage(imgDS,ds);
 
     Curve curve;
-    DIPaCUS::Misc::ComputeBoundaryCurve(imgDS,curve,1);
+    DIPaCUS::Misc::computeBoundaryCurve(curve,imgDS,1);
 
     KSpace KImage;
     KImage.init( ds.domain().lowerBound(),ds.domain().upperBound(),true);

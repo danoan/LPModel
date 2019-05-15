@@ -5,8 +5,7 @@ using namespace LPModel::Terms::SquaredCurvature::Internal::Linel;
 void IteratorManager::run(const Parameters &prm, const BinaryCallback &bcbk, const TernaryCallback &tcbk)
 {
     DGtal::Z2i::DigitalSet temp(prm.odrModel.domain);
-    DIPaCUS::Misc::DigitalBallIntersection DBIOptimization = prm.handle.intersectionComputer(prm.radius,
-                                                                                             prm.odrModel.optRegion);
+    DIPaCUS::Misc::DigitalBallIntersection DBIOptimization = prm.handle.intersectionComputer(prm.odrModel.optRegion);
 
     double bSum=0;
     double tSum=0;
