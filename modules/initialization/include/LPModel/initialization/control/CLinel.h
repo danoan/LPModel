@@ -27,8 +27,7 @@ namespace LPModel
                                 const DigitalSet& optRegion,
                                 const PixelMap& pixelMap);
 
-            int edgeBaseIndex(const int firstLinelVar,
-                              const int firstEdgeVar,
+            int edgeBaseIndex(const int firstEdgeVar,
                               const int linelIndex);
 
             Linel readLinel(std::istream& is, const PixelIndexMap& pim);

@@ -64,7 +64,7 @@ int main(int argc, char* argv[])
 
     typedef Linearization< Terms::Term::UIntMultiIndex,double > MyLinearization;
 
-    unsigned long nextIndex = grid.pixelMap.size()+grid.linelMap.size()+grid.edgeMap.size();
+    unsigned long nextIndex = grid.pixelMap.size()-3+grid.edgeMap.size();
     MyLinearization linearization(nextIndex);
 
     switch(in.linearizationLevel)

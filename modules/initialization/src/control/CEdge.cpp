@@ -40,15 +40,12 @@ void CEdge::createEdgeMap(EdgeMap &edgeMap,
     LinelMap::const_iterator it = linelMap.begin();
 
     int varIndex;
-    int firstLinelVar = pixelMap.size();
-    int firstEdgeVar = pixelMap.size()+linelMap.size();
+    int firstEdgeVar = pixelMap.size()-3;
     do
     {
         const Linel& linel = it->second;
 
-        varIndex = CLinel::edgeBaseIndex(firstLinelVar,
-                                         firstEdgeVar,
-                                         linel.linelIndex);
+        varIndex =  CLinel::edgeBaseIndex(firstEdgeVar,linel.linelIndex); //TODO: was CLinel::edgeBaseIndex(firstLinelVar,firstEdgeVar,linel.linelIndex);
 
         if(linel.orientation==Linel::LinelOrientation::Up
            || linel.orientation==Linel::LinelOrientation::Down)

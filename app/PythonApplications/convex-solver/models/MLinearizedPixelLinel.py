@@ -6,10 +6,10 @@ from models.utils import extendSparse, extendMatrix
 
 U = matrix( D._U, (D.numVars,1),'d' )
 V = matrix( D._V, (D.numVars,1),'d' )
-P = spmatrix( D._P_values, D._P_row,D._P_col, (D.numVars,D.numVars),'d' )
-Z = spmatrix( D._Z_values, D._Z_row,D._Z_col, (D.numSlackVars,D.numVars),'d' )
+P = spmatrix( D._P_values, D._P_dim0,D._P_dim1, (D.numVars,D.numVars),'d' )
+Z = spmatrix( D._Z_values, D._Z_dim0,D._Z_dim1, (D.numSlackVars,D.numVars),'d' )
 z = matrix( D._z, (D.numSlackVars,1),'d' )
-C = spmatrix( D._C_values, D._C_row,D._C_col, (D.numEdges//2,D.numVars),'d' )
+C = spmatrix( D._C_values, D._C_dim0,D._C_dim1, (D.numEdges//2,D.numVars),'d' )
 c = matrix( D._c, (D.numEdges//2,1),'d' )
 
 dataStats(D.numPixels,D.numEdges,D.numPixelLinelPairs,D.numSlackVars,D.numVars)

@@ -14,9 +14,9 @@ For each model we derive a constrained and a penalty version.
 
     An additional variable z is created for the pair.
     For each variable z, three constraints are included:
-        z <= p
-        z <= l
-        z >= p+l-1
+        z <= xi
+        z <= xj
+        z >= xi+xj-1
 
 
 ****MLinearizedPixelPixel

@@ -5,12 +5,12 @@ from models.dataCheck import memoryCheck, dataStats
 from models.utils import extendSparse, extendMatrix
 
 U = matrix( D._U, (D.numVars,1),'d' )
-P1 = spmatrix( D._P1_values, D._P1_row, D._P1_col, (D.numVars,D.numVars),'d' )
-P2 = spmatrix( D._P2_values, D._P2_row, D._P2_col, (D.numVars,D.numVars),'d' )
+P1 = spmatrix( D._P1_values, D._P1_dim0, D._P1_dim1, (D.numVars,D.numVars),'d' )
+P2 = spmatrix( D._P2_values, D._P2_dim0, D._P2_dim1, (D.numVars,D.numVars),'d' )
 P = P1+P2
-Z = spmatrix( D._Z_values, D._Z_row,D._Z_col, (D.numSlackVars,D.numVars),'d' )
+Z = spmatrix( D._Z_values, D._Z_dim0,D._Z_dim1, (D.numSlackVars,D.numVars),'d' )
 z = matrix( D._z, (D.numSlackVars,1),'d' )
-C = spmatrix( D._C_values, D._C_row,D._C_col, (D.numEdges//2,D.numVars),'d' )
+C = spmatrix( D._C_values, D._C_dim0,D._C_dim1, (D.numEdges//2,D.numVars),'d' )
 c = matrix( D._c, (D.numEdges//2,1),'d' )
 
 dataStats(D.numPixels,D.numEdges,D.numPixelPairs,D.numSlackVars,D.numVars)

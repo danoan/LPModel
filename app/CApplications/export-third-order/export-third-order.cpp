@@ -19,7 +19,7 @@
 #include "InputData.h"
 #include "InputReader.h"
 
-#include "PythonExporter.h"
+#include "LPModel/python-exporter/PythonExporter.h"
 
 using namespace LPModel;
 using namespace LPModel::Terms;
@@ -88,6 +88,8 @@ void exportThirdOrder(const std::string& outputPath,
             auto mit = mIndex.begin();
             unsigned long int pixel = *mit;
 
+            if(pixel>=numVars) throw std::runtime_error("Index out of range!");
+
             U[pixel] = mergedTerm.unaryMap.at(mIndex);
         }
     }
@@ -100,7 +102,7 @@ void exportThirdOrder(const std::string& outputPath,
         {
             const Term::UIntMultiIndex& mIndex = it->first;
             auto mit = mIndex.begin();
-            if(it->second !=0) S.insert( { *(mit++), *(mit++) } it->second );
+            if(it->second !=0) S.insert( { *(mit++), *(mit++) }, it->second );
         }
     }
 
@@ -154,7 +156,7 @@ void exportThirdOrder(const std::string& outputPath,
     ofs << "numConstraints = " << grid.edgeMap.size()/2 << "\n";
     ofs << "numVars = " << numVars  << "\n";
 
-    //exportPython(ofs,U,S,T,C,c);
+    exportPython(ofs,U,S,T,C,c);
 
     exportDigitalSetAsMatrix(ofs,ds);
     exportPixelMap(ofs,grid.pixelMap);

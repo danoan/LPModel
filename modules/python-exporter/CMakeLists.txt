@@ -1,28 +1,32 @@
 cmake_minimum_required(VERSION 3.2)
-project(export-third-order)
+project(python-exporter)
 
-add_executable(export-third-order export-third-order.cpp src/InputReader.cpp)
-add_dependencies(export-third-order initialization constraints terms utils)
+add_library(python-exporter SHARED src/PythonExporter.cpp )
+add_dependencies(python-exporter initialization )
 
-target_include_directories(export-third-order PRIVATE
+target_include_directories(python-exporter PRIVATE
         include
         ${LPMODEL_INCLUDE_DIR}/constraints/include
         ${LPMODEL_INCLUDE_DIR}/initialization/include
+        ${LPMODEL_INCLUDE_DIR}/linearization/include
+        ${LPMODEL_INCLUDE_DIR}/lpwriter/include
         ${LPMODEL_INCLUDE_DIR}/terms/include
         ${LPMODEL_INCLUDE_DIR}/utils/include
-        ${LPMODEL_INCLUDE_DIR}/python-exporter/include
+        ${LPMODEL_INCLUDE_DIR}/types/include
         ${DIPACUS_INCLUDE_DIRS}
         ${SCABOLIC_INCLUDE_DIRS}
         ${DGTAL_INCLUDE_DIRS})
 
-target_link_libraries(export-third-order
-        -lpython-exporter
-        -linitialization
+target_link_libraries(python-exporter
+        -llpwriter
         -lconstraints
         -lterms
-        -lutils
-        -ldipacus-base
+        -linitialization
         -lscabolic-core
+        -ldipacus-derivates
+        -ldipacus-components
+        -ldipacus-base
+        -lutils
         -lboost_system
         -lboost_filesystem
         ${DGTAL_LIBRARIES}

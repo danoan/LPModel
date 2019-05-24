@@ -86,7 +86,7 @@ int main(int argc, char* argv[])
     Terms::Term mergedTerm = scTerm;//Terms::API::merge(dataTerm,scTerm);
 
 
-    unsigned long nextIndex = grid.pixelMap.size()+grid.linelMap.size()+grid.edgeMap.size();
+    unsigned long nextIndex = grid.pixelMap.size()-3+grid.edgeMap.size();
     LPWriter::MyLinearization linearization(nextIndex);
     linearization.linearize(mergedTerm.binaryMap);
     linearization.linearize(mergedTerm.ternaryMap);

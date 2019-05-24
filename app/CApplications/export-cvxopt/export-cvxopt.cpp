@@ -21,12 +21,12 @@
 #include "InputData.h"
 #include "InputReader.h"
 
-#include "PythonExporter.h"
+#include "LPModel/python-exporter/PythonExporter.h"
 
 using namespace LPModel;
 using namespace LPModel::Terms;
 
-using namespace PythonExporter;
+using namespace LPModel::PythonExporter;
 
 typedef DIPaCUS::Representation::Image2D Image2D;
 typedef DGtal::Z2i::DigitalSet DigitalSet;
@@ -44,7 +44,7 @@ DigitalSet loadImageAsDigitalSet(const std::string& imageFilePath)
 
 void consistentPixel(const Constraints::ClosedAndConnected::PixelIncidence& pi,
                      unsigned long int cNum,
-                     SparseMatrix& C,
+                     SparseMatrix<2>& C,
                      std::vector<double>& c)
 {
     typedef Constraints::ClosedAndConnected::Pixel Pixel;
@@ -56,18 +56,18 @@ void consistentPixel(const Constraints::ClosedAndConnected::PixelIncidence& pi,
     }
     else if(pi.pixel.ct==Pixel::CellType::Variable)
     {
-        if(pi.posIncidence) C.insert(cNum,pi.pixel.varIndex,1);
-        else C.insert(cNum,pi.pixel.varIndex,-1);
+        if(pi.posIncidence) C.insert( {cNum,pi.pixel.varIndex},1);
+        else C.insert( {cNum,pi.pixel.varIndex},-1);
     }
 }
 
 void consistentEdge(const Constraints::ClosedAndConnected::EdgeIncidence& ei,
                     unsigned long int numC,
-                    SparseMatrix& C,
+                    SparseMatrix<2>& C,
                     std::vector<double>& c)
 {
-    if(ei.posIncidence) C.insert(numC,ei.edge.varIndex,1);
-    else C.insert(numC,ei.edge.varIndex,-1);
+    if(ei.posIncidence) C.insert( {numC,ei.edge.varIndex},1);
+    else C.insert( {numC,ei.edge.varIndex},-1);
 }
 
 
@@ -78,7 +78,7 @@ void exportPixelPairLinearization(const std::string& outputPath,
 {
     typedef Linearization< Terms::Term::UIntMultiIndex,double > MyLinearization;
 
-    unsigned long nextIndex = grid.pixelMap.size()+grid.linelMap.size()+grid.edgeMap.size();
+    unsigned long nextIndex = grid.pixelMap.size()-3+grid.edgeMap.size();
     MyLinearization linearization(nextIndex);
 
     MyLinearization::PartialLinearizationPair plp(Initialization::IVariable::Pixel,Initialization::IVariable::Pixel);
@@ -102,11 +102,13 @@ void exportPixelPairLinearization(const std::string& outputPath,
             auto mit = mIndex.begin();
             unsigned long int pixel = *mit;
 
+            if(pixel>=numVars) throw std::runtime_error("Index out of range!");
+
             U[pixel] = mergedTerm.unaryMap.at(mIndex);
         }
     }
 
-    SparseMatrix P1;
+    SparseMatrix<2> P1;
     {
         const Term::BinaryMap& bm = mergedTerm.binaryMap;
         for(auto it=bm.begin();it!=bm.end();++it)
@@ -116,12 +118,12 @@ void exportPixelPairLinearization(const std::string& outputPath,
             unsigned long int pixel = *mit;++mit;
             unsigned long int edge = *mit;
 
-            if(it->second!=0) P1.insert(pixel,edge,it->second);
+            if(it->second!=0) P1.insert({pixel,edge},it->second);
         }
     }
 
 
-    SparseMatrix P2;
+    SparseMatrix<2> P2;
     {
         const Term::BinaryMap& bm = partialL;
         for(auto it=bm.begin();it!=bm.end();++it)
@@ -131,12 +133,12 @@ void exportPixelPairLinearization(const std::string& outputPath,
             unsigned long int edge = *mit;++mit;
             unsigned long int pixelPair = *mit;
 
-            if(it->second!=0) P2.insert(pixelPair,edge,it->second);
+            if(it->second!=0) P2.insert( {pixelPair,edge},it->second);
         }
     }
 
     //RHS constants missing
-    SparseMatrix Z;
+    SparseMatrix<2> Z;
     std::vector<double> z;
     {
         unsigned long int slackBaseIndex = slackStart;
@@ -150,20 +152,20 @@ void exportPixelPairLinearization(const std::string& outputPath,
             unsigned long int pixel2 = *mit;
             unsigned long int auxVarIndex = it->second;
 
-            Z.insert(baseIndex*3,pixel1,-1);
-            Z.insert(baseIndex*3,auxVarIndex,1);
-            Z.insert(baseIndex*3,slackBaseIndex+baseIndex*3,1);
+            Z.insert( {baseIndex*3,pixel1},-1);
+            Z.insert( {baseIndex*3,auxVarIndex},1);
+            Z.insert( {baseIndex*3,slackBaseIndex+baseIndex*3},1);
             z[slackBaseIndex+baseIndex*3]=0;
 
-            Z.insert(baseIndex*3+1,pixel2,-1);
-            Z.insert(baseIndex*3+1,auxVarIndex,1);
-            Z.insert(baseIndex*3+1,slackBaseIndex+baseIndex*3+1,1);
+            Z.insert( {baseIndex*3+1,pixel2},-1);
+            Z.insert( {baseIndex*3+1,auxVarIndex},1);
+            Z.insert( {baseIndex*3+1,slackBaseIndex+baseIndex*3+1},1);
             z[slackBaseIndex+baseIndex*3+1]=0;
 
-            Z.insert(baseIndex*3+2,pixel1,-1);
-            Z.insert(baseIndex*3+2,pixel2,-1);
-            Z.insert(baseIndex*3+2,auxVarIndex,1);
-            Z.insert(baseIndex*3+2,slackBaseIndex+baseIndex*3+2,-1);
+            Z.insert( {baseIndex*3+2,pixel1},-1);
+            Z.insert( {baseIndex*3+2,pixel2},-1);
+            Z.insert( {baseIndex*3+2,auxVarIndex},1);
+            Z.insert( {baseIndex*3+2,slackBaseIndex+baseIndex*3+2},-1);
             z[slackBaseIndex+baseIndex*3+2]=-1;
 
             if(baseIndex*3+2>=numSlack) throw std::runtime_error("");
@@ -174,7 +176,7 @@ void exportPixelPairLinearization(const std::string& outputPath,
         }
     }
 
-    SparseMatrix C;
+    SparseMatrix<2> C;
     std::vector<double> c;
     {
         c.resize(grid.edgeMap.size()/2);
@@ -223,7 +225,7 @@ void exportPixelLinelPairLinearization(const std::string& outputPath,
                                        const Initialization::Grid& grid,
                                        const Terms::Term& mergedTerm)
 {
-    unsigned long nextIndex = grid.pixelMap.size()+grid.linelMap.size()+grid.edgeMap.size();
+    unsigned long nextIndex = grid.pixelMap.size()-3+grid.edgeMap.size();
     LPWriter::MyLinearization linearization(nextIndex);
     linearization.linearize(mergedTerm.binaryMap);
 
@@ -245,6 +247,8 @@ void exportPixelLinelPairLinearization(const std::string& outputPath,
             auto mit = mIndex.begin();
             unsigned long int pixel = *mit;
 
+            if(pixel>=numVars) throw std::runtime_error("Index out of range!");
+
             U[pixel] = mergedTerm.unaryMap.at(mIndex);
         }
     }
@@ -253,12 +257,13 @@ void exportPixelLinelPairLinearization(const std::string& outputPath,
     {
         for(auto it=linearization.begin();it!=linearization.end();++it)
         {
+            if(it->first>=numVars) throw std::runtime_error("Index out of range!");
             V[it->first] = it->second;
         }
     }
 
 
-    SparseMatrix P;
+    SparseMatrix<2> P;
     {
         const Term::TernaryMap& tm = mergedTerm.ternaryMap;
         for(auto it=tm.begin();it!=tm.end();++it)
@@ -275,14 +280,14 @@ void exportPixelLinelPairLinearization(const std::string& outputPath,
 
             unsigned long int linelPairIndex = linearization.uniqueIndexMap[lpIndex];
 
-            if(it->second!=0) P.insert(pixel2,linelPairIndex,it->second);
+            if(it->second!=0) P.insert( {pixel2,linelPairIndex},it->second);
 
         }
     }
 
 
     //RHS constants missing
-    SparseMatrix Z;
+    SparseMatrix<2> Z;
     std::vector<double> z;
     {
         unsigned long int slackBaseIndex = slackStart;
@@ -296,20 +301,20 @@ void exportPixelLinelPairLinearization(const std::string& outputPath,
             unsigned long int edge = *mit;
             unsigned long int auxVarIndex = it->second;
 
-            Z.insert(baseIndex*3,pixel1,-1);
-            Z.insert(baseIndex*3,auxVarIndex,1);
-            Z.insert(baseIndex*3,slackBaseIndex+baseIndex*3,1);
+            Z.insert( {baseIndex*3,pixel1},-1);
+            Z.insert( {baseIndex*3,auxVarIndex},1);
+            Z.insert( {baseIndex*3,slackBaseIndex+baseIndex*3},1);
             z[slackBaseIndex+baseIndex*3]=0;
 
-            Z.insert(baseIndex*3+1,edge,-1);
-            Z.insert(baseIndex*3+1,auxVarIndex,1);
-            Z.insert(baseIndex*3+1,slackBaseIndex+baseIndex*3+1,1);
+            Z.insert( {baseIndex*3+1,edge},-1);
+            Z.insert( {baseIndex*3+1,auxVarIndex},1);
+            Z.insert( {baseIndex*3+1,slackBaseIndex+baseIndex*3+1},1);
             z[slackBaseIndex+baseIndex*3+1]=0;
 
-            Z.insert(baseIndex*3+2,pixel1,-1);
-            Z.insert(baseIndex*3+2,edge,-1);
-            Z.insert(baseIndex*3+2,auxVarIndex,1);
-            Z.insert(baseIndex*3+2,slackBaseIndex+baseIndex*3+2,-1);
+            Z.insert( {baseIndex*3+2,pixel1},-1);
+            Z.insert( {baseIndex*3+2,edge},-1);
+            Z.insert( {baseIndex*3+2,auxVarIndex},1);
+            Z.insert( {baseIndex*3+2,slackBaseIndex+baseIndex*3+2},-1);
             z[slackBaseIndex+baseIndex*3+2]=-1;
 
             if(baseIndex*3+2>=numSlack) throw std::runtime_error("");
@@ -320,7 +325,7 @@ void exportPixelLinelPairLinearization(const std::string& outputPath,
         }
     }
 
-    SparseMatrix C;
+    SparseMatrix<2> C;
     std::vector<double> c;
     {
         c.resize(grid.edgeMap.size()/2);

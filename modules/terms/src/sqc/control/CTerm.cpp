@@ -108,8 +108,7 @@ void CTerm::Internal::setUnaryMap(Term::UnaryMap& um,
                                   const Grid& grid,
                                   double weight)
 {
-    unsigned long firstLinelVar = grid.pixelMap.size();
-    unsigned long firstEdgeVar = firstLinelVar + grid.linelMap.size();
+    unsigned long firstEdgeVar = grid.pixelMap.size()-3;
 
     DGtal::Z2i::KSpace kspace;
     kspace.init(prm.odrModel.optRegion.domain().lowerBound(),
@@ -120,8 +119,7 @@ void CTerm::Internal::setUnaryMap(Term::UnaryMap& um,
     double unaryValue=0;
     for(auto it=grid.linelMap.begin();it!=grid.linelMap.end();++it)
     {
-        edgeBaseIndex = Initialization::CLinel::edgeBaseIndex(firstLinelVar,
-                                                              firstEdgeVar,
+        edgeBaseIndex = Initialization::CLinel::edgeBaseIndex(firstEdgeVar,
                                                               it->second.linelIndex);
 
         unaryValue=sqc.constantContribution.at(it->first);
@@ -143,9 +141,7 @@ void CTerm::Internal::setBinaryMap(Term::BinaryMap& bm,
                                    const Grid& grid,
                                    double weight)
 {
-    unsigned long firstLinelVar = grid.pixelMap.size();
-    unsigned long firstEdgeVar = firstLinelVar + grid.linelMap.size();
-
+    unsigned long firstEdgeVar = grid.pixelMap.size()-3;
     int edgeBaseIndex;
 
     DGtal::Z2i::Point linel,pixel;
@@ -153,8 +149,7 @@ void CTerm::Internal::setBinaryMap(Term::BinaryMap& bm,
     {
         separate(linel,pixel,it->first);
 
-        edgeBaseIndex = Initialization::CLinel::edgeBaseIndex(firstLinelVar,
-                                                              firstEdgeVar,
+        edgeBaseIndex = Initialization::CLinel::edgeBaseIndex(firstEdgeVar,
                                                               grid.linelMap.at(linel).linelIndex);
 
         if(lfc.find(linel)==lfc.end()) lfc[linel]=sqc.constantContribution.at(linel);
@@ -174,8 +169,7 @@ void CTerm::Internal::setTernaryMap(Term::TernaryMap& tm,
                                     const Grid& grid,
                                     double weight)
 {
-    unsigned long firstLinelVar = grid.pixelMap.size();
-    unsigned long firstEdgeVar = firstLinelVar + grid.linelMap.size();
+    unsigned long firstEdgeVar = grid.pixelMap.size()-3;
 
     int edgeBaseIndex;
 
@@ -184,8 +178,7 @@ void CTerm::Internal::setTernaryMap(Term::TernaryMap& tm,
     {
         separate(linel,pixel1,pixel2,it->first);
 
-        edgeBaseIndex = Initialization::CLinel::edgeBaseIndex(firstLinelVar,
-                                                              firstEdgeVar,
+        edgeBaseIndex = Initialization::CLinel::edgeBaseIndex(firstEdgeVar,
                                                               grid.linelMap.at(linel).linelIndex);
 
         lfc[linel]+=weight*it->second;
