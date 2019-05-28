@@ -27,7 +27,7 @@ Constants CConstants::setConstants(const Parameters &prm)
 
         double Ij = temp.size();
 
-        double k = Ij - C; //Add constant in order to have SPD matrix for quadratic term
+        double k = Ij - C;
 
         cc[*it] = pow(k, 2);
         W += cc[*it];

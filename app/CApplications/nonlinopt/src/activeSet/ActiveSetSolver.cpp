@@ -1,9 +1,9 @@
 #include <DIPaCUS/derivates/Misc.h>
-#include "LPModel/nonlinopt/MinimizerAR.h"
+#include "LPModel/nonlinopt/activeSet/ActiveSetSolver.h"
 
 using namespace LPModel::NonLinOpt;
 
-MinimizerAR::MinimizerAR(const Grid& grid, const Term& term):grid(grid),term(term)
+ActiveSetSolver::ActiveSetSolver(const Grid& grid, const Term& term):grid(grid),term(term)
 {
     numPixels=0;
     numEdges=0;
@@ -26,7 +26,7 @@ MinimizerAR::MinimizerAR(const Grid& grid, const Term& term):grid(grid),term(ter
 
 }
 
-void MinimizerAR::buildConstraintsMatrix()
+void ActiveSetSolver::buildConstraintsMatrix()
 {
     Constraints::ClosedAndConnected::LinelConstraints lc;
     Constraints::ClosedAndConnected::closedConnectedContraints(lc,grid);
@@ -50,7 +50,7 @@ void MinimizerAR::buildConstraintsMatrix()
     }
 
     fic = currRow;
-    eqKernel = CM.block(0,0,fic,numVars).fullPivLu().kernel();
+    equalities = CM.block(0,0,fic,numVars);
 
     activeFilter.resize(2*numVars);
     //Greater than Zero and smaller than One
@@ -86,7 +86,7 @@ void MinimizerAR::buildConstraintsMatrix()
 
 }
 
-MinimizerAR::Matrix MinimizerAR::activeSet(Vector& x)
+ActiveSetSolver::Matrix ActiveSetSolver::activeSet(Vector& x)
 {
     FilterMatrix vLb = ( (inequalities*x).array()>=lbFilter.array() ).matrix();
     FilterMatrix vUb = ( (inequalities*x).array()<=ubFilter.array() ).matrix();
@@ -113,9 +113,11 @@ MinimizerAR::Matrix MinimizerAR::activeSet(Vector& x)
     return subM;
 }
 
-double MinimizerAR::maxDeplacementOnDk(const Vector& x, const Vector& dk)
+double ActiveSetSolver::maxDeplacementOnDk(const Vector& x, const Vector& dk)
 {
-    FilterMatrix minFilter = (inequalities*dk).array()>Vector::Zero(inequalities.rows()).array();
+    //For those that are greater than zero
+    FilterMatrix minFilter = (inequalities*dk).array()>Vector::Constant(inequalities.rows(),1,TOLERANCE).array();
+
     const Matrix& num = activeFilter-inequalities*x;
     const Matrix& den = inequalities*dk;
 
@@ -129,10 +131,13 @@ double MinimizerAR::maxDeplacementOnDk(const Vector& x, const Vector& dk)
         double pot=0;
         for(int i=first;i<minFilter.rows();++i)
         {
-            if(minFilter(i))
+            if(minFilter(i) && fabs(num(i)) > TOLERANCE)
             {
                 pot = num(i)/den(i);
-                if(pot < m) m = pot;
+                if(pot < m)
+                {
+                    m = pot;
+                }
             }
         }
     }
@@ -140,9 +145,9 @@ double MinimizerAR::maxDeplacementOnDk(const Vector& x, const Vector& dk)
     return m;
 }
 
-MinimizerAR::Vector MinimizerAR::feasibleSolution(const SolutionPairVector& spv)
+ActiveSetSolver::Vector ActiveSetSolver::feasibleSolution(const SolutionPairVector& spv)
 {
-    NonLinOpt::MinimizerAR::Vector v;
+    NonLinOpt::ActiveSetSolver::Vector v;
     v.resize(spv.size());
     for(auto it=spv.begin();it!=spv.end();++it)
     {
@@ -156,7 +161,7 @@ MinimizerAR::Vector MinimizerAR::feasibleSolution(const SolutionPairVector& spv)
     return v;
 }
 
-void MinimizerAR::gradient(Vector& grad, Vector& x)
+void ActiveSetSolver::gradient(Vector& grad, Vector& x)
 {
     std::vector<adouble> ax(x.size());
     adept::set_values(&ax[0],x.size(),&x[0]);
@@ -174,7 +179,7 @@ void MinimizerAR::gradient(Vector& grad, Vector& x)
     }
 }
 
-MinimizerAR::Size MinimizerAR::countTrue(const FilterMatrix& fm)
+ActiveSetSolver::Size ActiveSetSolver::countTrue(const FilterMatrix& fm)
 {
     Size c=0;
     for(int i=0;i<fm.rows();++i)
@@ -185,76 +190,73 @@ MinimizerAR::Size MinimizerAR::countTrue(const FilterMatrix& fm)
     return c;
 }
 
-MinimizerAR::Size MinimizerAR::countLowerZeroInequalities(const Vector& v, const Matrix& activeSet)
+ActiveSetSolver::Size ActiveSetSolver::countLowerZeroInequalities(const Vector& v, const Matrix& activeSet)
 {
     FilterMatrix result = ( (activeSet*v).array()<Vector::Zero(activeSet.rows()).array() ).matrix();
     return countTrue(result);
 }
 
-MinimizerAR::Vector MinimizerAR::findFeasibleDirection(const Vector& grad, const Matrix& activeSet)
+bool ActiveSetSolver::testDirection(const Matrix& activeSet, const Vector& curDir, const Vector& deplVector, double step, Size currActive)
 {
+    Vector nd1 = curDir + step*deplVector;
+    nd1 /= nd1.norm();
+    Size p1 = countLowerZeroInequalities(nd1,activeSet);
+
+    return p1>=currActive;
+}
+
+ActiveSetSolver::Vector ActiveSetSolver::findFeasibleDirection(const Vector& grad, const Matrix& activeSet)
+{
+
     Matrix temp;
     temp.resize(1,grad.rows());
     temp.row(0)=grad.transpose();
 
-    Matrix W = temp.fullPivLu().kernel();
-    std::vector<Deplacement> deplacements;
-    for(int i=0;i<W.cols();++i)
-    {
-        deplacements.push_back(Deplacement(W.col(i)));
-    }
+    Matrix N = temp.fullPivLu().kernel();
 
-    Vector dk = -eqKernel*eqKernel.transpose()*grad;
+    Matrix W = equalities.fullPivLu().kernel();
+    Matrix Q = W*( (W.transpose()*W).inverse() )*W.transpose();
+
+
+    Vector dk = -Q*grad;
     dk /= dk.norm();
-
-
 
     Size p0 = countLowerZeroInequalities(dk,activeSet);
     Size p1;
     Vector nd1;
-    Deplacement* depl;
+
     int i = -1;
-    int c;
+    double step=0.01;
 
 
     std::srand(time(NULL));
     std::cout << "*** Find feasible direction" << std::endl;
     while(p0<activeSet.rows())
     {
-        std::cout << "Gradient times dk: " <<dk.dot(grad) << std::endl;
-        std::cout << p0 << " out of " << activeSet.rows() << " inequalities are lower than zero for dk" << std::endl;
+//        std::cout << "Gradient times dk: " <<dk.dot(grad) << std::endl;
+//        std::cout << p0 << " out of " << activeSet.rows() << " inequalities are lower than zero for dk" << std::endl;
 
-        i = (i+1) % deplacements.size();
-        c=0;
-        do
+        i = (i+1) % N.cols();
+        if(i==0)
         {
-            depl = &deplacements[i];
-            nd1 = dk + depl->next() * depl->v;
-            nd1 /= nd1.norm();
-            p1 = countLowerZeroInequalities(nd1,activeSet);
-
-            if (p1 < p0) depl->setHigh();
-            else if (p1 > p0) depl->setLow();
-
-            ++c;
-
-        } while (p1 < p0 && c < 5);
-
-        if(c!=5)
+            step=-step;
+            step*=2;
+        }
+        if( testDirection(activeSet,dk,N.col(i),step,p0) )
         {
-            dk = nd1;
-            p0 = p1;
+            dk = dk + step*N.col(i);
+//            dk /= dk.norm();
+            p1 = countLowerZeroInequalities(dk,activeSet);
+            p0=p1;
         }
 
     }
-
-
 
     return dk;
 
 }
 
-double MinimizerAR::minimize(Vector& x, int maxSteps)
+double ActiveSetSolver::minimize(Vector& x, int maxSteps)
 {
     double lbda,w;
 
@@ -267,32 +269,51 @@ double MinimizerAR::minimize(Vector& x, int maxSteps)
     {
         gradient(grad,nextX);
         Matrix AS = activeSet(nextX);
-        Matrix AK = AS.fullPivLu().kernel();
-        Matrix ASt = AS.transpose();
-
-        if(grad.norm() < TOLERANCE) break;
-        if( (AK.transpose()*grad).norm() < TOLERANCE  ) break;
-
-        std::cout << "***Iteration" << std::endl;
-        std::cout << "### All x greater than zero: "
-                  << ( ( (nextX.array()>=Vector::Zero(numVars).array()).all() )?'T':'F' )
-                  << std::endl;
-
-
-        Matrix potSol = ASt.fullPivLu().solve(grad);
-        if( (ASt*potSol-grad).norm() < TOLERANCE )
+        if(AS.rows()>0)
         {
-            if( (potSol.array()<Vector::Zero(potSol.rows()).array()).all() ) break;
+            Matrix AK = AS.fullPivLu().kernel();
+            Matrix ASt = AS.transpose();
 
-            std::cout << "### Gradient is in the active matrix image" << std::endl;
+            if(grad.norm() < TOLERANCE) break;
+            if( (AK.transpose()*grad).norm() < TOLERANCE  ) break;
 
-            dk = -AK*AK.transpose()*grad;
+            std::cout << "***Iteration" << std::endl;
+            std::cout << "### All x greater than zero: "
+                      << ( ( (nextX.array()>=Vector::Zero(numVars).array()).all() )?'T':'F' )
+                      << std::endl;
+
+
+            Matrix potSol = ASt.fullPivLu().solve(grad);
+            if( (ASt*potSol-grad).norm() < TOLERANCE )
+            {
+                if( (potSol.array()<=Vector::Zero(potSol.rows()).array()).all() )
+                {
+                    std::cout << "A stationary solution was found!\n";
+                    break;
+                }
+
+                std::cout << "### Gradient is in the image of the active constraints matrix" << std::endl;
+
+                dk = -AK*AK.transpose()*grad;
+            }
+            else
+            {
+                std::cout << "### dk will be in the nullspace of active matrix" << std::endl;
+                dk = findFeasibleDirection(grad,AS);
+                //dk = -AK*AK.transpose()*grad;
+            }
         }
         else
         {
-            std::cout << "### dk will be in the nullspace of active matrix" << std::endl;
-            dk = findFeasibleDirection(grad,AS);
-            //dk = -AK*AK.transpose()*grad;
+            if(grad.norm() < TOLERANCE )
+            {
+                std::cout << "Stationary solution was found!\n";
+                break;
+            }else
+            {
+                dk.setRandom();
+                dk /= dk.norm();
+            }
         }
 
         std::cout << "Is dk descent direction: " << ( (dk.dot(grad) < 0)?'T':'F' ) << std::endl;
@@ -303,14 +324,26 @@ double MinimizerAR::minimize(Vector& x, int maxSteps)
         lbda = linearSearch(nextX,grad,dk,w);
         nextX = nextX + lbda*dk;
 
+//        std::cout << nextX << std::endl;
 
+        for(int i=0;i<nextX.rows();++i)
+        {
+            if(nextX.coeff(i)<0)
+            {
+                nextX.coeffRef(i) = 0;
+            }else if(nextX.coeff(i)>1)
+            {
+                nextX.coeffRef(i) = 1;
+            }
+        }
         --maxSteps;
     }
 
+    solutionVector = nextX;
     return objective<adouble>(nextX).value();
 }
 
-double MinimizerAR::linearSearch(const Vector& x, const Vector& grad, const Vector& dk, double startLbda)
+double ActiveSetSolver::linearSearch(const Vector& x, const Vector& grad, const Vector& dk, double startLbda)
 {
     int cmax=10;
     double lbda=startLbda;

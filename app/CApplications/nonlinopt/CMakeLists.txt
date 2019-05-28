@@ -2,8 +2,10 @@ cmake_minimum_required(VERSION 3.2)
 project(nonlinopt)
 
 add_executable(nonlinopt
-        src/Minimizer.cpp
-        src/MinimizerAR.cpp
+        src/activeSet/ActiveSetSolver.cpp
+        src/glpk/glpk.cpp
+        src/inputReader/InputData.cpp
+        src/utils/utils.cpp
         nonlinopt.cpp)
 
 add_dependencies(nonlinopt constraints initialization solassign terms lpwriter)
@@ -18,6 +20,7 @@ target_include_directories(nonlinopt PRIVATE
         ${LPMODEL_INCLUDE_DIR}/linearization/include
         ${LPMODEL_INCLUDE_DIR}/solassign/include
         ${LPMODEL_INCLUDE_DIR}/types/include
+        ${LPMODEL_INCLUDE_DIR}/utils/include
         ${SCABOLIC_INCLUDE_DIRS}
         ${DIPACUS_INCLUDE_DIRS}
         ${DGTAL_INCLUDE_DIRS}
@@ -25,13 +28,16 @@ target_include_directories(nonlinopt PRIVATE
 
 target_link_libraries( nonlinopt
         -ladept
+        -lsolassign
+        -llpmodel-utils
         -linitialization
         -llpwriter
         -lterms
         -lconstraints
-        -lsolassign
         -ldipacus-base
+        -ldipacus-derivates
         -lboost_filesystem
         -lboost_system
+        -lglpk
         ${DGTAL_LIBRARIES})
 

@@ -17,7 +17,7 @@ namespace LPModel
 {
     namespace NonLinOpt
     {
-        class MinimizerAR
+        class ActiveSetSolver
         {
         public:
             typedef unsigned long int Size;
@@ -44,111 +44,11 @@ namespace LPModel
 
             typedef Eigen::Matrix<bool,Eigen::Dynamic,1> FilterMatrix;
 
-            struct Deplacement
-            {
-                Deplacement(const Matrix::ColXpr v):sigma(1),
-                                                    low(-std::numeric_limits<double>::max()),
-                                                    high(std::numeric_limits<double>::max()),
-                                                    state(UndefRange),
-                                                    action(Sum),
-                                                    v(v),
-                                                    ic(0),
-                                                    inc(0){}
-
-                double defRange()
-                {
-                    while(true)
-                    {
-                        if(action==Sum)
-                        {
-                            sigma = sigma_s + ic*inc;
-                            if(sigma>=high) action=Subtract;
-                            else return sigma;
-                        }else
-                        {
-                            sigma = sigma_s -ic*inc;
-                            if( sigma<=low )
-                            {
-                                inc/=2.0;
-                                ic=0;
-                                action=Sum;
-                            }else
-                            {
-                                return sigma;
-                            }
-                        }
-                    }
-                }
-
-                double undefRange()
-                {
-                    while(true)
-                    {
-                        if(action==Sum)
-                        {
-                            action=Subtract;
-                            if(sigma<high)
-                            {
-                                sigma*=2;
-                                return sigma;
-                            }
-                        }else
-                        {
-                            action=Sum;
-                            if(-sigma>low)
-                            {
-                                sigma*=2;
-                                return -sigma;
-                            }
-                        }
-                    }
-                }
-
-                double next()
-                {
-                    if(state==DefRange) return defRange();
-                    else return undefRange();
-                }
-
-                void setRange()
-                {
-                    state = DefRange;
-                    range = high-low;
-                    sigma_s = range/2.0;
-                    action = Sum;
-                    inc = range/2.0;
-                }
-
-                void setHigh()
-                {
-                    if(state==DefRange) return;
-                    high = sigma;
-                    if(low!=-std::numeric_limits<double>::max()) setRange();
-                }
-
-                void setLow()
-                {
-                    if(state==DefRange) return;
-                    low = sigma;
-                    if(high!=std::numeric_limits<double>::max()) setRange();
-                }
-
-                double sigma,sigma_s,range;
-                double low,high;
-
-                enum{DefRange,UndefRange} state;
-                enum{Sum,Subtract} action;
-
-                Size ic;
-                double inc;
-
-                const Matrix::ColXpr v;
-            };
-
-
         public:
-            MinimizerAR(const Grid& grid, const Term& term);
+            ActiveSetSolver(const Grid& grid, const Term& term);
             Vector feasibleSolution(const SolutionPairVector& spv);
+
+            bool testDirection(const Matrix& activeSet, const Vector& curDir, const Vector& deplVector, double step, Size currActive);
 
             template<class TNUM, class TNUMARRAY>
             TNUM objective( const TNUMARRAY x) const
@@ -180,6 +80,12 @@ namespace LPModel
                     res += x[index1]*x[index2]*x[index3]*it->second;
                 }
 
+                //Force Zero or One solutions
+                for(int i=0;i<numVars;++i)
+                {
+                    res += -4*x[i]*(1-x[i]);
+                }
+
                 return res;
 
             }
@@ -204,6 +110,7 @@ namespace LPModel
             adept::Stack stack;
 
             Matrix CM;
+            Matrix equalities;
             Matrix inequalities;
             Vector activeFilter,lbFilter,ubFilter;
 
@@ -219,6 +126,9 @@ namespace LPModel
 
             const double TOLERANCE = 1.0e-6;
             const double alpha = 0.1;
+
+        public:
+            Vector solutionVector;
 
 
         };

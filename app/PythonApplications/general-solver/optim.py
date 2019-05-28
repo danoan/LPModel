@@ -4,7 +4,7 @@ from scipy.sparse import coo_matrix as spmatrix
 
 import matplotlib.pyplot as plt
 
-from models.data import DThirdOrder as D
+from models.data import DThirdOrderSmall as D
 #from models.data import DToy as D
 
 def constraint_as_penalization():
@@ -22,7 +22,7 @@ def constraint_as_penalization():
 
                     D._S_dim0.append(x)
                     D._S_dim1.append(x2)
-                    D._S_values.append(2*a*a2)
+                    D._S_values.append(a*a2)
 
             currR=r
             A.clear()
@@ -30,6 +30,14 @@ def constraint_as_penalization():
 
         A.append(v)
         X.append(c)
+
+def binary_constraints():
+    for i in range(D.numVars):
+        D._S_dim0.append(i)
+        D._S_dim1.append(i)
+        D._S_values.append(1000)
+
+        D._U[i]+=-2
 
 
 def f(X):
@@ -50,6 +58,7 @@ def f(X):
 
 def main():
     constraint_as_penalization()
+    binary_constraints()
     x0 = np.array( [0]*D.numVars )
     res = minimize(f, x0, method='BFGS', options={'disp': True})
 
