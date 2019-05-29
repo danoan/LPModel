@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.2)
 project(python-exporter)
 
 add_library(python-exporter SHARED src/PythonExporter.cpp )
-add_dependencies(python-exporter initialization )
+add_dependencies(python-exporter initialization constraints linearization lpwriter terms lpmodel-utils)
 
 target_include_directories(python-exporter PRIVATE
         include
@@ -26,7 +26,7 @@ target_link_libraries(python-exporter
         -ldipacus-derivates
         -ldipacus-components
         -ldipacus-base
-        -lutils
+        -llpmodel-utils
         -lboost_system
         -lboost_filesystem
         ${DGTAL_LIBRARIES}

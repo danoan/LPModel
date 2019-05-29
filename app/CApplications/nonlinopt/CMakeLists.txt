@@ -3,12 +3,11 @@ project(nonlinopt)
 
 add_executable(nonlinopt
         src/activeSet/ActiveSetSolver.cpp
-        src/glpk/glpk.cpp
         src/inputReader/InputData.cpp
         src/utils/utils.cpp
         nonlinopt.cpp)
 
-add_dependencies(nonlinopt constraints initialization solassign terms lpwriter)
+add_dependencies(nonlinopt constraints initialization solassign terms lpwriter lpmodel-glpk)
 
 target_include_directories(nonlinopt PRIVATE
         include
@@ -21,6 +20,7 @@ target_include_directories(nonlinopt PRIVATE
         ${LPMODEL_INCLUDE_DIR}/solassign/include
         ${LPMODEL_INCLUDE_DIR}/types/include
         ${LPMODEL_INCLUDE_DIR}/utils/include
+        ${LPMODEL_INCLUDE_DIR}/glpk/include
         ${SCABOLIC_INCLUDE_DIRS}
         ${DIPACUS_INCLUDE_DIRS}
         ${DGTAL_INCLUDE_DIRS}
@@ -30,6 +30,7 @@ target_link_libraries( nonlinopt
         -ladept
         -lsolassign
         -llpmodel-utils
+        -llpmodel-glpk
         -linitialization
         -llpwriter
         -lterms

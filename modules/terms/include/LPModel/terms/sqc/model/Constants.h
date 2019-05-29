@@ -31,8 +31,8 @@ namespace LPModel
                 const double F;
                 const double R;
 
-                const UnaryContribution unaryContribution;
                 const ConstantContribution constantContribution;
+                const UnaryContribution unaryContribution;
 
             };
         }

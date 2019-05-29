@@ -8,7 +8,8 @@
 #include <LPModel/terms/model/Term.h>
 #include <LPModel/solassign/model/SolutionAssignment.h>
 
-#include "LPModel/nonlinopt/glpk/glpk.h"
+#include "LPModel/glpk/glpk.h"
+#include "LPModel/nonlinopt/activeSet/ActiveSetSolver.h"
 
 namespace LPModel
 {
@@ -27,6 +28,8 @@ namespace LPModel
                                                                         const Term& mergedTerm,
                                                                         const Parameters& prm,
                                                                         const Grid& grid);
+
+            void printActiveSetVector(const ActiveSetSolver::Vector& v);
         }
     }
 }

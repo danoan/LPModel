@@ -19,7 +19,8 @@ double Utils::sumSQC(const DigitalSet& ds)
     double s = 0;
     for(auto it=ev.begin();it!=ev.end();++it)
     {
-        s+=*it;
+        std::cout << "sumSQC: " << *it << std::endl;
+        s+=pow(*it,2);
     }
 
     return s;

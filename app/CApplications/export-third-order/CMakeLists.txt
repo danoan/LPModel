@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.2)
 project(export-third-order)
 
 add_executable(export-third-order export-third-order.cpp src/InputReader.cpp)
-add_dependencies(export-third-order initialization constraints terms utils)
+add_dependencies(export-third-order initialization constraints terms lpmodel-utils python-exporter)
 
 target_include_directories(export-third-order PRIVATE
         include
@@ -20,7 +20,7 @@ target_link_libraries(export-third-order
         -linitialization
         -lconstraints
         -lterms
-        -lutils
+        -llpmodel-utils
         -ldipacus-base
         -lscabolic-core
         -lboost_system

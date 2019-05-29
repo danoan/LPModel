@@ -9,12 +9,9 @@
 
 namespace LPModel
 {
-    namespace NonLinOpt
+    namespace GLPK
     {
-        namespace GLPK
-        {
-            void glpk_solver(const std::string& lpInputFile, const std::string& outputSolutionFile);
-        }
+        void glpk_solver(const std::string& lpInputFile, const std::string& outputSolutionFile);
     }
 }
 

@@ -12,6 +12,7 @@ link_directories(${LPMODEL_LIBS_DIR}/constraints
         ${LPMODEL_LIBS_DIR}/utils
         ${LPMODEL_LIBS_DIR}/solassign
         ${LPMODEL_LIBS_DIR}/python-exporter
+        ${LPMODEL_LIBS_DIR}/glpk
         ${CMAKE_PREFIX_PATH}
         ${BOOST_LIBS_DIR}
         ${DIPACUS_LIBS_DIR})
@@ -24,6 +25,7 @@ add_subdirectory(modules/solassign)
 add_subdirectory(modules/terms)
 add_subdirectory(modules/utils)
 add_subdirectory(modules/python-exporter)
+add_subdirectory(modules/glpk)
 
 add_subdirectory(lab/test)
 

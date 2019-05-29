@@ -35,18 +35,24 @@ Term CTerm::setTerm(const Parameters &prm,
 
     assert(checkFn(lfc));
 
+    Term::ConstantsMap cm;
+    cm["weight-factor"] = sqc.F;
+    cm["sum-term"] = sqc.W;
+    cm["radius"] = sqc.R;
+    cm["half-digital-ball-area"] = sqc.C;
 
-    return Term(um,bm,tm);
+    return Term(um,bm,tm,cm);
 }
 
 bool CTerm::Internal::isPixel(const DGtal::Z2i::Point& p)
 {
-    return p(0)%2==1 && p(1)%2==1;
+    return abs( p(0)%2 )==1 && abs( p(1)%2 )==1;
 }
 
 bool CTerm::Internal::isLinel(const DGtal::Z2i::Point& p)
 {
-    return ( p(0)%2==1 && p(1)%2==0 || p(0)%2==0 && p(1)%2==1);
+    return ( abs( p(0)%2 )==1 && abs( p(1)%2 )==0 ||
+             abs( p(0)%2 )==0 && abs( p(1)%2 )==1);
 }
 
 void CTerm::Internal::separate(DGtal::Z2i::Point& linel,

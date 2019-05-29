@@ -15,7 +15,7 @@ target_include_directories(test-serialization PRIVATE
 
 target_link_libraries(test-serialization PRIVATE
         -linitialization
-        -lutils
+        -llpmodel-utils
         -lscabolic-core
         -ldipacus-components
         -ldipacus-base

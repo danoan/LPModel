@@ -1,6 +1,6 @@
-#include "LPModel/nonlinopt/glpk/glpk.h"
+#include "LPModel/glpk/glpk.h"
 
-using namespace LPModel::NonLinOpt;
+using namespace LPModel;
 
 
 void GLPK::glpk_solver(const std::string& lpInputFile, const std::string& outputSolutionFile)
@@ -37,10 +37,10 @@ void GLPK::glpk_solver(const std::string& lpInputFile, const std::string& output
     int numCols = glp_get_num_cols(P);
     for(int i=1;i<=numCols;++i)
     {
-        ofs << "x" << i-1 << " " << glp_get_col_prim(P,i) << "\n";
+        ofs << glp_get_col_name(P,i) << " " << glp_get_col_prim(P,i) << "\n";
     }
 
-    //glp_print_sol(P,outputSolutionFile2.c_str());
+    //glp_print_sol(P,"alok.txt");
 
     ofs.flush();
     ofs.close();

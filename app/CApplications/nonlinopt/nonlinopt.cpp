@@ -36,6 +36,17 @@ SolutionVector thresholdedSolution(const ActiveSetSolver::Vector& minSolVector,
     return sv;
 }
 
+ActiveSetSolver::Vector convertToVector(const SolutionVector& sv)
+{
+    ActiveSetSolver::Vector v(sv.size(),1);
+    for(int i=0;i<sv.size();++i)
+    {
+        v.coeffRef(i) = sv[i];
+    }
+
+    return v;
+}
+
 
 int main(int argc, char* argv[])
 {
@@ -70,8 +81,13 @@ int main(int argc, char* argv[])
     DigitalSet dsFinalSolution = LPModel::SolutionAssignment::digitalSetFromSolutionVector(sv,prm,grid);
     LPModel::Utils::exportImageFromDigitalSet(dsFinalSolution,id.outputPath);
 
+    NonLinOpt::Utils::printActiveSetVector(solverAS.solutionVector);
+
     std::cout << "SQC Before: " << LPModel::Utils::sumSQC(dsFeasibleSolution) << std::endl;
     std::cout << "SQC After: " << LPModel::Utils::sumSQC(dsFinalSolution) << std::endl;
+
+    std::cout << "Energy value: " << LPModel::Utils::sumSQC(dsFinalSolution) << std::endl;
+    std::cout << "Objective value: " << solverAS.objective<adouble>(convertToVector(sv)).value()*scTerm.constants.at("weight-factor") << std::endl;
 
 
     return 0;

@@ -50,6 +50,14 @@ namespace LPModel
                 return cleansedVector(spv);
             }
 
+            void printActiveSetVector(const ActiveSetSolver::Vector& v)
+            {
+                for(int i=0;i<v.rows();++i)
+                {
+                    std::cout << v.coeff(i) << std::endl;
+                }
+            }
+
         }
     }
 }

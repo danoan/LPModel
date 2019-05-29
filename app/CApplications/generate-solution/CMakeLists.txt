@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.2)
 project(generate-solution)
 
 add_executable(generate-solution generate-solution.cpp)
-add_dependencies(generate-solution initialization solassign utils)
+add_dependencies(generate-solution initialization solassign lpmodel-utils)
 
 target_include_directories(generate-solution PRIVATE
         ${LPMODEL_INCLUDE_DIR}/solassign/include

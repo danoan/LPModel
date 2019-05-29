@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.2)
 project(export-cplex-lp)
 
 add_executable(export-cplex-lp export-cplex-lp.cpp src/InputReader.cpp)
-add_dependencies(export-cplex-lp constraints initialization linearization lpwriter solassign terms utils)
+add_dependencies(export-cplex-lp constraints initialization linearization lpwriter solassign terms lpmodel-utils)
 
 target_include_directories(export-cplex-lp PRIVATE
         include
@@ -28,7 +28,7 @@ target_link_libraries(export-cplex-lp
         -ldipacus-derivates
         -ldipacus-components
         -ldipacus-base
-        -lutils
+        -llpmodel-utils
         -lboost_system
         -lboost_filesystem
         ${DGTAL_LIBRARIES}

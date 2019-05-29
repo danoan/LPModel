@@ -48,7 +48,7 @@ void consistentPixel(const Constraints::ClosedAndConnected::PixelIncidence& pi,
 {
     typedef Constraints::ClosedAndConnected::Pixel Pixel;
 
-    if(pi.pixel.ct==Pixel::CellType::RELAXATION_AUXILIARFrg)
+    if(pi.pixel.ct==Pixel::CellType::AuxiliarFrg)
     {
         if(pi.posIncidence) c[cNum] += -1;
         else c[cNum] += 1;

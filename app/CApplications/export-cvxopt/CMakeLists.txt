@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.2)
 project(export-cvxopt)
 
 add_executable(export-cvxopt export-cvxopt.cpp src/InputReader.cpp)
-add_dependencies(export-cvxopt constraints initialization linearization lpwriter solassign terms utils python-exporter)
+add_dependencies(export-cvxopt constraints initialization linearization lpwriter solassign terms lpmodel-utils python-exporter)
 
 target_include_directories(export-cvxopt PRIVATE
         include
@@ -28,7 +28,7 @@ target_link_libraries(export-cvxopt
         -ldipacus-derivates
         -ldipacus-components
         -ldipacus-base
-        -lutils
+        -llpmodel-utils
         -lboost_system
         -lboost_filesystem
         ${DGTAL_LIBRARIES}

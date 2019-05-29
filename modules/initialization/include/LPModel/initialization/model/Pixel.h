@@ -11,7 +11,7 @@ namespace LPModel
         struct Pixel:public IVariable
         {
             enum CellOrientation{Clockwise,Counterclockwise};
-            enum CellType{Variable,RELAXATION_AUXILIARBkg,RELAXATION_AUXILIARFrg,RELAXATION_AUXILIARInvalid};
+            enum CellType{Variable,AuxiliarBkg,AuxiliarFrg,AuxiliarInvalid};
 
             typedef DGtal::Z2i::Point KPoint;
 

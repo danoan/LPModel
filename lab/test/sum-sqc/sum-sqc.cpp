@@ -4,7 +4,6 @@
 
 using namespace LPModel;
 
-
 typedef DGtal::Z2i::Curve Curve;
 typedef GEOC::API::GridCurve::Curvature::EstimationsVector EstimationVector;
 typedef DGtal::Z2i::DigitalSet DigitalSet;

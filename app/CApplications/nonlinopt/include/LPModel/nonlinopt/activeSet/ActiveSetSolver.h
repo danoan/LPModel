@@ -53,12 +53,14 @@ namespace LPModel
             template<class TNUM, class TNUMARRAY>
             TNUM objective( const TNUMARRAY x) const
             {
+                int c=0;
                 TNUM res = 0;
                 Size index1,index2,index3;
                 for(auto it=term.unaryMap.begin();it!=term.unaryMap.end();++it)
                 {
                     index1 = *( it->first.begin() ) - edgeOffset;
                     res += x[index1]*it->second;
+                    if( x[index1]*it->second!=0 ) ++c;
                 }
 
                 for(auto it=term.binaryMap.begin();it!=term.binaryMap.end();++it)
@@ -81,10 +83,10 @@ namespace LPModel
                 }
 
                 //Force Zero or One solutions
-                for(int i=0;i<numVars;++i)
-                {
-                    res += -4*x[i]*(1-x[i]);
-                }
+//                for(int i=0;i<numVars;++i)
+//                {
+//                    res += pow(x[i],2)*pow( (x[i]-1),2)*5;
+//                }
 
                 return res;
 
