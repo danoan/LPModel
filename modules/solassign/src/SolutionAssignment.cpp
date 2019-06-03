@@ -73,7 +73,8 @@ SolutionAssignment::SolutionPairVector SolutionAssignment::solutionPairVector(co
         spVector.push_back( SolutionPair(varIndex,value));
 
         xPrefix=' ';
-        while(xPrefix!='x' && !ifs.eof()) ifs >> xPrefix;
+        while(xPrefix!='x' && !ifs.eof())
+            ifs >> xPrefix;
     }
 
     std::sort(spVector.begin(),spVector.end(),[](const SolutionPair& e1, const SolutionPair& e2){ return e1.first < e2.first;});
@@ -105,6 +106,43 @@ SolutionAssignment::SolutionVector SolutionAssignment::solutionVector(const Solu
     return varValue;
 }
 
+SolutionAssignment::DigitalSet SolutionAssignment::digitalSetFromSolutionVector(const SolutionPairVector &spVector,
+                                                                                const Parameters &parameters,
+                                                                                const Grid &grid)
+{
+    return digitalSetFromSolutionVector(solutionVector(spVector,parameters,grid),parameters,grid);
+}
+
+SolutionAssignment::DigitalSet SolutionAssignment::digitalSetFromSolutionVector(const SolutionVector &solVector,
+                                                                                const Parameters &parameters,
+                                                                                const Grid &grid)
+{
+    ReversePixelMap rpm;
+    reversePixelMap(rpm,grid);
+
+    Point pixelCoords;
+    std::unordered_map<Point, unsigned int> pointToVar;
+    int curr=0;
+    for(auto it=rpm.begin();it!=rpm.end();++it)
+    {
+        const Index& varIndex = it->first;
+        const Pixel& pixel = it->second;
+
+        pixelCoords = Point(pixel.col, pixel.row);
+        assert(parameters.odrModel.trustFRG(pixelCoords) == false);
+        pointToVar[pixelCoords]=curr;
+        ++curr;
+    }
+
+    DigitalSet dsOutput(parameters.odrModel.domain);
+    dsOutput.insert(parameters.odrModel.trustFRG.begin(),parameters.odrModel.trustFRG.end());
+
+    DigitalSet backTransformed(parameters.odrModel.domain);
+
+    parameters.handle.solutionSet(backTransformed,dsOutput,parameters.odrModel,Parameters::ODRModel::OM_CorrectConvexities, solVector.data(),pointToVar);
+    return DIPaCUS::Transform::bottomLeftBoundingBoxAtOrigin(backTransformed);
+}
+
 SolutionAssignment::DigitalSet SolutionAssignment::readSolution(const std::string &solutionFile,
                                                                 const Parameters &parameters,
                                                                 const Grid &grid)
@@ -119,31 +157,6 @@ SolutionAssignment::DigitalSet SolutionAssignment::readSolution(const std::strin
     ofs.close();
 
     SolutionVector solVector = solutionVector(spVector,parameters,grid);
+    return digitalSetFromSolutionVector(solVector,parameters,grid);
 
-    ReversePixelMap rpm;
-    reversePixelMap(rpm,grid);
-    
-    Point pixelCoords;
-    std::unordered_map<Point, unsigned int> pointToVar;
-    int curr=0;
-    for(auto it=spVector.begin();it!=spVector.end();++it)
-    {
-        const Index& varIndex = it->first;
-        const double& value = it->second;
-        if(rpm.find(varIndex)!=rpm.end()) //continue; //Not pixel variable;
-        {
-            pixelCoords = Point(rpm.at(varIndex).col, rpm.at(varIndex).row);
-            assert(parameters.odrModel.trustFRG(pixelCoords) == false);
-            pointToVar[pixelCoords]=curr;            
-            ++curr;
-        }
-    }
-    
-    DigitalSet dsOutput(parameters.odrModel.domain);
-    dsOutput.insert(parameters.odrModel.trustFRG.begin(),parameters.odrModel.trustFRG.end());
-
-    DigitalSet backTransformed(parameters.odrModel.domain);
-
-    parameters.handle.solutionSet(backTransformed,dsOutput,parameters.odrModel,solVector.data(),pointToVar);
-    return DIPaCUS::Transform::bottomLeftBoundingBoxAtOrigin(backTransformed);
 }

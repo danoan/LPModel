@@ -23,6 +23,10 @@ Term API::merge(Term& term1, const Term& term2)
     mergeMap(bm,term1.binaryMap,term2.binaryMap);
     mergeMap(tm,term1.ternaryMap,term2.ternaryMap);
 
-    return Term(um,bm,tm);
+    Term::ConstantsMap cm;
+    cm.insert(term1.constants.begin(),term1.constants.end());
+    cm.insert(term2.constants.begin(),term2.constants.end());
+
+    return Term(um,bm,tm,cm);
 }
 

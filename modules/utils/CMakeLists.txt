@@ -3,18 +3,19 @@ project(lpmodel-utils)
 
 find_package(DGtal REQUIRED)
 
-add_library(utils SHARED
-        src/dispUtils.cpp)
+add_library(lpmodel-utils SHARED
+        src/dispUtils.cpp
+        src/compUtils.cpp)
 
-add_dependencies(utils initialization)
+add_dependencies(lpmodel-utils initialization)
 
-target_include_directories(utils PRIVATE
+target_include_directories(lpmodel-utils PRIVATE
         include
         ${CMAKE_SOURCE_DIR}/modules/initialization/include
         ${DIPACUS_INCLUDE_DIRS}
         ${DGTAL_INCLUDE_DIRS})
 
-target_link_libraries(utils
+target_link_libraries(lpmodel-utils
         -lscabolic-core
         ${DGTAL_LIBRARIES}
         )

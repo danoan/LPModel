@@ -48,6 +48,14 @@ namespace LPModel
                                        const Parameters& parameters,
                                        const Grid& grid);
 
+        DigitalSet digitalSetFromSolutionVector(const SolutionPairVector &spv,
+                                                const Parameters &parameters,
+                                                const Grid &grid);
+
+        DigitalSet digitalSetFromSolutionVector(const SolutionVector &solVector,
+                                                const Parameters &parameters,
+                                                const Grid &grid);
+
 
         DigitalSet readSolution(const std::string& solutionFile,
                           const Parameters& parameters,

@@ -34,5 +34,7 @@ LPModel::Terms::Term API::prepare(const Parameters &prm, const Grid &grid, doubl
         }
     }
 
-    return Term(um,bm,tm);
+    Term::ConstantsMap cm;
+
+    return Term(um,bm,tm,cm);
 }

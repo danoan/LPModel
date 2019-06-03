@@ -19,8 +19,10 @@ namespace LPModel
         typedef Initialization::Grid Grid;
         typedef unsigned long Index;
 
-        typedef std::map<Index,double> VariableMap;
-        typedef VariableMap::const_iterator VariableMapIterator;
+        typedef std::map<Index,double> CoefficientMap;
+        typedef CoefficientMap::const_iterator CoefficientMapIterator;
+
+        typedef std::map<Index,double> FixedLabels;
 
         typedef Utils::MultiIndex<Index> MyMultiIndex;
         typedef std::map<MyMultiIndex,Index> MultiToUniqueMap;
@@ -50,8 +52,8 @@ namespace LPModel
                             Terms::Term::GeneralMap::const_iterator end);
 
         void writeObjective(std::ofstream& ofs,
-                            VariableMapIterator begin,
-                            VariableMapIterator end);
+                            CoefficientMapIterator begin,
+                            CoefficientMapIterator end);
 
         void writePixel(StringConstraint& sc,
                         const PixelIncidence& pi);
@@ -69,6 +71,10 @@ namespace LPModel
                              int& cIndexStart,
                              const LinelConstraints& lc);
 
+        void writeFixedLabels(std::ofstream &ofs,
+                              int& cIndexStart,
+                              const FixedLabels& fixedLabels);
+
         void writeLinearizationConstraint(std::ofstream &ofs,
                                           int& startConstraintNum,
                                           const MyMultiIndex &multiIndex,
@@ -80,8 +86,8 @@ namespace LPModel
                                            MultiToUniqueMapIterator end);
 
         void writeBounds(std::ofstream &ofs,
-                         VariableMapIterator begin,
-                         VariableMapIterator end);
+                         CoefficientMapIterator begin,
+                         CoefficientMapIterator end);
 
         void writeBounds(std::ofstream &ofs,
                          Grid::PixelMap::const_iterator begin,
@@ -95,15 +101,16 @@ namespace LPModel
                            const Grid& grid);
 
         void writeBinaries(std::ofstream& ofs,
-                           VariableMapIterator begin,
-                           VariableMapIterator end);
+                           CoefficientMapIterator begin,
+                           CoefficientMapIterator end);
 
         void writeLP(const std::string& outputFilePath,
                      const Initialization::Parameters& prm,
                      const Initialization::Grid& grid,
                      const Terms::Term::UnaryMap& um,
                      const MyLinearization& linearization,
-                     const int relLevel);
+                     const int relLevel,
+                     const FixedLabels& fixedLabels=FixedLabels());
 
 
         void writeQP(const std::string& outputFilePath,
@@ -113,7 +120,8 @@ namespace LPModel
                      const Terms::Term::BinaryMap& bm,
                      const Terms::Term::BinaryMap& partialL,
                      const MyLinearization& linearization,
-                     const int relLevel);
+                     const int relLevel,
+                     const FixedLabels& fixedLabels=FixedLabels());
     }
 }
 

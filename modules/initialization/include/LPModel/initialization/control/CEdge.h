@@ -27,10 +27,6 @@ namespace LPModel
                                const PixelMap& pixelMap,
                                const LinelMap& linelMap);
 
-            int edgeBaseIndex(const int firstLinelVar,
-                              const int firstEdgeVar,
-                              const int linelIndex);
-
             Edge readEdge(std::istream& is, const LinelIndexMap& lim);
 
             bool isSequence(const int firstEdgeVar,

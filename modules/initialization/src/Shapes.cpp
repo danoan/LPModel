@@ -12,7 +12,7 @@ Shapes::DigitalSet Shapes::square(double h)
 
 Shapes::DigitalSet Shapes::flower(double h)
 {
-    Flower flower(0,0,10,5,3,0);
+    Flower flower(0,0,10,5,2,0);
     DigitalSet ds = Internal::shapeDigitizer(flower,h);
 
     return DIPaCUS::Transform::bottomLeftBoundingBoxAtOrigin(ds);

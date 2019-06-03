@@ -50,8 +50,8 @@ void LPWriter::writeObjective(std::ofstream& ofs,
 }
 
 void LPWriter::writeObjective(std::ofstream &ofs,
-                               VariableMapIterator begin,
-                               VariableMapIterator end)
+                              CoefficientMapIterator begin,
+                              CoefficientMapIterator end)
 {
     for(auto it=begin;it!=end;++it)
     {
@@ -97,8 +97,8 @@ void LPWriter::writeLinearizationConstraints(std::ofstream &ofs,
 }
 
 void LPWriter::writeBounds(std::ofstream &ofs,
-                            VariableMapIterator begin,
-                            VariableMapIterator end)
+                           CoefficientMapIterator begin,
+                           CoefficientMapIterator end)
 {
     for(auto it=begin;it!=end;++it)
     {
@@ -150,8 +150,8 @@ void LPWriter::writeBinaries(std::ofstream& ofs,
 }
 
 void LPWriter::writeBinaries(std::ofstream& ofs,
-                             VariableMapIterator begin,
-                             VariableMapIterator end)
+                             CoefficientMapIterator begin,
+                             CoefficientMapIterator end)
 {
     for(auto it=begin;it!=end;++it)
     {
@@ -166,7 +166,7 @@ void LPWriter::writePixelPenalty(StringConstraint& sc,
 {
     std::ostringstream oss;
     char s=pi.posIncidence?'+':'-';
-    if(pi.pixel.ct==Pixel::CellType::RELAXATION_AUXILIARFrg)
+    if(pi.pixel.ct==Pixel::CellType::AuxiliarFrg)
     {
         double v = sc.rhs.top();sc.rhs.pop();
 
@@ -196,7 +196,7 @@ void LPWriter::writePixel(StringConstraint& sc,
 {
     std::ostringstream oss;
     char s=pi.posIncidence?'+':'-';
-    if(pi.pixel.ct==Pixel::CellType::RELAXATION_AUXILIARFrg)
+    if(pi.pixel.ct==Pixel::CellType::AuxiliarFrg)
     {
         double v = sc.rhs.top();sc.rhs.pop();
 
@@ -249,12 +249,24 @@ void LPWriter::writeConstraint(std::ofstream &ofs,
     }
 }
 
+void LPWriter::writeFixedLabels(std::ofstream &ofs,
+                           int& cIndexStart,
+                           const FixedLabels& fixedLabels)
+{
+    for(auto it=fixedLabels.begin();it!=fixedLabels.end();++it)
+    {
+        ofs << "c" << cIndexStart++ << ": ";
+        ofs << "x" << it->first << " = " << it->second << "\n";
+    }
+}
+
 void LPWriter::writeLP(const std::string& outputFilePath,
                        const Initialization::Parameters& prm,
                        const Initialization::Grid& grid,
                        const Terms::Term::UnaryMap& um,
                        const MyLinearization& linearization,
-                       const int relLevel)
+                       const int relLevel,
+                       const FixedLabels& fixedLabels)
 {
     std::cerr << "Writing LP-Program at " << outputFilePath << "\n";
 
@@ -276,6 +288,8 @@ void LPWriter::writeLP(const std::string& outputFilePath,
     Constraints::ClosedAndConnected::LinelConstraints lc;
     Constraints::ClosedAndConnected::closedConnectedContraints(lc,grid);
     LPWriter::writeConstraint(ofs,constraintNum,lc);
+
+    LPWriter::writeFixedLabels(ofs,constraintNum,fixedLabels);
 
     if(relLevel==LPModel::RELAXATION_NONE)
     {
@@ -322,7 +336,8 @@ void LPWriter::writeQP(const std::string& outputFilePath,
                        const Terms::Term::BinaryMap& bm,
                        const Terms::Term::BinaryMap& partialL,
                        const MyLinearization& linearization,
-                       const int relLevel)
+                       const int relLevel,
+                       const FixedLabels& fixedLabels)
 {
     std::cerr << "Writing QP-Program at " << outputFilePath << "\n";
 
@@ -345,6 +360,8 @@ void LPWriter::writeQP(const std::string& outputFilePath,
     Constraints::ClosedAndConnected::LinelConstraints lc;
     Constraints::ClosedAndConnected::closedConnectedContraints(lc,grid);
     LPWriter::writeConstraint(ofs,constraintNum,lc);
+
+    LPWriter::writeFixedLabels(ofs,constraintNum,fixedLabels);
 
 
     if(relLevel==LPModel::RELAXATION_NONE)
