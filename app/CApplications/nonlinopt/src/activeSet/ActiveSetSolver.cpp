@@ -32,6 +32,7 @@ void ActiveSetSolver::buildConstraintsMatrix()
     Constraints::ClosedAndConnected::closedConnectedContraints(lc,grid);
 
     CM.resize(lc.size()+2*numVars,numVars);
+    CM.setZero();
 
     Size currRow = 0;
     for(auto it=lc.begin();it!=lc.end();++it,++currRow)
@@ -53,6 +54,7 @@ void ActiveSetSolver::buildConstraintsMatrix()
     equalities = CM.block(0,0,fic,numVars);
 
     activeFilter.resize(2*numVars);
+    activeFilter.setZero();
     //Greater than Zero and smaller than One
     for(auto it=grid.pixelMap.begin();it!=grid.pixelMap.end();++it)
     {
@@ -147,14 +149,19 @@ double ActiveSetSolver::maxDeplacementOnDk(const Vector& x, const Vector& dk)
 
 ActiveSetSolver::Vector ActiveSetSolver::feasibleSolution(const SolutionPairVector& spv)
 {
+    //Notice that spv may come from a linearization of the formulation. In other words
+    //the size of spv may be larger than the number of variables.
     NonLinOpt::ActiveSetSolver::Vector v;
-    v.resize(spv.size());
+    v.resize(numVars);
     for(auto it=spv.begin();it!=spv.end();++it)
     {
         const unsigned long int& index = it->first;
 
-        if(index>numPixels) v.coeffRef( it->first - edgeOffset ) = it->second;
-        else v.coeffRef( it->first ) = it->second;
+        if(index < numVars)
+        {
+            if(index<numPixels) v.coeffRef( it->first - edgeOffset ) = it->second;
+            else v.coeffRef( it->first ) = it->second;
+        }
 
     }
 
@@ -192,30 +199,32 @@ ActiveSetSolver::Size ActiveSetSolver::countTrue(const FilterMatrix& fm)
 
 ActiveSetSolver::Size ActiveSetSolver::countLowerZeroInequalities(const Vector& v, const Matrix& activeSet)
 {
-    FilterMatrix result = ( (activeSet*v).array()<Vector::Zero(activeSet.rows()).array() ).matrix();
+    FilterMatrix result = ( (activeSet*v).array()<=Vector::Zero(activeSet.rows()).array() ).matrix();
     return countTrue(result);
 }
 
-bool ActiveSetSolver::testDirection(const Matrix& activeSet, const Vector& curDir, const Vector& deplVector, double step, Size currActive)
+bool ActiveSetSolver::testDirection(const Matrix& activeSet, const Vector& curDir, const Vector& deplVector, double step, Size currActive,
+                                    const Matrix& projM)
 {
     Vector nd1 = curDir + step*deplVector;
+    nd1 = projM*nd1;
     nd1 /= nd1.norm();
     Size p1 = countLowerZeroInequalities(nd1,activeSet);
 
-    return p1>=currActive;
+    return p1>currActive;
 }
 
 ActiveSetSolver::Vector ActiveSetSolver::findFeasibleDirection(const Vector& grad, const Matrix& activeSet)
 {
+
+    Matrix W = equalities.fullPivLu().kernel();
+    Matrix Q = W*( (W.transpose()*W).inverse() )*W.transpose();
 
     Matrix temp;
     temp.resize(1,grad.rows());
     temp.row(0)=grad.transpose();
 
     Matrix N = temp.fullPivLu().kernel();
-
-    Matrix W = equalities.fullPivLu().kernel();
-    Matrix Q = W*( (W.transpose()*W).inverse() )*W.transpose();
 
 
     Vector dk = -Q*grad;
@@ -233,8 +242,8 @@ ActiveSetSolver::Vector ActiveSetSolver::findFeasibleDirection(const Vector& gra
     std::cout << "*** Find feasible direction" << std::endl;
     while(p0<activeSet.rows())
     {
-//        std::cout << "Gradient times dk: " <<dk.dot(grad) << std::endl;
-//        std::cout << p0 << " out of " << activeSet.rows() << " inequalities are lower than zero for dk" << std::endl;
+        std::cout << "Gradient times dk: " <<dk.dot(grad) << std::endl;
+        std::cout << p0 << " out of " << activeSet.rows() << " inequalities are lower than zero for dk" << std::endl;
 
         i = (i+1) % N.cols();
         if(i==0)
@@ -242,12 +251,14 @@ ActiveSetSolver::Vector ActiveSetSolver::findFeasibleDirection(const Vector& gra
             step=-step;
             step*=2;
         }
-        if( testDirection(activeSet,dk,N.col(i),step,p0) )
+        if( testDirection(activeSet,dk,N.col(i),step,p0,Q) )
         {
             dk = dk + step*N.col(i);
-//            dk /= dk.norm();
+            dk = Q*dk;
+            dk /= dk.norm();
             p1 = countLowerZeroInequalities(dk,activeSet);
             p0=p1;
+            step=-0.01;
         }
 
     }
@@ -267,6 +278,7 @@ double ActiveSetSolver::minimize(Vector& x, int maxSteps)
     Vector nextX = x;
     while(maxSteps>0)
     {
+
         gradient(grad,nextX);
         Matrix AS = activeSet(nextX);
         if(AS.rows()>0)
@@ -274,11 +286,8 @@ double ActiveSetSolver::minimize(Vector& x, int maxSteps)
             Matrix AK = AS.fullPivLu().kernel();
             Matrix ASt = AS.transpose();
 
-            if(grad.norm() < TOLERANCE) break;
-            if( (AK.transpose()*grad).norm() < TOLERANCE  ) break;
-
             std::cout << "***Iteration" << std::endl;
-            std::cout << "### All x greater than zero: "
+            std::cout << "### All x greater or equal than zero: "
                       << ( ( (nextX.array()>=Vector::Zero(numVars).array()).all() )?'T':'F' )
                       << std::endl;
 
@@ -292,15 +301,15 @@ double ActiveSetSolver::minimize(Vector& x, int maxSteps)
                     break;
                 }
 
-                std::cout << "### Gradient is in the image of the active constraints matrix" << std::endl;
+                std::cout << "### Gradient is a linear combination of active set matrix column vectors,"
+                            "but some of its coordinates are positive" << std::endl;
 
-                dk = -AK*AK.transpose()*grad;
+                dk = findFeasibleDirection(grad,AS);
             }
             else
             {
                 std::cout << "### dk will be in the nullspace of active matrix" << std::endl;
                 dk = findFeasibleDirection(grad,AS);
-                //dk = -AK*AK.transpose()*grad;
             }
         }
         else
@@ -323,8 +332,6 @@ double ActiveSetSolver::minimize(Vector& x, int maxSteps)
 
         lbda = linearSearch(nextX,grad,dk,w);
         nextX = nextX + lbda*dk;
-
-//        std::cout << nextX << std::endl;
 
         for(int i=0;i<nextX.rows();++i)
         {

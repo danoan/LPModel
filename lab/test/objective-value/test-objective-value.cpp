@@ -109,49 +109,6 @@ bool countLinel(const Grid& grid, const Linel& linel, const SolutionPairVector& 
     return false;
 }
 
-double sqcEstimation(const Parameters& prm,const Grid& grid, const SolutionPairVector& spv)
-{
-    typedef DGtal::Z2i::Domain Domain;
-    typedef DGtal::Z2i::Point Point;
-
-    DigitalSet tempBall( Domain( 2*Point(-prm.radius,-prm.radius), 2*Point(prm.radius,prm.radius) ) );
-    tempBall = DIPaCUS::Shapes::ball(1.0,0,0,prm.radius);
-
-    double W = 0;
-    double C = tempBall.size() / 2.0;
-    double F = 9.0 / pow(prm.radius, 6.0);
-    double R = prm.radius;
-
-    DigitalSet trustPlusOpt = prm.odrModel.trustFRG;
-    trustPlusOpt.insert(prm.odrModel.optRegion.begin(),prm.odrModel.optRegion.end());
-
-    DIPaCUS::Misc::DigitalBallIntersection DBI = prm.handle.intersectionComputer(trustPlusOpt);
-
-    Domain domain = prm.odrModel.trustFRG.domain();
-    DigitalSet temp(domain);
-
-    double s=0;
-    int c=0;
-    for(auto it=grid.linelMap.begin();it!=grid.linelMap.end();++it)
-    {
-        if(countLinel(grid,it->second,spv))
-        {
-            temp.clear();
-            DBI(temp, Point(it->second.x,it->second.y));
-
-            double Ij = temp.size();
-            double k = Ij - C;
-
-            s += pow(k,2)*F;
-            std::cout << k << std::endl;
-            ++c;
-        }
-    }
-
-    return s;
-
-}
-
 int main()
 {
     typedef DIPaCUS::Shapes::DigitalSet DigitalSet;
@@ -174,14 +131,11 @@ int main()
     ActiveSetSolver::Vector v = solverAS.feasibleSolution(spv);
     adouble objectiveValue = solverAS.objective<adouble>(v)*scTerm.constants.at("weight-factor");
 
-    sqcEstimation(prm,grid,spv);
-
     DGtal::Z2i::KSpace kspace;
     kspace.init(dsInput.domain().lowerBound(),dsInput.domain().upperBound(),true);
     DGtal::Z2i::Curve curve;
     DIPaCUS::Misc::computeBoundaryCurve(curve,dsInput);
     alok(kspace,dsInput,curve.begin(),curve.end());
-    exit(1);
 
     std::cout << "Energy value: " << LPModel::Utils::sumSQC(dsInput) << std::endl;
     std::cout << "Objective value: " << objectiveValue << std::endl;

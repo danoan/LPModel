@@ -382,9 +382,6 @@ int main(int argc, char* argv[])
               << "with linearization level=" << resolveLinearizationLevelName( in.linearizationLevel ) << "\n"
               << "and optimization region width of " << in.optRegionWidth << " pixels...\n";
 
-    boost::filesystem::path p(in.outputPath);
-    boost::filesystem::create_directories(p.remove_filename());
-
     DigitalSet ds = loadImageAsDigitalSet(in.pgmInputImage);
 
 

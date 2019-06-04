@@ -4,12 +4,12 @@ project(lpmodel-lpwriter)
 add_library(lpwriter SHARED
         src/LPWriter.cpp)
 
-add_dependencies(lpwriter initialization terms constraints linearization)
+add_dependencies(lpwriter initialization${LINEL} terms${LINEL} constraints linearization)
 
 target_include_directories(lpwriter PRIVATE
         include
         ${CMAKE_SOURCE_DIR}/modules/constraints/include
-        ${CMAKE_SOURCE_DIR}/modules/initialization/include
+        ${CMAKE_SOURCE_DIR}/modules/initialization${LINEL}/include
         ${CMAKE_SOURCE_DIR}/modules/objective/include
         ${CMAKE_SOURCE_DIR}/modules/linearization/include
         ${CMAKE_SOURCE_DIR}/modules/terms/include
@@ -18,7 +18,7 @@ target_include_directories(lpwriter PRIVATE
         ${DGTAL_INCLUDE_DIRS})
 
 target_link_libraries(lpwriter
-        -lterms
+        -lterms${LINEL}
         -lconstraints
-        -linitialization
+        -linitialization${LINEL}
         -lscabolic-core)

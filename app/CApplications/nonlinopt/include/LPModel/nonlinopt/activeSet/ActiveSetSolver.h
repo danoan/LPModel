@@ -48,7 +48,7 @@ namespace LPModel
             ActiveSetSolver(const Grid& grid, const Term& term);
             Vector feasibleSolution(const SolutionPairVector& spv);
 
-            bool testDirection(const Matrix& activeSet, const Vector& curDir, const Vector& deplVector, double step, Size currActive);
+            bool testDirection(const Matrix& activeSet, const Vector& curDir, const Vector& deplVector, double step, Size currActive, const Matrix& projM);
 
             template<class TNUM, class TNUMARRAY>
             TNUM objective( const TNUMARRAY x) const
