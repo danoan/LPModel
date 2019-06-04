@@ -47,7 +47,6 @@ ActiveSetSolver::Vector convertToVector(const SolutionVector& sv)
     return v;
 }
 
-
 int main(int argc, char* argv[])
 {
     InputData id = readInput(argc,argv);
@@ -75,13 +74,13 @@ int main(int argc, char* argv[])
     double optValue = solverAS.minimize(v,id.iterations);
     std::cout << "Optvalue: " << optValue << std::endl;
 
-
+    std::cout << "Solution Vector: \n" << solverAS.solutionVector;
     SolutionVector sv = thresholdedSolution(solverAS.solutionVector,id.threshold);
 
     DigitalSet dsFinalSolution = LPModel::SolutionAssignment::digitalSetFromSolutionVector(sv,prm,grid);
     LPModel::Utils::exportImageFromDigitalSet(dsFinalSolution,id.outputPath);
 
-    NonLinOpt::Utils::printActiveSetVector(solverAS.solutionVector);
+    //NonLinOpt::Utils::printActiveSetVector(solverAS.solutionVector);
 
     std::cout << "SQC Before: " << LPModel::Utils::sumSQC(dsFeasibleSolution) << std::endl;
     std::cout << "SQC After: " << LPModel::Utils::sumSQC(dsFinalSolution) << std::endl;

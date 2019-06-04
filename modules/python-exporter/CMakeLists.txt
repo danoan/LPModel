@@ -2,12 +2,12 @@ cmake_minimum_required(VERSION 3.2)
 project(python-exporter)
 
 add_library(python-exporter SHARED src/PythonExporter.cpp )
-add_dependencies(python-exporter initialization constraints linearization lpwriter terms lpmodel-utils)
+add_dependencies(python-exporter initialization${LINEL} constraints linearization lpwriter terms${LINEL} lpmodel-utils)
 
 target_include_directories(python-exporter PRIVATE
         include
         ${LPMODEL_INCLUDE_DIR}/constraints/include
-        ${LPMODEL_INCLUDE_DIR}/initialization/include
+        ${LPMODEL_INCLUDE_DIR}/initialization${LINEL}/include
         ${LPMODEL_INCLUDE_DIR}/linearization/include
         ${LPMODEL_INCLUDE_DIR}/lpwriter/include
         ${LPMODEL_INCLUDE_DIR}/terms/include
@@ -20,8 +20,8 @@ target_include_directories(python-exporter PRIVATE
 target_link_libraries(python-exporter
         -llpwriter
         -lconstraints
-        -lterms
-        -linitialization
+        -lterms${LINEL}
+        -linitialization${LINEL}
         -lscabolic-core
         -ldipacus-derivates
         -ldipacus-components

@@ -28,6 +28,15 @@ namespace LPModel
                                                                         const Parameters& prm,
                                                                         const Grid& grid)
             {
+                typedef std::map<unsigned long int,double> FixedLabels;
+
+                FixedLabels fixedLabels;
+                for(auto it = grid.pixelMap.begin();it!=grid.pixelMap.end();++it)
+                {
+                    if(it->second.ct==Initialization::Pixel::Variable)
+                        fixedLabels[it->second.varIndex] = 1;
+                }
+
                 //Find a feasible solution
                 std::string lpOutputFile = outputFolder + "/temp.lp";
                 std::string solutionFile = outputFolder + "/temp.sol";
@@ -39,7 +48,7 @@ namespace LPModel
                 linearization.linearize(mergedTerm.binaryMap);
                 linearization.coupledLinearization(mergedTerm.ternaryMap);
 
-                LPWriter::writeLP(lpOutputFile,prm,grid,mergedTerm.unaryMap,linearization,RelaxationLevel::RELAXATION_ALL);
+                LPWriter::writeLP(lpOutputFile,prm,grid,mergedTerm.unaryMap,linearization,RelaxationLevel::RELAXATION_ALL,fixedLabels);
 
                 GLPK::glpk_solver(lpOutputFile,solutionFile);
 
@@ -49,6 +58,8 @@ namespace LPModel
 
                 return cleansedVector(spv);
             }
+
+
 
             void printActiveSetVector(const ActiveSetSolver::Vector& v)
             {

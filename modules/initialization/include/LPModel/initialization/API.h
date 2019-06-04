@@ -5,8 +5,8 @@
 #include <string>
 
 #include <DIPaCUS/base/Representation.h>
-#include "SCaBOliC/Core/ODRModel.h"
-#include "SCaBOliC/Core/ODRInterpixels.h"
+#include "SCaBOliC/Core/model/ODRModel.h"
+#include "SCaBOliC/Core/ODRInterpixels/ODRInterpixels.h"
 #include "DIPaCUS/derivates/Misc.h"
 #include "DIPaCUS/base/Representation.h"
 

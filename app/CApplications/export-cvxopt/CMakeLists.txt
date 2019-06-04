@@ -2,12 +2,12 @@ cmake_minimum_required(VERSION 3.2)
 project(export-cvxopt)
 
 add_executable(export-cvxopt export-cvxopt.cpp src/InputReader.cpp)
-add_dependencies(export-cvxopt constraints initialization linearization lpwriter solassign terms lpmodel-utils python-exporter)
+add_dependencies(export-cvxopt constraints initialization${LINEL} linearization lpwriter solassign terms${LINEL} lpmodel-utils python-exporter)
 
 target_include_directories(export-cvxopt PRIVATE
         include
         ${LPMODEL_INCLUDE_DIR}/constraints/include
-        ${LPMODEL_INCLUDE_DIR}/initialization/include
+        ${LPMODEL_INCLUDE_DIR}/initialization${LINEL}/include
         ${LPMODEL_INCLUDE_DIR}/linearization/include
         ${LPMODEL_INCLUDE_DIR}/lpwriter/include
         ${LPMODEL_INCLUDE_DIR}/terms/include
@@ -22,8 +22,8 @@ target_link_libraries(export-cvxopt
         -lpython-exporter
         -llpwriter
         -lconstraints
-        -lterms
-        -linitialization
+        -lterms${LINEL}
+        -linitialization${LINEL}
         -lscabolic-core
         -ldipacus-derivates
         -ldipacus-components

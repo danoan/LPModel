@@ -2,12 +2,12 @@ cmake_minimum_required(VERSION 3.2)
 project(export-cplex-qp)
 
 add_executable(export-cplex-qp export-cplex-qp.cpp src/InputReader.cpp)
-add_dependencies(export-cplex-qp constraints initialization linearization lpwriter solassign terms lpmodel-utils)
+add_dependencies(export-cplex-qp constraints initialization${LINEL} linearization lpwriter solassign terms${LINEL} lpmodel-utils)
 
 target_include_directories(export-cplex-qp PRIVATE
         include
         ${LPMODEL_INCLUDE_DIR}/constraints/include
-        ${LPMODEL_INCLUDE_DIR}/initialization/include
+        ${LPMODEL_INCLUDE_DIR}/initialization${LINEL}/include
         ${LPMODEL_INCLUDE_DIR}/linearization/include
         ${LPMODEL_INCLUDE_DIR}/lpwriter/include
         ${LPMODEL_INCLUDE_DIR}/terms/include
@@ -20,8 +20,8 @@ target_include_directories(export-cplex-qp PRIVATE
 target_link_libraries(export-cplex-qp
         -llpwriter
         -lconstraints
-        -lterms
-        -linitialization
+        -lterms${LINEL}
+        -linitialization${LINEL}
         -lscabolic-core
         -ldipacus-derivates
         -ldipacus-components

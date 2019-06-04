@@ -7,13 +7,13 @@ add_executable(nonlinopt
         src/utils/utils.cpp
         nonlinopt.cpp)
 
-add_dependencies(nonlinopt constraints initialization solassign terms lpwriter lpmodel-glpk)
+add_dependencies(nonlinopt constraints initialization${LINEL} solassign terms${LINEL} lpwriter lpmodel-glpk lpmodel-utils)
 
 target_include_directories(nonlinopt PRIVATE
         include
         ${ADEPT_INCLUDE_DIRS}
-        ${LPMODEL_INCLUDE_DIR}/initialization/include
-        ${LPMODEL_INCLUDE_DIR}/terms/include
+        ${LPMODEL_INCLUDE_DIR}/initialization${LINEL}/include
+        ${LPMODEL_INCLUDE_DIR}/terms${LINEL}/include
         ${LPMODEL_INCLUDE_DIR}/constraints/include
         ${LPMODEL_INCLUDE_DIR}/lpwriter/include
         ${LPMODEL_INCLUDE_DIR}/linearization/include
@@ -31,9 +31,9 @@ target_link_libraries( nonlinopt
         -lsolassign
         -llpmodel-utils
         -llpmodel-glpk
-        -linitialization
+        -linitialization${LINEL}
         -llpwriter
-        -lterms
+        -lterms${LINEL}
         -lconstraints
         -ldipacus-base
         -ldipacus-derivates
