@@ -4,7 +4,13 @@ project(lpmodel-lpwriter)
 add_library(lpwriter SHARED
         src/LPWriter.cpp)
 
-add_dependencies(lpwriter initialization${LINEL} terms${LINEL} constraints linearization)
+if(${USE_REMOTE_REPOSITORIES})
+    add_dependencies(lpwriter scabolic initialization${LINEL} terms${LINEL} constraints linearization)
+else()
+    add_dependencies(lpwriter initialization${LINEL} terms${LINEL} constraints linearization)
+endif()
+
+
 
 target_include_directories(lpwriter PRIVATE
         include

@@ -12,15 +12,15 @@ add_dependencies(nonlinopt constraints initialization${LINEL} solassign terms${L
 target_include_directories(nonlinopt PRIVATE
         include
         ${ADEPT_INCLUDE_DIRS}
-        ${LPMODEL_INCLUDE_DIR}/initialization${LINEL}/include
-        ${LPMODEL_INCLUDE_DIR}/terms${LINEL}/include
-        ${LPMODEL_INCLUDE_DIR}/constraints/include
-        ${LPMODEL_INCLUDE_DIR}/lpwriter/include
-        ${LPMODEL_INCLUDE_DIR}/linearization/include
-        ${LPMODEL_INCLUDE_DIR}/solassign/include
-        ${LPMODEL_INCLUDE_DIR}/types/include
-        ${LPMODEL_INCLUDE_DIR}/utils/include
-        ${LPMODEL_INCLUDE_DIR}/glpk/include
+        ${CMAKE_SOURCE_DIR}/modules/initialization${LINEL}/include
+        ${CMAKE_SOURCE_DIR}/modules/terms${LINEL}/include
+        ${CMAKE_SOURCE_DIR}/modules/constraints/include
+        ${CMAKE_SOURCE_DIR}/modules/lpwriter/include
+        ${CMAKE_SOURCE_DIR}/modules/linearization/include
+        ${CMAKE_SOURCE_DIR}/modules/solassign/include
+        ${CMAKE_SOURCE_DIR}/modules/types/include
+        ${CMAKE_SOURCE_DIR}/modules/utils/include
+        ${CMAKE_SOURCE_DIR}/modules/glpk/include
         ${SCABOLIC_INCLUDE_DIRS}
         ${DIPACUS_INCLUDE_DIRS}
         ${DGTAL_INCLUDE_DIRS}

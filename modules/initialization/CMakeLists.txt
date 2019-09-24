@@ -1,10 +1,6 @@
 cmake_minimum_required(VERSION 3.8)
 project(lpmodel-initialization)
 
-find_package(DGtal REQUIRED)
-find_package(OpenCV REQUIRED)
-
-
 add_library(initialization SHARED
         src/Shapes.cpp
         src/control/CPixel.cpp
@@ -12,6 +8,11 @@ add_library(initialization SHARED
         src/control/CLinel.cpp
         src/control/CGrid.cpp
         src/API.cpp)
+
+
+if(${USE_REMOTE_REPOSITORIES})
+    add_dependencies(initialization dipacus scabolic)
+endif()
 
 target_link_libraries(initialization
         -lscabolic-core

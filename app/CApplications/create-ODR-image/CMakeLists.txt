@@ -6,7 +6,7 @@ add_dependencies(create-ODR-image initialization${LINEL})
 
 target_include_directories(create-ODR-image PRIVATE
         include
-        ${LPMODEL_INCLUDE_DIR}/initialization${LINEL}/include
+        ${CMAKE_SOURCE_DIR}/modules/initialization${LINEL}/include
         ${DIPACUS_INCLUDE_DIRS}
         ${SCABOLIC_INCLUDE_DIRS}
         ${DGTAL_INCLUDE_DIRS})

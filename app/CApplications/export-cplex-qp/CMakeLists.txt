@@ -6,13 +6,13 @@ add_dependencies(export-cplex-qp constraints initialization${LINEL} linearizatio
 
 target_include_directories(export-cplex-qp PRIVATE
         include
-        ${LPMODEL_INCLUDE_DIR}/constraints/include
-        ${LPMODEL_INCLUDE_DIR}/initialization${LINEL}/include
-        ${LPMODEL_INCLUDE_DIR}/linearization/include
-        ${LPMODEL_INCLUDE_DIR}/lpwriter/include
-        ${LPMODEL_INCLUDE_DIR}/terms/include
-        ${LPMODEL_INCLUDE_DIR}/utils/include
-        ${LPMODEL_INCLUDE_DIR}/types/include
+        ${CMAKE_SOURCE_DIR}/modules/constraints/include
+        ${CMAKE_SOURCE_DIR}/modules/initialization${LINEL}/include
+        ${CMAKE_SOURCE_DIR}/modules/linearization/include
+        ${CMAKE_SOURCE_DIR}/modules/lpwriter/include
+        ${CMAKE_SOURCE_DIR}/modules/terms/include
+        ${CMAKE_SOURCE_DIR}/modules/utils/include
+        ${CMAKE_SOURCE_DIR}/modules/types/include
         ${DIPACUS_INCLUDE_DIRS}
         ${SCABOLIC_INCLUDE_DIRS}
         ${DGTAL_INCLUDE_DIRS})

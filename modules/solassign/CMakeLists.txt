@@ -12,7 +12,7 @@ target_include_directories(solassign PRIVATE
         include
         ${CMAKE_SOURCE_DIR}/modules/initialization${LINEL}/include
         ${CMAKE_SOURCE_DIR}/modules/terms/include
-        ${DIPACUS_INCLUDE_DIRS}
+        ${SCABOLIC_INCLUDE_DIRS}
         ${DGTAL_INCLUDE_DIRS})
 
 target_link_libraries(solassign PRIVATE

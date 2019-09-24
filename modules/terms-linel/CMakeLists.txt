@@ -20,5 +20,5 @@ add_dependencies(terms-linel initialization-linel)
 target_include_directories(terms-linel PRIVATE
         include
         ${CMAKE_SOURCE_DIR}/modules/initialization-linel/include
-        ${DIPACUS_INCLUDE_DIRS}
+        ${SCABOLIC_INCLUDE_DIRS}
         ${DGTAL_INCLUDE_DIRS})

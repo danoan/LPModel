@@ -7,7 +7,12 @@ add_library(lpmodel-utils SHARED
         src/dispUtils.cpp
         src/compUtils.cpp)
 
-add_dependencies(lpmodel-utils initialization${LINEL})
+if(${USE_REMOTE_REPOSITORIES})
+    add_dependencies(lpmodel-utils scabolic initialization${LINEL})
+else()
+    add_dependencies(lpmodel-utils initialization${LINEL})
+endif()
+
 
 target_include_directories(lpmodel-utils PRIVATE
         include

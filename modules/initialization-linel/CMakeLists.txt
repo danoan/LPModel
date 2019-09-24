@@ -13,6 +13,10 @@ add_library(initialization-linel SHARED
         src/control/CGrid.cpp
         src/API.cpp)
 
+if(${USE_REMOTE_REPOSITORIES})
+    add_dependencies(initialization-linel dipacus scabolic)
+endif()
+
 target_link_libraries(initialization-linel
         -lscabolic-core
         -lscabolic-energy

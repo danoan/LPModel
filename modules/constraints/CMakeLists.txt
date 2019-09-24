@@ -12,4 +12,5 @@ target_include_directories(constraints PRIVATE
         include
         ${CMAKE_SOURCE_DIR}/modules/initialization${LINEL}/include
         ${CMAKE_SOURCE_DIR}/modules/terms/include
+        ${SCABOLIC_INCLUDE_DIRS}
         ${DGTAL_INCLUDE_DIRS})

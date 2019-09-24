@@ -22,7 +22,7 @@ namespace LPModel
                              const Grid& grid,
                              double weight);
 
-                inline Point fromInterpixelToPixelSpace(const Point& ipPoint){ return (ipPoint + Point(1,1))/2.0;}
+                inline Point fromInterpixelToPixelSpace(const Point& ipPoint){ return Point( (int) (ipPoint[0]+1)/2, (int) (ipPoint[1]+1)/2 );}
                 inline Point fromPixelToInterpixelSpace(const Point& pPoint){ return pPoint*2 - Point(1,1);}
             }
         }
