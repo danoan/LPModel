@@ -49,6 +49,8 @@ CLinel::KPoint CLinel::Internal::findAuxiliarPixelCoord(const PixelMap& pixelMap
     {
         if(it->second.ct==ct) return it->first;
     }
+
+    throw std::runtime_error("Auxiliar Pixel not found!");
 }
 
 void CLinel::Internal::auxiliaryMap(AuxLinelMap& auxLinelMap,
