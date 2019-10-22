@@ -32,7 +32,7 @@ Constants CConstants::setConstants(const Parameters &prm)
         cc[*it] = pow(k, 2);
         W += cc[*it];
 
-        uc[*it] = 2*k+1;
+        uc[*it] = 2*k;
     }
 
     return Constants(W,C,F,R,cc,uc);

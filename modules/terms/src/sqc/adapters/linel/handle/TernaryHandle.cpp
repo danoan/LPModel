@@ -10,5 +10,13 @@ void TernaryHandle::operator()(const Point &linel,
     ti << linel << pixel1 << pixel2;
 
     if(this->tm.find(ti)==this->tm.end()) this->tm[ti]=0;
-    this->tm[ti]+=2;
+
+    if(pixel1==pixel2)
+    {
+        this->tm[ti]+=1;
+    }else
+    {
+        this->tm[ti]+=2;
+    }
+
 }

@@ -25,9 +25,8 @@ void IteratorManager::run(const Parameters &prm, const BinaryCallback &bcbk, con
         {
             bcbk(linel,*pit);
 
-            auto npit = pit;
-            ++npit;
-            for(;npit!=temp.end();++npit)
+
+            for(auto npit = pit;npit!=temp.end();++npit)
             {
                 tcbk(linel,*pit,*npit);
             }
