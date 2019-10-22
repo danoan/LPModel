@@ -2,7 +2,6 @@ cmake_minimum_required(VERSION 3.8)
 project(lpmodel-initialization)
 
 add_library(initialization SHARED
-        src/Shapes.cpp
         src/control/CPixel.cpp
         src/control/CEdge.cpp
         src/control/CLinel.cpp

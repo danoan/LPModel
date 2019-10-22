@@ -105,23 +105,17 @@ Parameters API::initParameters(const DigitalSet &originalDS,int optRegionWidth)
     DigitalSet boundary(domain);
     DigitalSet optRegion(domain);
 
-    double radius = 3;
+    double radius = 5;
     double gridStep = 1.0;
 
-    ODRInterpixels odrInterpixels(ODRModel::AC_LINEL,
-                                  ODRModel::CM_PIXEL,
-                                  radius,
+    ODRInterpixels odrInterpixels(radius,
                                   gridStep,
                                   optRegionWidth,
                                   ODRModel::LevelDefinition::LD_CloserFromCenter,
-                                  ODRModel::FourNeighborhood,
-                                  ODRModel::StructuringElementType::RECT,
-                                  true);
+                                  ODRModel::FourNeighborhood);
 
-    ODRModel odrModel = odrInterpixels.createODR(ODRModel::OM_CorrectConvexities,
-                                                 ODRModel::AM_AroundBoundary,
-                                                 originalDS,
-                                                 true);
+    ODRModel odrModel = odrInterpixels.createODR(originalDS,
+                                                 ODRModel::OM_CorrectConvexities);
 
     DigitalSet extendedOptRegion = Internal::extendedOptRegion(odrModel);
     DigitalSet extendedAppRegion = Internal::extendedAppRegion(odrModel.applicationRegion,extendedOptRegion);

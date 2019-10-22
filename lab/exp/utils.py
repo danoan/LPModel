@@ -1,7 +1,7 @@
 import subprocess,sys,os
 
-PROJECT_FOLDER="/home-local/dantu1/GIT/PhD/LPModel"
-BIN_FOLDER="%s/%s" % (PROJECT_FOLDER,"cmake-build-debug/CApplications")
+PROJECT_FOLDER="/home/dantu/GIT/PhD/LPModel"
+BIN_FOLDER="%s/%s" % (PROJECT_FOLDER,"cmake-build-debug/app/CApplications")
 if 'GUROBI_HOME' in os.environ.keys():
     GUROBI_HOME=os.environ['GUROBI_HOME']
 else:
@@ -120,7 +120,7 @@ def exportQP(shapeName,shapePath,outputFolder,optWidth=1,sqWeight=1,dataWeight=0
     [-r Relaxation level {none,original,auxiliar,all}. Default: none
     """
 
-    outputPath = "%s/%s" % (outputFolder,"formulation.qp")
+    outputPath = "%s/%s" % (outputFolder,"formulation.lp")
 
     print("\n-------------Exporting QP-------------\n")
     binary = "%s/%s" % (BIN_FOLDER,"export-cplex-qp/export-cplex-qp")

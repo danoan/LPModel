@@ -8,15 +8,15 @@ add_library(lpmodel-utils SHARED
         src/compUtils.cpp)
 
 if(${USE_REMOTE_REPOSITORIES})
-    add_dependencies(lpmodel-utils scabolic initialization${LINEL})
+    add_dependencies(lpmodel-utils scabolic initialization)
 else()
-    add_dependencies(lpmodel-utils initialization${LINEL})
+    add_dependencies(lpmodel-utils initialization)
 endif()
 
 
 target_include_directories(lpmodel-utils PRIVATE
         include
-        ${CMAKE_SOURCE_DIR}/modules/initialization${LINEL}/include
+        ${CMAKE_SOURCE_DIR}/modules/initialization/include
         ${DIPACUS_INCLUDE_DIRS}
         ${DGTAL_INCLUDE_DIRS})
 

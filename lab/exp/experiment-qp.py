@@ -3,8 +3,8 @@
 import subprocess,sys,os
 from utils import *
 
-PROJECT_FOLDER="/home-local/dantu1/GIT/PhD/LPModel"
-BIN_FOLDER="%s/%s" % (PROJECT_FOLDER,"cmake-build-debug/CApplications")
+PROJECT_FOLDER="/home/dantu/GIT/PhD/LPModel"
+BIN_FOLDER="%s/%s" % (PROJECT_FOLDER,"cmake-build-debug/app/CApplications")
 if 'GUROBI_HOME' in os.environ.keys():
     GUROBI_HOME=os.environ['GUROBI_HOME']
 else:
@@ -23,14 +23,14 @@ L_PIXEL_LINEL="pixel-linel"       #Linearize pixel linel second order terms
 L_ALL_COUPLED="all-coupled"       #Linearize all variables with coupling
 L_ALL_UNCOUPLED="all-uncoupled"   #Linearize all variables with no coupling
 
-SHAPE_CONFIGURATIONS=["square", "flower"]
+SHAPE_CONFIGURATIONS=["square", "triangle"]
 GRID_CONFIGURATIONS=[1.0]
 OPTWIDTH_CONFIGURATIONS=[0,1]
 SQWEIGTH_CONFIGURATIONS=[1.0]
 DATAWEIGTH_CONFIGURATIONS=[0.0]
-RELAXATION_CONFIGURATIONS=[R_NONE, R_ORIGINAL, R_AUXILIAR, R_ALL]
+RELAXATION_CONFIGURATIONS=[R_ALL, R_ORIGINAL, R_AUXILIAR, R_NONE]
 LINEARIZATION_CONFIGURATIONS=[L_PIXEL_PAIR,L_PIXEL_LINEL]
-MAX_ITERATIONS=3
+MAX_ITERATIONS=5
 
 
 CONFIG_LIST=[ (SHAPE_CONFIGURATIONS,"shape"),
@@ -44,7 +44,7 @@ CONFIG_LIST=[ (SHAPE_CONFIGURATIONS,"shape"),
 
 def main():
     argc = len(sys.argv)
-    baseFolder = "%s/%s" % (PROJECT_FOLDER,"CApplications/scripts/output/experiment-qp")
+    baseFolder = "%s/%s" % (PROJECT_FOLDER,"lab/exp/output/experiment-qp")
 
     shape_gs_1_output = "%s/%s" % (baseFolder,"shapes/grid-1.0")
     shape_gs_05_output = "%s/%s" % (baseFolder,"shapes/grid-0.5")

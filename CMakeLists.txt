@@ -26,13 +26,11 @@ set(SCABOLIC_LIBS_DIR ${EXTPROJECTS_BUILD_DIR}/lib CACHE PATH "SCaBoliC libs dir
 find_package(DGtal REQUIRED)
 find_package(OpenCV REQUIRED)
 
-set(LINEL "-linel")
-
 link_directories(${CMAKE_BINARY_DIR}/modules/constraints
-        ${CMAKE_BINARY_DIR}/modules/initialization${LINEL}
+        ${CMAKE_BINARY_DIR}/modules/initialization
         ${CMAKE_BINARY_DIR}/modules/linearization
         ${CMAKE_BINARY_DIR}/modules/lpwriter
-        ${CMAKE_BINARY_DIR}/modules/terms${LINEL}
+        ${CMAKE_BINARY_DIR}/modules/terms
         ${CMAKE_BINARY_DIR}/modules/utils
         ${CMAKE_BINARY_DIR}/modules/solassign
         ${CMAKE_BINARY_DIR}/modules/python-exporter
@@ -47,11 +45,11 @@ if(${USE_REMOTE_REPOSITORIES})
 endif()
 
 add_subdirectory(modules/constraints)
-add_subdirectory(modules/initialization${LINEL})
+add_subdirectory(modules/initialization)
 add_subdirectory(modules/linearization)
 add_subdirectory(modules/lpwriter)
 add_subdirectory(modules/solassign)
-add_subdirectory(modules/terms${LINEL})
+add_subdirectory(modules/terms)
 add_subdirectory(modules/utils)
 add_subdirectory(modules/python-exporter)
 add_subdirectory(modules/glpk)

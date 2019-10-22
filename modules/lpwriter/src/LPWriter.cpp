@@ -322,7 +322,7 @@ void LPWriter::writeLP(const std::string& outputFilePath,
 
 
 
-    ofs << "\nEnd";
+    ofs << "\nEnd\n";
 
     ofs.flush();
     ofs.close();

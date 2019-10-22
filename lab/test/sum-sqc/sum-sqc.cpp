@@ -1,8 +1,6 @@
 #include <DGtal/helpers/StdDefs.h>
-#include "geoc/api/gridCurve/Curvature.hpp"
-#include "LPModel/initialization/Shapes.h"
-
-using namespace LPModel;
+#include <DIPaCUS/base/Shapes.h>
+#include <geoc/api/gridCurve/Curvature.hpp>
 
 typedef DGtal::Z2i::Curve Curve;
 typedef GEOC::API::GridCurve::Curvature::EstimationsVector EstimationVector;
@@ -34,9 +32,9 @@ int main(int argc, char* argv[])
 {
 
 
-    DigitalSet square1 = Initialization::Shapes::square(1.0);
-    DigitalSet square2 = Initialization::Shapes::square(0.5);
-    DigitalSet square4 = Initialization::Shapes::square(0.25);
+    DigitalSet square1 = DIPaCUS::Shapes::square(1.0);
+    DigitalSet square2 = DIPaCUS::Shapes::square(0.5);
+    DigitalSet square4 = DIPaCUS::Shapes::square(0.25);
 
     std::cout << square1.size() << std::endl;
     std::cout << square2.size() << std::endl;

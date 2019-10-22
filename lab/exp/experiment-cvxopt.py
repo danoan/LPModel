@@ -15,9 +15,9 @@ L_PIXEL_LINEL="pixel-linel"       #Linearize pixel linel second order terms
 L_ALL_COUPLED="all-coupled"       #Linearize all variables with coupling
 L_ALL_UNCOUPLED="all-uncoupled"   #Linearize all variables with no coupling
 
-SHAPE_CONFIGURATIONS=["square"]
+SHAPE_CONFIGURATIONS=["square","triangle"]
 GRID_CONFIGURATIONS=[1.0]
-OPTWIDTH_CONFIGURATIONS=[0,1,2]
+OPTWIDTH_CONFIGURATIONS=[0,1]
 SQWEIGTH_CONFIGURATIONS=[1.0]
 DATAWEIGTH_CONFIGURATIONS=[0.0]
 RELAXATION_CONFIGURATIONS=[R_NONE]
@@ -31,7 +31,7 @@ CONFIG_LIST=[ (SHAPE_CONFIGURATIONS,"shape"),
               (DATAWEIGTH_CONFIGURATIONS,"dataWeight"),
               (RELAXATION_CONFIGURATIONS,"relaxationLevel")]
 
-PYTHON_CONTAINER = "%s/%s" % (PROJECT_FOLDER,"PythonApplications/convex-solver")
+PYTHON_CONTAINER = "%s/%s" % (PROJECT_FOLDER,"app/PythonApplications/convex-solver")
 
 
 def createPythonContainer(pythonContainerSource,pythonContainerTarget):
@@ -87,7 +87,7 @@ def cvxOpt(pythonContainer,logFilePath):
 
 
 def main():
-    baseFolder = "%s/%s" % (PROJECT_FOLDER,"CApplications/scripts/output/experiment-cvxopt")
+    baseFolder = "%s/%s" % (PROJECT_FOLDER,"lab/exp/output/experiment-cvxopt")
 
     shape_gs_1_output = "%s/%s" % (baseFolder,"shapes/grid-1.0")
 

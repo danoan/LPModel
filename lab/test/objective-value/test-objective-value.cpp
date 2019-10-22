@@ -72,7 +72,7 @@ void alok(const KSpace& kspace, const DigitalSet& digShape, TLinelIterator begin
     }
 }
 
-SolutionPairVector initialFeasibleSolution(const Parameters& prm, const Grid& grid, const Term& scTerm)
+SolutionPairVector initialFeasibleSolution(const std::string& outputFolder,const Parameters& prm, const Grid& grid, const Term& scTerm)
 {
     FixedLabels fixedLabels;
     for(auto it = grid.pixelMap.begin();it!=grid.pixelMap.end();++it)
@@ -86,10 +86,10 @@ SolutionPairVector initialFeasibleSolution(const Parameters& prm, const Grid& gr
     linearization.linearize(scTerm.binaryMap);
     linearization.coupledLinearization(scTerm.ternaryMap);
 
-    std::string outputLPFormulationPath = "/home-local/dantu1/GIT/PhD/LPModel/lab/test/objective-value/output/formulation.lp";
+    std::string outputLPFormulationPath = outputFolder + "/formulation.lp";
     writeLP(outputLPFormulationPath,prm,grid,scTerm.unaryMap,linearization,LPModel::RELAXATION_NONE,fixedLabels);
 
-    std::string outputLPSolution = "/home-local/dantu1/GIT/PhD/LPModel/lab/test/objective-value/output/solution.lp";
+    std::string outputLPSolution = outputFolder + "/solution.lp";
     glpk_solver(outputLPFormulationPath,outputLPSolution);
 
     SolutionPairVector spv = solutionPairVector(outputLPSolution,prm,grid);
@@ -109,22 +109,31 @@ bool countLinel(const Grid& grid, const Linel& linel, const SolutionPairVector& 
     return false;
 }
 
-int main()
+int main(int argc, char* argv[])
 {
     typedef DIPaCUS::Shapes::DigitalSet DigitalSet;
     int levels = 0;
 
+    if(argc<2)
+    {
+        std::cerr << "Specify an output folder.\n";
+        exit(1);
+    }
+
+    std::string outputFolder = argv[1];
+
     DigitalSet dsInput = DIPaCUS::Shapes::square(1.0);
     Parameters prm = API::initParameters(dsInput,
                                          levels);
+
     Grid grid = API::createGrid(prm.odrModel.optRegion,
                                 prm);
 
-    LPModel::Utils::exportODRModel(prm,"/home-local/dantu1/GIT/PhD/LPModel/lab/test/objective-value/output/odrModel.eps");
+    LPModel::Utils::exportODRModel(prm,outputFolder + "/odrModel.eps");
 
     Term scTerm = SquaredCurvature::API::prepare(prm,grid,1.0);
 
-    SolutionPairVector spv = initialFeasibleSolution(prm,grid,scTerm);
+    SolutionPairVector spv = initialFeasibleSolution(outputFolder,prm,grid,scTerm);
 
 
     ActiveSetSolver solverAS(grid,scTerm);

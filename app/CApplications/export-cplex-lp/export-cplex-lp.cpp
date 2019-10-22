@@ -12,7 +12,6 @@
 #include <LPModel/terms/API.h>
 #include "LPModel/initialization/API.h"
 
-#include "LPModel/initialization/Shapes.h"
 #include "LPModel/terms/sqc/CSqc.h"
 #include "LPModel/constraints/ClosedAndConnected.h"
 
@@ -41,14 +40,6 @@ DigitalSet loadImageAsDigitalSet(const std::string& imageFilePath)
 int main(int argc, char* argv[])
 {
     InputData in = readInput(argc,argv);
-    std::cerr << "Preparing LP for image: " << in.pgmInputImage << "\n"
-              << "with sq-weight=" << in.sqWeight << "; data-weight=" << in.dataWeight << "\n"
-              << "with relaxation level=" << resolveRelaxationLevelName(in.relaxationLevel) << "\n"
-              << "with linearization level=" << resolveLinearizationLevelName(in.linearizationLevel) << "\n"
-              << "; and optimization region width of " << in.optRegionWidth << " ...\n";
-
-
-
     DigitalSet ds = loadImageAsDigitalSet(in.pgmInputImage);
     
 
@@ -90,6 +81,8 @@ int main(int argc, char* argv[])
 
 
     LPWriter::writeLP(in.outputPath,prm,grid,mergedTerm.unaryMap,linearization,in.relaxationLevel);
+    std::ofstream ofs(in.outputPath + "/inputData.txt");
+    printInputData(ofs,in);
 
 
     return 0;

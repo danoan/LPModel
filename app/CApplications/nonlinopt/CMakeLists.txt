@@ -7,13 +7,13 @@ add_executable(nonlinopt
         src/utils/utils.cpp
         nonlinopt.cpp)
 
-add_dependencies(nonlinopt constraints initialization${LINEL} solassign terms${LINEL} lpwriter lpmodel-glpk lpmodel-utils)
+add_dependencies(nonlinopt constraints initialization solassign terms lpwriter lpmodel-glpk lpmodel-utils)
 
 target_include_directories(nonlinopt PRIVATE
         include
         ${ADEPT_INCLUDE_DIRS}
-        ${CMAKE_SOURCE_DIR}/modules/initialization${LINEL}/include
-        ${CMAKE_SOURCE_DIR}/modules/terms${LINEL}/include
+        ${CMAKE_SOURCE_DIR}/modules/initialization/include
+        ${CMAKE_SOURCE_DIR}/modules/terms/include
         ${CMAKE_SOURCE_DIR}/modules/constraints/include
         ${CMAKE_SOURCE_DIR}/modules/lpwriter/include
         ${CMAKE_SOURCE_DIR}/modules/linearization/include
@@ -31,9 +31,9 @@ target_link_libraries( nonlinopt
         -lsolassign
         -llpmodel-utils
         -llpmodel-glpk
-        -linitialization${LINEL}
+        -linitialization
         -llpwriter
-        -lterms${LINEL}
+        -lterms
         -lconstraints
         -ldipacus-base
         -ldipacus-derivates

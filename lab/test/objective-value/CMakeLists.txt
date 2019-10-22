@@ -6,11 +6,11 @@ add_executable(test-objective-value
         ${CMAKE_SOURCE_DIR}/app/CApplications/nonlinopt/src/activeSet/ActiveSetSolver.cpp)
 
 
-add_dependencies(test-objective-value initialization${LINEL} constraints terms${LINEL} lpwriter lpmodel-glpk lpmodel-utils)
+add_dependencies(test-objective-value initialization constraints terms lpwriter lpmodel-glpk lpmodel-utils)
 
 target_include_directories(test-objective-value PRIVATE
         ${ADEPT_INCLUDE_DIRS}
-        ${CMAKE_SOURCE_DIR}/modules/initialization${LINEL}/include
+        ${CMAKE_SOURCE_DIR}/modules/initialization/include
         ${CMAKE_SOURCE_DIR}/modules/constraints/include
         ${CMAKE_SOURCE_DIR}/modules/terms/include
         ${CMAKE_SOURCE_DIR}/modules/lpwriter/include
@@ -28,9 +28,9 @@ target_link_libraries(test-objective-value
         -llpmodel-glpk
         -llpmodel-utils
         -lsolassign
-        -linitialization${LINEL}
+        -linitialization
         -lconstraints
-        -lterms${LINEL}
+        -lterms
         -llpwriter
         -lscabolic-core
         -ldipacus-derivates

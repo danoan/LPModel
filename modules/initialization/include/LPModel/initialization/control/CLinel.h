@@ -66,13 +66,13 @@ namespace LPModel
                 typedef std::vector<SignedKPoint> IncidentLinels;
                 typedef std::vector<KPoint> IncidentPixels;
 
-                void RELAXATION_AUXILIARyMap(AuxLinelMap& auxLinelMap,
+                void auxiliaryMap(AuxLinelMap& auxLinelMap,
                                   const PixelMap& pixelMap);
 
                 IncidentLinels incidentLinels(const KPoint& pixel);
                 IncidentPixels incidentPixels(const _Linel &linel);
 
-                KPoint findRELAXATION_AUXILIARPixelCoord(const PixelMap& pixelMap,
+                KPoint findAuxiliarPixelCoord(const PixelMap& pixelMap,
                                               Pixel::CellType ct);
 
                 void fixInvalidAuxPixels(AuxLinelMap& auxLinelMap,

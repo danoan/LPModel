@@ -5,16 +5,16 @@ add_library(python-exporter SHARED src/PythonExporter.cpp )
 
 
 if(${USE_REMOTE_REPOSITORIES})
-    add_dependencies(python-exporter dipacus scabolic initialization${LINEL} constraints linearization lpwriter terms${LINEL} lpmodel-utils)
+    add_dependencies(python-exporter dipacus scabolic initialization constraints linearization lpwriter terms lpmodel-utils)
 else()
-    add_dependencies(python-exporter initialization${LINEL} constraints linearization lpwriter terms${LINEL} lpmodel-utils)
+    add_dependencies(python-exporter initialization constraints linearization lpwriter terms lpmodel-utils)
 endif()
 
 
 target_include_directories(python-exporter PRIVATE
         include
         ${CMAKE_SOURCE_DIR}/modules/constraints/include
-        ${CMAKE_SOURCE_DIR}/modules/initialization${LINEL}/include
+        ${CMAKE_SOURCE_DIR}/modules/initialization/include
         ${CMAKE_SOURCE_DIR}/modules/linearization/include
         ${CMAKE_SOURCE_DIR}/modules/lpwriter/include
         ${CMAKE_SOURCE_DIR}/modules/terms/include
@@ -27,8 +27,8 @@ target_include_directories(python-exporter PRIVATE
 target_link_libraries(python-exporter
         -llpwriter
         -lconstraints
-        -lterms${LINEL}
-        -linitialization${LINEL}
+        -lterms
+        -linitialization
         -lscabolic-core
         -ldipacus-derivates
         -ldipacus-components

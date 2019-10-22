@@ -12,7 +12,6 @@
 #include <LPModel/terms/API.h>
 
 #include "LPModel/initialization/API.h"
-#include "LPModel/initialization/Shapes.h"
 
 #include "LPModel/terms/sqc/CSqc.h"
 #include "LPModel/constraints/ClosedAndConnected.h"

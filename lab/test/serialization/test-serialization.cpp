@@ -1,7 +1,7 @@
 #include <boost/filesystem.hpp>
 
 #include <SCaBOliC/Core/display.h>
-#include <SCaBOliC/Core/ODRLinels/ODRLinels.h>
+#include <SCaBOliC/Core//ODRInterpixels.h>
 
 #include "LPModel/initialization/API.h"
 #include "LPModel/initialization/model/Parameters.h"
@@ -26,19 +26,14 @@ namespace LPModel{ namespace Initialization{
         double gridStep = 1.0;
 
 
-        ODRLinels odrLinels(ODRModel::AC_LINEL,
-                                      ODRModel::CM_PIXEL,
-                                      radius,
-                                      gridStep,
-                                      levels,
-                                      ODRModel::LevelDefinition::LD_CloserFromCenter,
-                                      ODRModel::FourNeighborhood,
-                                      ODRModel::StructuringElementType::RECT);
+        ODRInterpixels odrLinels(radius,
+                                 gridStep,
+                                 levels,
+                                 ODRModel::LevelDefinition::LD_CloserFromCenter,
+                                 ODRModel::FourNeighborhood);
 
-        ODRModel odrModel = odrLinels.createODR(ODRModel::OM_CorrectConvexities,
-                                                     ODRModel::AM_AroundBoundary,
-                                                     originalDS,
-                                                     true);
+        ODRModel odrModel = odrLinels.createODR(originalDS,
+                                                ODRModel::OM_CorrectConvexities);
 
         DigitalSet extendedOptRegion = Internal::extendedOptRegion(odrModel);
         DigitalSet extendedAppRegion = Internal::extendedAppRegion(odrModel.applicationRegion,extendedOptRegion);
@@ -46,7 +41,7 @@ namespace LPModel{ namespace Initialization{
         DIPaCUS::SetOperations::setDifference(reducedTrustFrg,odrModel.trustFRG,extendedOptRegion);
 
 
-        LinelSpaceHandle* ish = (LinelSpaceHandle*) odrLinels.handle();
+        InterpixelSpaceHandle* ish = (InterpixelSpaceHandle*) odrLinels.handle();
 
         return Parameters( ODRModel(odrModel.domain,
                                     odrModel.original,

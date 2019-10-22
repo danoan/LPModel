@@ -2,15 +2,15 @@ cmake_minimum_required(VERSION 3.2)
 project(export-cplex-lp)
 
 add_executable(export-cplex-lp export-cplex-lp.cpp src/InputReader.cpp)
-add_dependencies(export-cplex-lp constraints initialization${LINEL} linearization lpwriter solassign terms${LINEL} lpmodel-utils)
+add_dependencies(export-cplex-lp constraints initialization linearization lpwriter solassign terms lpmodel-utils)
 
 target_include_directories(export-cplex-lp PRIVATE
         include
         ${CMAKE_SOURCE_DIR}/modules/constraints/include
-        ${CMAKE_SOURCE_DIR}/modules/initialization${LINEL}/include
+        ${CMAKE_SOURCE_DIR}/modules/initialization/include
         ${CMAKE_SOURCE_DIR}/modules/linearization/include
         ${CMAKE_SOURCE_DIR}/modules/lpwriter/include
-        ${CMAKE_SOURCE_DIR}/modules/terms${LINEL}/include
+        ${CMAKE_SOURCE_DIR}/modules/terms/include
         ${CMAKE_SOURCE_DIR}/modules/utils/include
         ${CMAKE_SOURCE_DIR}/modules/types/include
         ${DIPACUS_INCLUDE_DIRS}
@@ -22,8 +22,8 @@ target_include_directories(export-cplex-lp PRIVATE
 target_link_libraries(export-cplex-lp
         -llpwriter
         -lconstraints
-        -lterms${LINEL}
-        -linitialization${LINEL}
+        -lterms
+        -linitialization
         -lscabolic-core
         -ldipacus-derivates
         -ldipacus-components

@@ -23,6 +23,7 @@ struct InputData
     LPModel::RelaxationLevel relaxationLevel;
     LPModel::LinearizationLevel linearizationLevel;
     std::string outputPath;
+
 };
 
 #endif //EXPORT_CPLEX_LP_INPUTDATA_H

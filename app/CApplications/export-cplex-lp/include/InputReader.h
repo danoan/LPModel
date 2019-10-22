@@ -12,5 +12,6 @@
 InputData readInput(int argc, char* argv[]);
 std::string resolveRelaxationLevelName(LPModel::RelaxationLevel R);
 std::string resolveLinearizationLevelName(LPModel::LinearizationLevel L);
+void printInputData(std::ostream& os,const InputData& id);
 
 #endif //EXPORT_CPLEX_LP_INPUTREADER_H

@@ -83,3 +83,13 @@ std::string resolveRelaxationLevelName(LPModel::RelaxationLevel R)
     else if(R==LPModel::RELAXATION_ALL) return "All";
     else return "Not recognized";
 }
+
+void printInputData(std::ostream& os, const InputData& id)
+{
+    os << "Input image: " << id.pgmInputImage << "\n"
+       << "Optimization region width: " << id.optRegionWidth << " \n"
+       << "Squared Curvature Weight: " << id.sqWeight << " \n"
+       << "Data Weight: " << id.dataWeight << " \n"
+       << "Relaxation Level: " << resolveRelaxationLevelName(id.relaxationLevel)<< " \n"
+       << "Linearization Level: " << resolveLinearizationLevelName(id.linearizationLevel)<< " \n";
+}

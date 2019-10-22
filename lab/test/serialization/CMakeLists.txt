@@ -5,16 +5,16 @@ project(test-serialization)
 add_executable(test-serialization test-serialization.cpp)
 target_compile_definitions(test-serialization PRIVATE -DPROJECT_DIR=\"${CMAKE_SOURCE_DIR}\")
 
-add_dependencies(test-serialization initialization${LINEL})
+add_dependencies(test-serialization initialization)
 
 target_include_directories(test-serialization PRIVATE
-        ${CMAKE_SOURCE_DIR}/modules/initialization${LINEL}/include
+        ${CMAKE_SOURCE_DIR}/modules/initialization/include
         ${CMAKE_SOURCE_DIR}/modules/utils/include
         ${DIPACUS_INCLUDE_DIRS}
         ${DGTAL_INCLUDE_DIRS})
 
 target_link_libraries(test-serialization PRIVATE
-        -linitialization${LINEL}
+        -linitialization
         -llpmodel-utils
         -lscabolic-core
         -ldipacus-components
