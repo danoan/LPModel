@@ -108,7 +108,7 @@ Parameters API::initParameters(const DigitalSet &originalDS,int optRegionWidth)
     double radius = 5;
     double gridStep = 1.0;
 
-    ODRInterpixels odrInterpixels(radius,
+    ODRPixels odrInterpixels(radius,
                                   gridStep,
                                   optRegionWidth,
                                   ODRModel::LevelDefinition::LD_CloserFromCenter,
@@ -128,7 +128,7 @@ Parameters API::initParameters(const DigitalSet &originalDS,int optRegionWidth)
     DIPaCUS::SetOperations::setDifference(reducedTrustBkg,odrModel.trustBKG,extendedOptRegion);
 
 
-    InterpixelSpaceHandle* ish = (InterpixelSpaceHandle*) odrInterpixels.handle();
+    PixelSpaceHandle* ish = (PixelSpaceHandle*) odrInterpixels.handle();
 
     return Parameters( ODRModel(odrModel.domain,
                                 odrModel.original,

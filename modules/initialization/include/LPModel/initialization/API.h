@@ -5,8 +5,8 @@
 #include <string>
 
 #include <DIPaCUS/base/Representation.h>
-#include "SCaBOliC/Core/ODRModel.h"
-#include "SCaBOliC/Core//ODRInterpixels.h"
+#include "SCaBOliC/Core/model/ODRModel.h"
+#include "SCaBOliC/Core/ODRPixels/ODRPixels.h"
 #include "DIPaCUS/derivates/Misc.h"
 #include "DIPaCUS/base/Representation.h"
 
@@ -28,7 +28,7 @@ namespace LPModel
             typedef Point KPoint;
 
             typedef DIPaCUS::Neighborhood::FourNeighborhoodPredicate FourNeighborhood;
-            typedef SCaBOliC::Core::ODRInterpixels ODRInterpixels;
+            typedef SCaBOliC::Core::ODRPixels ODRPixels;
             typedef SCaBOliC::Core::ODRModel ODRModel;
 
             //For test only

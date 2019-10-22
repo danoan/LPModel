@@ -1,7 +1,7 @@
 #include <boost/filesystem.hpp>
 
 #include <SCaBOliC/Core/display.h>
-#include <SCaBOliC/Core//ODRInterpixels.h>
+#include <SCaBOliC/Core//ODRPixels.h>
 
 #include "LPModel/initialization/API.h"
 #include "LPModel/initialization/model/Parameters.h"
@@ -26,7 +26,7 @@ namespace LPModel{ namespace Initialization{
         double gridStep = 1.0;
 
 
-        ODRInterpixels odrLinels(radius,
+        ODRPixels odrLinels(radius,
                                  gridStep,
                                  levels,
                                  ODRModel::LevelDefinition::LD_CloserFromCenter,
@@ -41,7 +41,7 @@ namespace LPModel{ namespace Initialization{
         DIPaCUS::SetOperations::setDifference(reducedTrustFrg,odrModel.trustFRG,extendedOptRegion);
 
 
-        InterpixelSpaceHandle* ish = (InterpixelSpaceHandle*) odrLinels.handle();
+        PixelSpaceHandle* ish = (PixelSpaceHandle*) odrLinels.handle();
 
         return Parameters( ODRModel(odrModel.domain,
                                     odrModel.original,

@@ -1,8 +1,8 @@
 #ifndef LPMODEL_INITIALIZATION_PARAMETERS_H
 #define LPMODEL_INITIALIZATION_PARAMETERS_H
 
-#include "SCaBOliC/Core/ODRModel.h"
-#include "SCaBOliC/Core/InterpixelSpaceHandle.h"
+#include "SCaBOliC/Core/model/ODRModel.h"
+#include "SCaBOliC/Core/ODRPixels/PixelSpaceHandle.h"
 
 namespace LPModel
 {
@@ -12,10 +12,10 @@ namespace LPModel
         {
             typedef DGtal::Z2i::DigitalSet DigitalSet;
             typedef SCaBOliC::Core::ODRModel ODRModel;
-            typedef SCaBOliC::Core::InterpixelSpaceHandle InterpixelSpaceHandle;
+            typedef SCaBOliC::Core::PixelSpaceHandle PixelSpaceHandle;
 
             Parameters(const ODRModel& odrModel,
-                       const InterpixelSpaceHandle& handle,
+                       const PixelSpaceHandle& handle,
                        const unsigned long radius=3,
                        const double squaredCurvatureWeight=1,
                        const double dataWeight=0.2):odrModel(odrModel),
@@ -26,7 +26,7 @@ namespace LPModel
             {}
 
             const ODRModel odrModel;
-            const InterpixelSpaceHandle handle;
+            const PixelSpaceHandle handle;
             const unsigned long radius;
             const double squaredCurvatureWeight;
             const double dataWeight;

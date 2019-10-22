@@ -30,6 +30,7 @@ link_directories(${CMAKE_BINARY_DIR}/modules/constraints
         ${CMAKE_BINARY_DIR}/modules/initialization
         ${CMAKE_BINARY_DIR}/modules/linearization
         ${CMAKE_BINARY_DIR}/modules/lpwriter
+        ${CMAKE_BINARY_DIR}/modules/opt-model
         ${CMAKE_BINARY_DIR}/modules/terms
         ${CMAKE_BINARY_DIR}/modules/utils
         ${CMAKE_BINARY_DIR}/modules/solassign
@@ -48,6 +49,7 @@ add_subdirectory(modules/constraints)
 add_subdirectory(modules/initialization)
 add_subdirectory(modules/linearization)
 add_subdirectory(modules/lpwriter)
+add_subdirectory(modules/opt-model)
 add_subdirectory(modules/solassign)
 add_subdirectory(modules/terms)
 add_subdirectory(modules/utils)

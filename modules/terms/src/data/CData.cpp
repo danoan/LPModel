@@ -11,7 +11,7 @@ LPModel::Terms::Term API::prepare(const Parameters &prm, const Grid &grid, doubl
     typedef DGtal::Z2i::DigitalSet DigitalSet;
 
 
-    //Assume that ODRInterpixels evenIteration attributed is
+    //Assume that ODRPixels evenIteration attributed is
     //manually set to true
     const DigitalSet& optRegion = prm.odrModel.optRegion;
     DigitalSet frgInOptRegion(optRegion.domain());

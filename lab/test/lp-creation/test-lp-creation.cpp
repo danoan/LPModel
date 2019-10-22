@@ -1,6 +1,6 @@
 #include <DGtal/helpers/StdDefs.h>
-#include <SCaBOliC/Core/ODRModel.h>
-#include <SCaBOliC/Core//ODRInterpixels.h>
+#include <SCaBOliC/Core/model/ODRModel.h>
+#include <SCaBOliC/Core//ODRPixels.h>
 #include <LPModel/initialization/API.h>
 #include <LPModel/utils/dispUtils.h>
 #include <LPModel/terms/model/Term.h>
@@ -35,7 +35,7 @@ Initialization::Parameters initParameters()
     int levels = 0;
     double gridStep = 1.0;
 
-    ODRInterpixels odrLinels(radius,
+    ODRPixels odrLinels(radius,
                                   gridStep,
                                   levels,
                                   ODRModel::LevelDefinition::LD_CloserFromCenter,
@@ -51,7 +51,7 @@ Initialization::Parameters initParameters()
     DigitalSet reducedTrustFrg(odrModel.trustFRG.domain());
     DIPaCUS::SetOperations::setDifference(reducedTrustFrg,odrModel.trustFRG,extendedOptRegion);
 
-    InterpixelSpaceHandle* ish = (InterpixelSpaceHandle*) odrLinels.handle();
+    PixelSpaceHandle* ish = (PixelSpaceHandle*) odrLinels.handle();
 
     return Initialization::Parameters( ODRModel(odrModel.domain,
                                                 odrModel.original,
