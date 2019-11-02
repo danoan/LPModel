@@ -44,10 +44,11 @@ int main(int argc, char* argv[])
     
 
     Initialization::Parameters prm = Initialization::API::initParameters(ds,in.optRegionWidth);
-    Initialization::Grid grid = Initialization::API::createGrid(prm.odrModel.optRegion,
-                                                                prm);
 
-    Terms::Term scTerm = SquaredCurvature::API::prepare(prm,grid,in.sqWeight);
+    std::cerr << "Generating Grid Object\n";
+    Initialization::Grid* grid = Initialization::API::readGridFromFile(in.gridObjectFile);
+
+    Terms::Term scTerm = SquaredCurvature::API::prepare(prm,*grid,in.sqWeight);
     //Terms::Term dataTerm = DataFidelity::API::prepare(prm,grid,in.dataWeight);
 
     Terms::Term mergedTerm = scTerm;//Terms::API::merge(dataTerm,scTerm);
@@ -55,7 +56,7 @@ int main(int argc, char* argv[])
 
     typedef Linearization< Terms::Term::UIntMultiIndex,double > MyLinearization;
 
-    unsigned long nextIndex = grid.pixelMap.size()-3+grid.edgeMap.size();
+    unsigned long nextIndex = grid->pixelMap.size()-3+grid->edgeMap.size();
     MyLinearization linearization(nextIndex);
 
     switch(in.linearizationLevel)
@@ -80,7 +81,7 @@ int main(int argc, char* argv[])
     }
 
 
-    LPWriter::writeLP(in.outputPath,prm,grid,mergedTerm.unaryMap,linearization,in.relaxationLevel);
+    LPWriter::writeLP(in.outputPath,prm,*grid,mergedTerm.unaryMap,linearization,in.relaxationLevel);
     std::ofstream ofs(in.outputPath + "/inputData.txt");
     printInputData(ofs,in);
 

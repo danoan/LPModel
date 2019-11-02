@@ -66,14 +66,13 @@ def main():
             iterationFolder = "%s/it%d" % (outputFolder,it)
 
             gridObjectFile = exportGrid(shapePath,iterationFolder,optWidth)
-            qpCplexFile = exportQP(shapeName,shapePath,iterationFolder,optWidth,sqWeight,dataWeight,rel,lin)
+            qpCplexFile = exportQP(shapeName,shapePath,gridObjectFile,iterationFolder,optWidth,sqWeight,dataWeight,rel,lin)
             qpSolutionFile = solveQP(qpCplexFile,iterationFolder)
 
             shapeSolutionFile = generateSolution(shapePath, optWidth, gridObjectFile, qpSolutionFile,iterationFolder)
             shapePath = shapeSolutionFile
 
             it+=1
-            exit()
 
 
 

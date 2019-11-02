@@ -385,10 +385,9 @@ int main(int argc, char* argv[])
 
 
     Initialization::Parameters prm = Initialization::API::initParameters(ds,in.optRegionWidth);
-    Initialization::Grid grid = Initialization::API::createGrid(prm.odrModel.optRegion,
-                                                                prm);
+    Initialization::Grid* grid = Initialization::API::readGridFromFile(in.gridObjectFile);
 
-    Terms::Term scTerm = SquaredCurvature::API::prepare(prm,grid,in.sqWeight);
+    Terms::Term scTerm = SquaredCurvature::API::prepare(prm,*grid,in.sqWeight);
     //Terms::Term dataTerm = DataFidelity::API::prepare(prm,grid,in.dataWeight);
 
     Terms::Term mergedTerm = scTerm;//Terms::API::merge(dataTerm,scTerm);
@@ -397,12 +396,12 @@ int main(int argc, char* argv[])
     {
         case LPModel::LINEARIZATION_PIXEL_PAIR:
         {
-            exportPixelPairLinearization(in.outputPath,ds,grid,mergedTerm);
+            exportPixelPairLinearization(in.outputPath,ds,*grid,mergedTerm);
             break;
         }
         case LPModel::LINEARIZATION_PIXEL_LINEL:
         {
-            exportPixelLinelPairLinearization(in.outputPath,ds,grid,mergedTerm);
+            exportPixelLinelPairLinearization(in.outputPath,ds,*grid,mergedTerm);
             break;
         }
         default:

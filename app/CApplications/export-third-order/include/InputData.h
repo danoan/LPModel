@@ -12,6 +12,7 @@ struct InputData
     };
 
     std::string pgmInputImage;
+    std::string gridObjectFile;
     int optRegionWidth;
     double sqWeight;
     double dataWeight;

@@ -55,7 +55,7 @@ def main():
             iterationFolder = "%s/it%d" % (outputFolder,it)
 
             gridObjectFile = exportGrid(shapePath,iterationFolder,optWidth)
-            lpCplexFile = exportLP(shapeName,shapePath,iterationFolder,optWidth,sqWeight,dataWeight,rel,lin)
+            lpCplexFile = exportLP(shapeName,shapePath,gridObjectFile,iterationFolder,optWidth,sqWeight,dataWeight,rel,lin)
             lpSolutionFile = solveLP(lpCplexFile,iterationFolder)
 
             shapeSolutionFile = generateSolution(shapePath, optWidth, gridObjectFile, lpSolutionFile,iterationFolder)

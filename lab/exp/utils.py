@@ -85,7 +85,7 @@ def exportGrid(pgmShapeImage,outputFolder,optWidth=1):
     return outputPath
 
 
-def exportLP(shapeName,shapePath,outputFolder,optWidth=1,sqWeight=1,dataWeight=0,rel="none",lin="all-coupled"):
+def exportLP(shapeName,shapePath,gridObjectFile,outputFolder,optWidth=1,sqWeight=1,dataWeight=0,rel="none",lin="all-coupled"):
     """
     USAGE: pgm-input-image output-path
     [-w Optimization region width. Default: 1]
@@ -99,7 +99,7 @@ def exportLP(shapeName,shapePath,outputFolder,optWidth=1,sqWeight=1,dataWeight=0
 
     print("\n-------------Exporting LP-------------\n")
     binary = "%s/%s" % (BIN_FOLDER,"export-cplex-lp/export-cplex-lp")
-    subprocess.call( [binary,shapePath,outputPath,
+    subprocess.call( [binary,shapePath,gridObjectFile,outputPath,
                       "%s%s" % ("-w",optWidth),
                       "%s%s" % ("-s",sqWeight),
                       "%s%s" % ("-d",dataWeight),
@@ -110,7 +110,7 @@ def exportLP(shapeName,shapePath,outputFolder,optWidth=1,sqWeight=1,dataWeight=0
     return outputPath
 
 
-def exportQP(shapeName,shapePath,outputFolder,optWidth=1,sqWeight=1,dataWeight=0,rel="none",lin="all-coupled"):
+def exportQP(shapeName,shapePath,gridObjectFile,outputFolder,optWidth=1,sqWeight=1,dataWeight=0,rel="none",lin="all-coupled"):
     """
     USAGE: pgm-input-image output-path
     [-w Optimization region width. Default: 1]
@@ -124,13 +124,14 @@ def exportQP(shapeName,shapePath,outputFolder,optWidth=1,sqWeight=1,dataWeight=0
 
     print("\n-------------Exporting QP-------------\n")
     binary = "%s/%s" % (BIN_FOLDER,"export-cplex-qp/export-cplex-qp")
-    subprocess.call( [binary,shapePath,outputPath,
+    subprocess.call( [binary,shapePath,gridObjectFile,outputPath,
                       "%s%s" % ("-w",optWidth),
                       "%s%s" % ("-s",sqWeight),
                       "%s%s" % ("-d",dataWeight),
                       "%s%s" % ("-l",lin),
                       "%s%s" % ("-r","none"),
                       ])
+
 
     return outputPath
 

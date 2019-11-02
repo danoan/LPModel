@@ -1,8 +1,24 @@
 #include "InputReader.h"
 
+void usage(int argc, char* argv[])
+{
+    std::cerr << "Usage: pgm-input-image grid-object-file output-path "
+                 "[-w Optimization region width. Default: 1]"
+                 "[-s Squared curvature term weight. Default: 1]"
+                 "[-d Data term weight. Default: 0]"
+                 "[-l Linearization level {none,pixel-pair,pixel-linel,all-coupled,all-uncoupled}. Default: all-coupled";
+                 "[-r Relaxation level {none,original,auxiliar,all}. Default: none";
+}
+
 InputData readInput(int argc, char* argv[])
 {
     InputData in;
+    
+    if(argc < 4)
+    {
+        usage(argc,argv);
+        exit(1);
+    }
 
     int opt;
     while( (opt=getopt(argc,argv,"w:s:d:r:l:"))!=-1)
@@ -48,18 +64,14 @@ InputData readInput(int argc, char* argv[])
             }
             default:
             {
-                std::cerr << "Usage: pgm-input-image output-path "
-                            "[-w Optimization region width. Default: 1]"
-                            "[-s Squared curvature term weight. Default: 1]"
-                            "[-d Data term weight. Default: 0]"
-                            "[-l Linearization level {none,pixel-pair,pixel-linel,all-coupled,all-uncoupled}. Default: all-coupled";
-                            "[-r Relaxation level {none,original,auxiliar,all}. Default: none";
+                usage(argc,argv);
                 exit(1);
             }
         }
     }
 
     in.pgmInputImage = argv[optind++];
+    in.gridObjectFile = argv[optind++];
     in.outputPath = argv[optind++];
 
     return in;
@@ -87,6 +99,7 @@ std::string resolveRelaxationLevelName(LPModel::RelaxationLevel R)
 void printInputData(std::ostream& os, const InputData& id)
 {
     os << "Input image: " << id.pgmInputImage << "\n"
+       << "Grid object file: " << id.gridObjectFile<< "\n"
        << "Optimization region width: " << id.optRegionWidth << " \n"
        << "Squared Curvature Weight: " << id.sqWeight << " \n"
        << "Data Weight: " << id.dataWeight << " \n"

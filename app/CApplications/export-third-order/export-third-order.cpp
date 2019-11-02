@@ -184,15 +184,14 @@ int main(int argc, char* argv[])
 
 
     Initialization::Parameters prm = Initialization::API::initParameters(ds,in.optRegionWidth);
-    Initialization::Grid grid = Initialization::API::createGrid(prm.odrModel.optRegion,
-                                                                prm);
+    Initialization::Grid* grid = Initialization::API::readGridFromFile(in.gridObjectFile);
 
-    Terms::Term scTerm = SquaredCurvature::API::prepare(prm,grid,in.sqWeight);
+    Terms::Term scTerm = SquaredCurvature::API::prepare(prm,*grid,in.sqWeight);
     //Terms::Term dataTerm = DataFidelity::API::prepare(prm,grid,in.dataWeight);
 
     Terms::Term mergedTerm = scTerm;//Terms::API::merge(dataTerm,scTerm);
 
-    exportThirdOrder(in.outputPath,ds,grid,mergedTerm);
+    exportThirdOrder(in.outputPath,ds,*grid,mergedTerm);
 
 
     return 0;

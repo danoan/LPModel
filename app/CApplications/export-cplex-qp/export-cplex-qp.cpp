@@ -55,16 +55,15 @@ int main(int argc, char* argv[])
 
 
     Initialization::Parameters prm = Initialization::API::initParameters(ds,in.optRegionWidth);
-    Initialization::Grid grid = Initialization::API::createGrid(prm.odrModel.optRegion,
-                                                                prm);
+    Initialization::Grid* grid = Initialization::API::readGridFromFile(in.gridObjectFile);
 
-    Terms::Term scTerm = SquaredCurvature::API::prepare(prm,grid,in.sqWeight);
+    Terms::Term scTerm = SquaredCurvature::API::prepare(prm,*grid,in.sqWeight);
     //Terms::Term dataTerm = DataFidelity::API::prepare(prm,grid,in.dataWeight);
 
     Terms::Term mergedTerm = scTerm;//Terms::API::merge(dataTerm,scTerm);
 
     typedef Linearization< Terms::Term::UIntMultiIndex,double > MyLinearization;
-    unsigned long nextIndex = grid.pixelMap.size()-3+grid.edgeMap.size(); //TODO: was + grid.linelMap.size()
+    unsigned long nextIndex = grid->pixelMap.size()-3+grid->edgeMap.size(); //TODO: was + grid.linelMap.size()
     LPWriter::MyLinearization linearization(nextIndex);
 
     Terms::Term::BinaryMap partialLinearizationBM;
@@ -80,7 +79,7 @@ int main(int argc, char* argv[])
         case LPModel::LINEARIZATION_PIXEL_PAIR:
         {
             MyLinearization::PartialLinearizationPair plp(Initialization::IVariable::Pixel,Initialization::IVariable::Pixel);
-            partialLinearizationBM = linearization.partialLinearization(mergedTerm.ternaryMap,grid,plp);
+            partialLinearizationBM = linearization.partialLinearization(mergedTerm.ternaryMap,*grid,plp);
             break;
         }
         default:
@@ -90,7 +89,7 @@ int main(int argc, char* argv[])
         }
     }
 
-    LPWriter::writeQP(in.outputPath,prm,grid,mergedTerm.unaryMap,mergedTerm.binaryMap,partialLinearizationBM,linearization,in.relaxationLevel);
+    LPWriter::writeQP(in.outputPath,prm,*grid,mergedTerm.unaryMap,mergedTerm.binaryMap,partialLinearizationBM,linearization,in.relaxationLevel);
 
 
 
