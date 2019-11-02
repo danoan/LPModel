@@ -8,6 +8,7 @@
 #include "InputData.h"
 
 
+void usage(int argc, char* argv[]);
 InputData readInput(int argc, char* argv[]);
 
 #endif //EXPORT_GRID_INPUTREADER_H

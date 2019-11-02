@@ -4,8 +4,19 @@ std::string pgmInputImage;
 int optRegionWidth;
 std::string outputPath;
 
+void usage(int argc, char* argv[])
+{
+    std::cerr << "Usage: PGMShapeImage OutputFilePath [-w OptRegionWidth default: 1]\n";
+}
+
 InputData readInput(int argc, char* argv[])
 {
+    if (argc < 3)
+    {
+        usage(argc,argv);
+        exit(1);
+    }
+
     InputData in;
     int opt;
     while( (opt=getopt(argc,argv,"w:"))!=-1 )
@@ -19,7 +30,7 @@ InputData readInput(int argc, char* argv[])
             }
             default:
             {
-                std::cerr << "Usage: PGMShapeImage OutputFilePath [-w OptRegionWidth default: 1]\n";
+                usage(argc,argv);
                 exit(1);
             }
         }
