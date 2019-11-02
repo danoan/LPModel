@@ -31,11 +31,11 @@ namespace LPModel
 
             typedef std::map<unsigned long, const IVariable*> VariableMap;
 
-            Grid(const PixelMap& pixelMap,
-                 const EdgeMap& edgeMap,
-                 const LinelMap& linelMap):_pixelMap(pixelMap),
-                                           _edgeMap(edgeMap),
-                                           _linelMap(linelMap),
+            Grid(const PixelMap& inpixelMap,
+                 const EdgeMap& inedgeMap,
+                 const LinelMap& inlinelMap):_pixelMap(inpixelMap),
+                                           _edgeMap(inedgeMap),
+                                           _linelMap(inlinelMap),
                                            pixelMap(_pixelMap),
                                            edgeMap(_edgeMap),
                                            linelMap(_linelMap),
