@@ -22,7 +22,8 @@ double sumSqc(const DigitalSet& ds)
 
     double sumSQC=0;
     EstimationVector estimations;
-    GEOC::API::GridCurve::Curvature::identityClosed<ALG_CURV>(KImage,curve.begin(),curve.end(),estimations,1.0);
+    GEOC::Estimator::Standard::IICurvatureExtraData extraData(true,5);
+    GEOC::API::GridCurve::Curvature::identityClosed<ALG_CURV>(KImage,curve.begin(),curve.end(),estimations,1.0,&extraData);
     for(auto it=estimations.begin();it!=estimations.end();++it) sumSQC+=pow(*it,2);
 
     return sumSQC;

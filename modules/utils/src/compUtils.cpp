@@ -14,7 +14,8 @@ double Utils::sumSQC(const DigitalSet& ds)
     kspace.init(ds.domain().lowerBound(),ds.domain().upperBound(),true);
 
     Curvature::EstimationsVector ev;
-    Curvature::identityOpen<Curvature::EstimationAlgorithms::ALG_II>(kspace,curve.begin(),curve.end(),ev,h);
+    GEOC::Estimator::Standard::IICurvatureExtraData extraData(true,5);
+    Curvature::identityOpen<Curvature::EstimationAlgorithms::ALG_II>(kspace,curve.begin(),curve.end(),ev,h,&extraData);
 
     double s = 0;
     for(auto it=ev.begin();it!=ev.end();++it)
