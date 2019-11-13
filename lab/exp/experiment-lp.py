@@ -1,6 +1,7 @@
 #!/sur/bin/python3
 
 import subprocess,sys,os
+from api import *
 from utils import *
 
 R_NONE="none"                     #No relaxation
@@ -34,32 +35,43 @@ CONFIG_LIST=[ (RELAXATION_CONFIGURATIONS,"relaxationLevel"),
 
 def main():
     argc = len(sys.argv)
-    baseFolder = "%s/%s" % (PROJECT_FOLDER,"lab/exp/output/experiment-lp")
+
+    if argc < 5:
+        raise("Usage: projectFolder relBinFolder relScriptFolder outputFolder")
+
+    projectFolder = sys.argv[1]
+    relBinFolder = sys.argv[2]
+    relScriptFolder = sys.argv[3]
+    baseFolder = sys.argv[4]
 
     outputShapes = "%s/%s" % (baseFolder,"shapes")
-
-    shapes = Shapes()
-
-
+    api = API(projectFolder,relBinFolder,relScriptFolder)
     for c in combinations( CONFIG_LIST ):
         print("\n########### Running instance %s ############\n" % (c,))
         rel,lin,optWidth,gridStep,shapeName,sqWeight,dataWeight = c
 
-        shapes.generate(shapeName,gridStep,outputShapes)
+        shapePath = "%s/%.2f/%s.pgm" % (outputShapes,gridStep,shapeName)
+        api.generateShape(shapeName,gridStep,shapePath)
 
-        shapePath = shapes.get(shapeName,gridStep,outputShapes)
-        outputFolder = resolveOutputFolder(baseFolder,shapeName,optWidth,rel,lin)
+        outputFolder = "%s/%s/width-%d/%s/%s" % (baseFolder,shapeName,optWidth,rel,lin)
+        api.iterationZero(outputFolder,shapePath,optWidth)
 
-        iterationZero(outputFolder,shapePath,optWidth)
         it=1
         while it<=MAX_ITERATIONS:
             iterationFolder = "%s/it%d" % (outputFolder,it)
 
-            gridObjectFile = exportGrid(shapePath,iterationFolder,optWidth)
-            lpCplexFile = exportLP(shapeName,shapePath,gridObjectFile,iterationFolder,optWidth,sqWeight,dataWeight,rel,lin)
-            lpSolutionFile = solveLP(lpCplexFile,iterationFolder)
+            gridPath = "%s/grid.obj" % (iterationFolder,)
+            api.exportGrid(shapePath,gridPath,optWidth=optWidth)
 
-            shapeSolutionFile = generateSolution(shapePath, optWidth, gridObjectFile, lpSolutionFile,iterationFolder)
+            lpPath = "%s/formulation.lp" % (iterationFolder,)
+            api.exportLP(shapePath,gridPath,lpPath,optWidth,sqWeight,dataWeight,rel,lin)
+
+            solutionPath="%s/formulation.sol" % (iterationFolder,)
+            logPath="%s/formulation.log" % (iterationFolder,)
+            api.solveLP(lpPath,solutionPath,logFilepath=logPath)
+
+            shapeSolutionFile = "%s/solution.pgm" % (iterationFolder,)
+            api.generateSolution(shapePath, optWidth, gridPath, solutionPath,shapeSolutionFile)
             shapePath = shapeSolutionFile
 
             it+=1

@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 
 import subprocess,sys,os
+from api import *
 from utils import *
 
 
@@ -23,90 +24,45 @@ DATAWEIGTH_CONFIGURATIONS=[0.0]
 RELAXATION_CONFIGURATIONS=[R_NONE]
 LINEARIZATION_CONFIGURATIONS=[L_PIXEL_PAIR,L_PIXEL_LINEL]
 
-
-CONFIG_LIST=[ (SHAPE_CONFIGURATIONS,"shape"),
-              (GRID_CONFIGURATIONS,"grid"),
+CONFIG_LIST=[ (RELAXATION_CONFIGURATIONS,"relaxationLevel"),
+              (LINEARIZATION_CONFIGURATIONS,'linearizationLevel'),
               (OPTWIDTH_CONFIGURATIONS,"optWidth"),
+              (GRID_CONFIGURATIONS,"grid"),
+              (SHAPE_CONFIGURATIONS,"shape"),
               (SQWEIGTH_CONFIGURATIONS,"sqWeight"),
-              (DATAWEIGTH_CONFIGURATIONS,"dataWeight"),
-              (RELAXATION_CONFIGURATIONS,"relaxationLevel")]
-
-PYTHON_CONTAINER = "%s/%s" % (PROJECT_FOLDER,"app/PythonApplications/convex-solver")
-
-
-def createPythonContainer(pythonContainerSource,pythonContainerTarget):
-    print("\n-------------Creating Python Container -------------\n")
-
-    subprocess.call(["mkdir",
-                     "-p",
-                     pythonContainerTarget
-                     ])
-
-    subprocess.call(["cp",
-                     "-r",
-                     pythonContainerSource,
-                     pythonContainerTarget])
-
-    return "%s/%s" % (pythonContainerTarget,os.path.basename(pythonContainerSource))
-
-
-def exportCvxopt(pgmInputImage,pythonContainer,optWidth,sqWeight,dataWeight,lin):
-    """
-    Usage: pgm-input-image output-path
-    [-w Optimization region width. Default: 1]
-    [-s Squared curvature term weight. Default: 1]
-    [-d Data term weight. Default: 0]
-    [-l Linearization level {none,pixel-pair,pixel-linel,all-coupled,all-uncoupled}. Default: all-coupled]
-    """
-    print("\n-------------Exporting CvxOpt Python Models-------------\n")
-
-    cleansedName = "".join( [ s.title() for s in lin.split("-") ] )
-    outputPath = "%s/%s/D%s.py" % (pythonContainer,"models/data",cleansedName)
-
-    binary = "%s/%s" % (BIN_FOLDER,"export-cvxopt/export-cvxopt")
-    subprocess.call( [binary,
-                      pgmInputImage,
-                      outputPath,
-                      "%s%s" % ("-w",optWidth),
-                      "%s%s" % ("-s",sqWeight),
-                      "%s%s" % ("-d",dataWeight),
-                      "%s%s" % ("-l",lin)
-                      ])
-
-
-def cvxOpt(pythonContainer,logFilePath):
-
-    logFile = open(logFilePath,'w')
-    pythonSource = "%s/%s" % (pythonContainer,"optim.py")
-    subprocess.call( ["python3",
-                      pythonSource
-                      ],
-                     stdout=logFile)
-
-
+              (DATAWEIGTH_CONFIGURATIONS,"dataWeight")]
 
 
 def main():
-    baseFolder = "%s/%s" % (PROJECT_FOLDER,"lab/exp/output/experiment-cvxopt")
+    argc = len(sys.argv)
 
-    shape_gs_1_output = "%s/%s" % (baseFolder,"shapes/grid-1.0")
+    if argc < 5:
+        raise("Usage: projectFolder relBinFolder relScriptFolder outputFolder")
 
-    shapes = Shapes()
-    shapes.generate(shape_gs_1_output,1.0)
+    projectFolder = sys.argv[1]
+    relBinFolder = sys.argv[2]
+    relScriptFolder = sys.argv[3]
+    baseFolder = sys.argv[4]
 
+    outputShapes = "%s/%s" % (baseFolder,"shapes")
+
+    api = API(projectFolder,relBinFolder,relScriptFolder)
     for c in combinations( CONFIG_LIST ):
         print("\n########### Running instance %s ############\n" % (c,))
-        shapeName,gridStep,optWidth,sqWeight,dataWeight,rel = c
+        rel,lin,optWidth,gridStep,shapeName,sqWeight,dataWeight = c
 
-        shapePath = shapes.get(gridStep,shapeName)
+        shapePath = "%s/%.2f/%s.pgm" % (outputShapes,gridStep,shapeName)
+        api.generateShape(shapeName,gridStep,shapePath)
+
         outputFolder = "%s/%s/width-%d/" % (baseFolder,shapeName,optWidth)
+        gridPath = "%s/grid.obj" % (outputFolder,)
+        api.exportGrid(shapePath,gridPath,optWidth=optWidth)
 
-        pythonContainer = createPythonContainer(PYTHON_CONTAINER,outputFolder)
-        exportCvxopt(shapePath,pythonContainer,optWidth,sqWeight,dataWeight,L_PIXEL_LINEL)
-        exportCvxopt(shapePath,pythonContainer,optWidth,sqWeight,dataWeight,L_PIXEL_PAIR)
+        modelPath="%s/%s" % (outputFolder,"model.py")
+        api.exportCvxopt(shapePath,gridPath,optWidth,sqWeight,dataWeight,lin,modelPath)
 
-        logFilePath = "%s/%s" % (outputFolder,"log.txt")
-        cvxOpt(pythonContainer,logFilePath)
+        solutionPath="%s/%s" % (outputFolder,"solution.pgm")
+        api.solveCVXOpt(modelPath,solutionPath,lin,"constrained-convex")
 
 
 main()

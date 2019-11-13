@@ -1,6 +1,7 @@
 #!/sur/bin/python3
 
 import subprocess,sys,os
+from api import *
 from utils import *
 
 PROJECT_FOLDER="/home/dantu/GIT/PhD/LPModel"
@@ -23,53 +24,63 @@ L_PIXEL_LINEL="pixel-linel"       #Linearize pixel linel second order terms
 L_ALL_COUPLED="all-coupled"       #Linearize all variables with coupling
 L_ALL_UNCOUPLED="all-uncoupled"   #Linearize all variables with no coupling
 
-SHAPE_CONFIGURATIONS=["square", "triangle"]
-GRID_CONFIGURATIONS=[1.0]
+SHAPE_CONFIGURATIONS=["square", "triangle","flower","bean"]
+GRID_CONFIGURATIONS=[1.0,0.5]
 OPTWIDTH_CONFIGURATIONS=[0,1]
 SQWEIGTH_CONFIGURATIONS=[1.0]
 DATAWEIGTH_CONFIGURATIONS=[0.0]
 RELAXATION_CONFIGURATIONS=[R_ALL, R_ORIGINAL, R_AUXILIAR, R_NONE]
 LINEARIZATION_CONFIGURATIONS=[L_PIXEL_PAIR,L_PIXEL_LINEL]
-MAX_ITERATIONS=5
+MAX_ITERATIONS=10
 
 
-CONFIG_LIST=[ (SHAPE_CONFIGURATIONS,"shape"),
-              (GRID_CONFIGURATIONS,"grid"),
+CONFIG_LIST=[ (RELAXATION_CONFIGURATIONS,"relaxationLevel"),
+              (LINEARIZATION_CONFIGURATIONS,'linearizationLevel'),
               (OPTWIDTH_CONFIGURATIONS,"optWidth"),
+              (GRID_CONFIGURATIONS,"grid"),
+              (SHAPE_CONFIGURATIONS,"shape"),
               (SQWEIGTH_CONFIGURATIONS,"sqWeight"),
-              (DATAWEIGTH_CONFIGURATIONS,"dataWeight"),
-              (RELAXATION_CONFIGURATIONS,"relaxationLevel"),
-              (LINEARIZATION_CONFIGURATIONS,'linearizationLevel')]
+              (DATAWEIGTH_CONFIGURATIONS,"dataWeight")]
 
 
 def main():
     argc = len(sys.argv)
-    baseFolder = "%s/%s" % (PROJECT_FOLDER,"lab/exp/output/experiment-qp")
 
-    shape_gs_1_output = "%s/%s" % (baseFolder,"shapes/grid-1.0")
-    shape_gs_05_output = "%s/%s" % (baseFolder,"shapes/grid-0.5")
+    if argc < 5:
+        raise("Usage: projectFolder relBinFolder relScriptFolder outputFolder")
 
-    shapes = Shapes()
-    shapes.generate(shape_gs_1_output,1.0)
-    shapes.generate(shape_gs_05_output,0.5)
+    projectFolder = sys.argv[1]
+    relBinFolder = sys.argv[2]
+    relScriptFolder = sys.argv[3]
+    baseFolder = sys.argv[4]
 
+    outputShapes = "%s/%s" % (baseFolder,"shapes")
+    api = API(projectFolder,relBinFolder,relScriptFolder)
     for c in combinations( CONFIG_LIST ):
         print("\n########### Running instance %s ############\n" % (c,))
-        shapeName,gridStep,optWidth,sqWeight,dataWeight,rel,lin = c
+        rel,lin,optWidth,gridStep,shapeName,sqWeight,dataWeight = c
 
-        shapePath = shapes.get(gridStep,shapeName)
-        outputFolder = resolveOutputFolder(baseFolder,shapeName,optWidth,rel,lin)
+        shapePath = "%s/%.2f/%s.pgm" % (outputShapes,gridStep,shapeName)
+        api.generateShape(shapeName,gridStep,shapePath)
 
-        iterationZero(outputFolder,shapePath,optWidth)
+        outputFolder = "%s/%s/width-%d/%s/%s" % (baseFolder,shapeName,optWidth,rel,lin)
+        api.iterationZero(outputFolder,shapePath,optWidth)
+
         it=1
         while it<=MAX_ITERATIONS:
             iterationFolder = "%s/it%d" % (outputFolder,it)
 
-            gridObjectFile = exportGrid(shapePath,iterationFolder,optWidth)
-            qpCplexFile = exportQP(shapeName,shapePath,gridObjectFile,iterationFolder,optWidth,sqWeight,dataWeight,rel,lin)
-            qpSolutionFile = solveQP(qpCplexFile,iterationFolder)
+            gridPath = "%s/grid.obj" % (iterationFolder,)
+            api.exportGrid(shapePath,gridPath,optWidth=optWidth)
 
-            shapeSolutionFile = generateSolution(shapePath, optWidth, gridObjectFile, qpSolutionFile,iterationFolder)
+            qpPath = "%s/formulation.lp" % (iterationFolder,)
+            api.exportQP(shapePath,gridPath,qpPath,optWidth,sqWeight,dataWeight,rel,lin)
+
+            solutionPath = "%s/formulation.sol" % (iterationFolder,)
+            api.solveQP(qpPath,solutionPath)
+
+            shapeSolutionFile = "%s/solution.pgm" % (iterationFolder,)
+            api.generateSolution(shapePath, optWidth, gridPath, solutionPath,shapeSolutionFile)
             shapePath = shapeSolutionFile
 
             it+=1
