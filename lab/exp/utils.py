@@ -28,22 +28,21 @@ def combinations(configList):
         yield tuple( configList[i][0][c[i]] for i in range(numParams) )
 
 class Shapes:
-    def __init__(self):
-        self.gridPathDict = {}
 
-    def generate(self,outputPath,gridStep):
+    def generate(self,shapeName,gridStep,outputPath):
         #USAGE: generate-shapes OUTPUT-PATH GRID-STEP
-
-        self.gridPathDict.update( {gridStep:outputPath} )
 
         print("\n-------------Generating Shapes-------------\n")
         print("OUTPUT_PATH: %s\nGridStep: %.2f" % (outputPath,gridStep))
 
         binary = "%s/%s" % (BIN_FOLDER,"generate-shapes/generate-shapes")
-        subprocess.call( [binary,outputPath,str(gridStep)] )
+        subprocess.call( [binary,
+                          self.get(shapeName,gridStep,outputPath),
+                          shapeName,
+                          str(gridStep)] )
 
-    def get(self,gridStep,shapeName):
-        return "%s/%s.pgm" % (self.gridPathDict[gridStep],shapeName)
+    def get(self,shapeName,gridStep,outputPath):
+        return "%s/grid-%.2f/%s.pgm" % (outputPath,gridStep,shapeName)
 
 
 def resolveOutputFolder(baseFolder,shapeName,optWidth,rel,lin):

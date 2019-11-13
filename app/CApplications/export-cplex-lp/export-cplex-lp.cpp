@@ -54,6 +54,8 @@ int main(int argc, char* argv[])
     Terms::Term mergedTerm = scTerm;//Terms::API::merge(dataTerm,scTerm);
 
 
+
+
     typedef Linearization< Terms::Term::UIntMultiIndex,double > MyLinearization;
 
     unsigned long nextIndex = grid->pixelMap.size()-3+grid->edgeMap.size();

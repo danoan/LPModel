@@ -95,7 +95,7 @@ SolutionAssignment::SolutionVector SolutionAssignment::solutionVector(const Solu
         const double& value = it->second;
         if(rpm.find(varIndex)!=rpm.end()) //continue; //Not pixel variable;
         {
-            if (value >= 0.5) {
+            if (value > 0.5) {
                 varValue.push_back(1);
             } else {
                 varValue.push_back(0);
