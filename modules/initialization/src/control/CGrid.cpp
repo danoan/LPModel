@@ -21,9 +21,10 @@ namespace LPModel{ namespace Initialization{
 
     std::ifstream& operator>>(std::ifstream &is, Grid** grid)
     {
-        Grid::PixelMap pm;
-        Grid::LinelMap lm;
-        Grid::EdgeMap em;
+        *grid = new Grid();
+        const Grid::PixelMap& pm = (*grid)->pixelMap;
+        const Grid::EdgeMap& em = (*grid)->edgeMap;
+        const Grid::LinelMap& lm = (*grid)->linelMap;
 
         unsigned long pixelMapSize;
         is.read( (char*) &pixelMapSize, sizeof(unsigned long) );
@@ -31,13 +32,13 @@ namespace LPModel{ namespace Initialization{
         {
             Pixel pixel = CPixel::readPixel(is);
             Grid::Point coord(pixel.col,pixel.row);
-            pm.insert(Grid::PixelMapElement(coord,pixel));
+            (*grid)->addInPixelMap(Grid::PixelMapElement(coord,pixel));
         }
 
         CLinel::PixelIndexMap pim;
         for(auto it=pm.begin();it!=pm.end();++it)
         {
-            pim.insert( std::pair<unsigned long,Pixel>(it->second.varIndex,it->second) );
+            pim.insert( std::pair<unsigned long,const Pixel&>(it->second.varIndex,it->second) );
         }
 
         unsigned long linelMapSize;
@@ -46,7 +47,7 @@ namespace LPModel{ namespace Initialization{
         {
             Linel linel = CLinel::readLinel(is,pim);
             Grid::Point coord(linel.x,linel.y);
-            lm.insert(Grid::LinelMapElement(coord,linel));
+            (*grid)->addInLinelMap(Grid::LinelMapElement(coord,linel));
         }
 
 
@@ -61,11 +62,11 @@ namespace LPModel{ namespace Initialization{
         for(int i=0;i<edgeMapSize;++i)
         {
             Edge edge = CEdge::readEdge(is,lim);
-            em.insert(Grid::EdgeMapElement(edge.varIndex,edge));
+            (*grid)->addInEdgeMap(Grid::EdgeMapElement(edge.varIndex,edge));
         }
 
 
-        *grid = new Grid(pm,em,lm);
+
         return is;
     }
 

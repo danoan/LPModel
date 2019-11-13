@@ -20,7 +20,7 @@ namespace LPModel
             typedef Linel::LinelMap LinelMap;
             typedef Pixel::PixelMap PixelMap;
 
-            typedef std::map<unsigned long, Pixel> PixelIndexMap;
+            typedef std::map<unsigned long, const Pixel&> PixelIndexMap;
 
             void createLinelSet(LinelMap& linelMap,
                                 const DigitalSet& trustFrg,

@@ -31,19 +31,10 @@ namespace LPModel
 
             typedef std::map<unsigned long, const IVariable*> VariableMap;
 
-            Grid(const PixelMap& inpixelMap,
-                 const EdgeMap& inedgeMap,
-                 const LinelMap& inlinelMap):_pixelMap(inpixelMap),
-                                           _edgeMap(inedgeMap),
-                                           _linelMap(inlinelMap),
-                                           pixelMap(_pixelMap),
-                                           edgeMap(_edgeMap),
-                                           linelMap(_linelMap),
-                                           variableMap(_variableMap)
-            {
-                addInVariableMap(pixelMap);
-                addInVariableMap(edgeMap);
-            }
+            Grid():pixelMap(_pixelMap),
+                   edgeMap(_edgeMap),
+                   linelMap(_linelMap),
+                   variableMap(_variableMap){}
 
             Grid(const DigitalSet& ds,
                  const DigitalSet& trustFrg):pixelMap(_pixelMap),
@@ -58,8 +49,8 @@ namespace LPModel
                                        _pixelMap);
                 CEdge::createEdgeMap(_edgeMap,_pixelMap,_linelMap);
 
-                addInVariableMap(pixelMap);
-                addInVariableMap(edgeMap);
+                addInVariableMap(_pixelMap);
+                addInVariableMap(_edgeMap);
             }
 
             template<class TIVariableMap>
@@ -71,6 +62,10 @@ namespace LPModel
                     _variableMap[ivar->varIndex] = ivar;
                 }
             }
+
+            inline void addInPixelMap(const PixelMapElement& pme){_pixelMap.insert(pme);}
+            inline void addInEdgeMap(const EdgeMapElement& eme){_edgeMap.insert(eme);}
+            inline void addInLinelMap(const LinelMapElement& lme){_linelMap.insert(lme);}
 
             friend std::ifstream& operator>>(std::ifstream& is, Grid** grid);
             friend std::ofstream& operator<<(std::ofstream& os, const Grid& grid);
