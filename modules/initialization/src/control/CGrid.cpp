@@ -65,6 +65,8 @@ namespace LPModel{ namespace Initialization{
             (*grid)->addInEdgeMap(Grid::EdgeMapElement(edge.varIndex,edge));
         }
 
+        (*grid)->addInVariableMap(pm);
+        (*grid)->addInVariableMap(em);
 
 
         return is;
