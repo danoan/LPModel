@@ -187,8 +187,20 @@ class API:
                           outputFilepath])
 
 
+    def evaluateEnergy(self,shapePath, shapeSolutionPath, optWidth, gridObjectFile,outputFilepath):
+        print("\n-------------Computing Image Energy-------------\n")
+
+        binary = "%s/%s" % (self.bin_folder,"app/CApplications/evaluate-energy/evaluate-energy")
+        subprocess.call( [binary,
+                          shapePath,
+                          shapeSolutionPath,
+                          "%d" % (optWidth,),
+                          gridObjectFile,
+                          outputFilepath])
+
+
     def iterationZero(self,outputFolder,shapePath,optWidth):
-        iterationFolder = "%s/%s" % (outputFolder,"it0")
+        iterationFolder = "%s/%s" % (outputFolder,"it0000")
 
         subprocess.call( ["mkdir",
                           "-p",

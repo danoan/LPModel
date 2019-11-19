@@ -30,7 +30,7 @@ OPTWIDTH_CONFIGURATIONS=[0,1]
 SQWEIGTH_CONFIGURATIONS=[1.0]
 DATAWEIGTH_CONFIGURATIONS=[0.0]
 RELAXATION_CONFIGURATIONS=[R_ALL, R_ORIGINAL, R_AUXILIAR, R_NONE]
-LINEARIZATION_CONFIGURATIONS=[L_PIXEL_PAIR,L_PIXEL_LINEL]
+LINEARIZATION_CONFIGURATIONS=[L_PIXEL_LINEL,L_PIXEL_PAIR]
 MAX_ITERATIONS=10
 
 
@@ -63,7 +63,7 @@ def main():
         shapePath = "%s/%.2f/%s.pgm" % (outputShapes,gridStep,shapeName)
         api.generateShape(shapeName,gridStep,shapePath)
 
-        outputFolder = "%s/%s/width-%d/%s/%s" % (baseFolder,shapeName,optWidth,rel,lin)
+        outputFolder = "%s/%s/grid-%.2f/width-%d/%s/%s" % (baseFolder,shapeName,gridStep,optWidth,rel,lin)
         api.iterationZero(outputFolder,shapePath,optWidth)
 
         it=1
@@ -81,6 +81,10 @@ def main():
 
             shapeSolutionFile = "%s/solution.pgm" % (iterationFolder,)
             api.generateSolution(shapePath, optWidth, gridPath, solutionPath,shapeSolutionFile)
+
+            energyValuePath = "%s/energyValue.txt" % (iterationFolder,)
+            api.evaluateEnergy(shapePath,optWidth,gridPath,energyValuePath)
+
             shapePath = shapeSolutionFile
 
             it+=1

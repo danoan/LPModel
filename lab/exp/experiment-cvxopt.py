@@ -54,7 +54,7 @@ def main():
         shapePath = "%s/%.2f/%s.pgm" % (outputShapes,gridStep,shapeName)
         api.generateShape(shapeName,gridStep,shapePath)
 
-        outputFolder = "%s/%s/width-%d/" % (baseFolder,shapeName,optWidth)
+        outputFolder = "%s/%s/grid-%.2f/width-%d/%s/%s" % (baseFolder,shapeName,gridStep,optWidth,rel,lin)
         gridPath = "%s/grid.obj" % (outputFolder,)
         api.exportGrid(shapePath,gridPath,optWidth=optWidth)
 

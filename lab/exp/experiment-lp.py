@@ -16,13 +16,14 @@ L_ALL_COUPLED="all-coupled"       #Linearize all variables with coupling
 L_ALL_UNCOUPLED="all-uncoupled"   #Linearize all variables with no coupling
 
 SHAPE_CONFIGURATIONS=["square", "triangle", "flower","bean"]
-GRID_CONFIGURATIONS=[1.0,0.5,0.25]
-OPTWIDTH_CONFIGURATIONS=[0,1]
+GRID_CONFIGURATIONS=[1.0,0.5]
+OPTWIDTH_CONFIGURATIONS=[0]
 SQWEIGTH_CONFIGURATIONS=[1.0]
 DATAWEIGTH_CONFIGURATIONS=[0.0]
-RELAXATION_CONFIGURATIONS=[R_ALL, R_ORIGINAL, R_AUXILIAR, R_NONE]
+#RELAXATION_CONFIGURATIONS=[R_ALL, R_ORIGINAL, R_AUXILIAR, R_NONE]
+RELAXATION_CONFIGURATIONS=[R_ALL]
 LINEARIZATION_CONFIGURATIONS=[L_ALL_COUPLED]
-MAX_ITERATIONS=10
+MAX_ITERATIONS=20
 
 
 CONFIG_LIST=[ (RELAXATION_CONFIGURATIONS,"relaxationLevel"),
@@ -53,12 +54,12 @@ def main():
         shapePath = "%s/%.2f/%s.pgm" % (outputShapes,gridStep,shapeName)
         api.generateShape(shapeName,gridStep,shapePath)
 
-        outputFolder = "%s/%s/width-%d/%s/%s" % (baseFolder,shapeName,optWidth,rel,lin)
+        outputFolder = "%s/%s/grid-%.2f/width-%d/%s/%s" % (baseFolder,shapeName,gridStep,optWidth,rel,lin)
         api.iterationZero(outputFolder,shapePath,optWidth)
 
         it=1
         while it<=MAX_ITERATIONS:
-            iterationFolder = "%s/it%d" % (outputFolder,it)
+            iterationFolder = "%s/it%04d" % (outputFolder,it)
 
             gridPath = "%s/grid.obj" % (iterationFolder,)
             api.exportGrid(shapePath,gridPath,optWidth=optWidth)
@@ -72,6 +73,10 @@ def main():
 
             shapeSolutionFile = "%s/solution.pgm" % (iterationFolder,)
             api.generateSolution(shapePath, optWidth, gridPath, solutionPath,shapeSolutionFile)
+
+            energyValuePath = "%s/energyValue.txt" % (iterationFolder,)
+            api.evaluateEnergy(shapePath,shapeSolutionFile,optWidth,gridPath,energyValuePath)
+
             shapePath = shapeSolutionFile
 
             it+=1

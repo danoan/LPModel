@@ -68,3 +68,5 @@ add_subdirectory(app/CApplications/export-third-order)
 add_subdirectory(app/CApplications/generate-shapes)
 add_subdirectory(app/CApplications/generate-solution)
 add_subdirectory(app/CApplications/nonlinopt)
+
+add_subdirectory(app/CApplications/evaluate-energy)
