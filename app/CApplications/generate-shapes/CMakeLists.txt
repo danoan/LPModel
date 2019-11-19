@@ -13,6 +13,7 @@ target_include_directories(generate-shapes PRIVATE
 
 target_link_libraries(generate-shapes
         -ldipacus-base
+        -ldipacus-components
         -lboost_system
         -lboost_filesystem
         ${DGTAL_LIBRARIES}

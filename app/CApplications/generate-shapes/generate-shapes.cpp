@@ -1,4 +1,5 @@
 #include <boost/filesystem/operations.hpp>
+#include <DIPaCUS/components/Transform.h>
 #include "DGtal/helpers/StdDefs.h"
 #include "DGtal/io/writers/GenericWriter.h"
 
@@ -79,7 +80,7 @@ DigitalSet resolveShape(const std::string& shapeStr,double gridStep)
     else if(shapeStr=="wave") shape = Shape( ShapeType::Wave);
     else shape = Shape(ShapeType::UserDefined,shapeStr);
 
-    return resolveShape(shape,gridStep);
+    return DIPaCUS::Transform::bottomLeftBoundingBoxAtOrigin( resolveShape(shape,gridStep),DGtal::Z2i::Point(20,20) );
 
 }
 
