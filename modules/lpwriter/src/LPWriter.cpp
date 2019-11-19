@@ -333,7 +333,6 @@ void LPWriter::writeQP(const std::string& outputFilePath,
                        const Initialization::Parameters& prm,
                        const Initialization::Grid& grid,
                        const Terms::Term::UnaryMap& um,
-                       const Terms::Term::BinaryMap& bm,
                        const Terms::Term::BinaryMap& partialL,
                        const MyLinearization& linearization,
                        const int relLevel,
@@ -349,7 +348,6 @@ void LPWriter::writeQP(const std::string& outputFilePath,
 
     writeObjective(ofs,um.begin(),um.end());
     ofs << " + [ ";
-    writeObjective(ofs,bm.begin(),bm.end());
     writeObjective(ofs,partialL.begin(),partialL.end());
     ofs << " ] ";
 

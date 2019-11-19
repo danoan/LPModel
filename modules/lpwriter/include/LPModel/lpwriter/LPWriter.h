@@ -117,7 +117,6 @@ namespace LPModel
                      const Initialization::Parameters& prm,
                      const Initialization::Grid& grid,
                      const Terms::Term::UnaryMap& um,
-                     const Terms::Term::BinaryMap& bm,
                      const Terms::Term::BinaryMap& partialL,
                      const MyLinearization& linearization,
                      const int relLevel,
