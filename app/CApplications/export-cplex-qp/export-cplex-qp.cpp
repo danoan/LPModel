@@ -72,8 +72,8 @@ int main(int argc, char* argv[])
     {
         case LPModel::LINEARIZATION_PIXEL_LINEL:
         {
-            linearization.linearize(mergedTerm.binaryMap);
-            linearization.coupledLinearization(mergedTerm.ternaryMap);
+            MyLinearization::PartialLinearizationPair plp(Initialization::IVariable::Pixel,Initialization::IVariable::Edge);
+            partialLinearizationBM = linearization.partialLinearization(mergedTerm.ternaryMap,*grid,plp);
             break;
         }
         case LPModel::LINEARIZATION_PIXEL_PAIR:
@@ -89,7 +89,7 @@ int main(int argc, char* argv[])
         }
     }
 
-    LPWriter::writeQP(in.outputPath,prm,*grid,mergedTerm.unaryMap,mergedTerm.binaryMap,partialLinearizationBM,linearization,in.relaxationLevel);
+    LPWriter::writeQP(in.outputPath,prm,*grid,mergedTerm.unaryMap,partialLinearizationBM,linearization,in.relaxationLevel);
 
 
 
