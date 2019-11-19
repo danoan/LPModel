@@ -95,6 +95,7 @@ SolutionAssignment::SolutionVector SolutionAssignment::solutionVector(const Solu
         const double& value = it->second;
         if(rpm.find(varIndex)!=rpm.end()) //continue; //Not pixel variable;
         {
+
             if (value > 0.5) {
                 varValue.push_back(1);
             } else {
@@ -137,10 +138,10 @@ SolutionAssignment::DigitalSet SolutionAssignment::digitalSetFromSolutionVector(
     DigitalSet dsOutput(parameters.odrModel.domain);
     dsOutput.insert(parameters.odrModel.trustFRG.begin(),parameters.odrModel.trustFRG.end());
 
-    DigitalSet backTransformed(parameters.odrModel.domain);
+    DigitalSet backTransformed(parameters.odrModel.original.domain());
 
     parameters.handle.solutionSet(backTransformed,dsOutput,parameters.odrModel,Parameters::ODRModel::OM_CorrectConvexities, solVector.data(),pointToVar);
-    return DIPaCUS::Transform::bottomLeftBoundingBoxAtOrigin(backTransformed);
+    return backTransformed;
 }
 
 SolutionAssignment::DigitalSet SolutionAssignment::readSolution(const std::string &solutionFile,
